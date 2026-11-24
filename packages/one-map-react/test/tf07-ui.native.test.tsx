@@ -35,8 +35,9 @@ import {
 import { NativeMarkerOverlay } from "../src/adapters/shared/native-marker-overlay.js";
 import {
   createNativeUI,
-  type NativeMarkerHostProps,
+  type NativeAnnotationHostProps,
 } from "../src/adapters/shared/native-ui.js";
+import type { NativeBackend } from "../src/contracts/backend.js";
 import type {
   MapRef,
   Point,
@@ -142,7 +143,10 @@ jest.mock("@maplibre/maplibre-react-native", () => {
     LayerAnnotation: () => null,
   };
 });
-const Host = forwardRef<MarkerRef, NativeMarkerHostProps>((props, ref) => {
+const Host = forwardRef<
+  MarkerRef,
+  Pick<NativeAnnotationHostProps, "anchor" | "children">
+>((props, ref) => {
   const nativeID = useId();
   useImperativeHandle(ref, () => ({ refresh }), []);
   return (
@@ -173,7 +177,7 @@ const components = {
 };
 const { Marker: BoundMarker } = createNativeMapBinding(MarkerMap, components);
 
-const sessionFixture = () => {
+const sessionFixture = (backend: NativeBackend = "mapbox-native") => {
   const project = jest.fn(async (): Promise<Point> => [100, 200]);
   const unproject = jest.fn(
     async (point: Point) => [point[0] / 10, point[1] / 10] as const
@@ -189,7 +193,7 @@ const sessionFixture = () => {
       ref: { current: map },
       map,
       ready: true,
-      components,
+      components: { ...components, backend },
       viewState: { longitude: 10, latitude: 20, zoom: 4, bearing: 0, pitch: 0 },
       overlayHostName: "fixture-control-host",
       setNativeLayout: jest.fn(),
@@ -259,14 +263,12 @@ describe("TF07 native UI composition", () => {
   test.each(["mapbox-native", "maplibre-native"] as const)(
     "%s hides only its SDK's unavailable projection and recovers on camera movement",
     async (backend) => {
-      const fixture = sessionFixture();
+      const fixture = sessionFixture(backend);
       const scene = (zoom: number) => (
         <FixtureSessionProvider
           value={{ ...fixture.session, viewState: { ...scaleCamera, zoom } }}
         >
           <NativeMarkerOverlay
-            backend={backend}
-            id="viewport"
             lngLat={[10, 20]}
             anchor="center"
             offset={[0, 0]}
@@ -316,7 +318,6 @@ describe("TF07 native UI composition", () => {
         }}
       >
         <NativeMarkerOverlay
-          id="live"
           lngLat={[10, 20]}
           anchor="bottom-right"
           offset={offset}
@@ -373,7 +374,6 @@ describe("TF07 native UI composition", () => {
     const scene = (longitude: number) => (
       <FixtureSessionProvider value={fixture.session}>
         <NativeMarkerOverlay
-          id="stale"
           lngLat={[longitude, 20]}
           anchor="center"
           offset={[0, 0]}
@@ -427,7 +427,6 @@ describe("TF07 native UI composition", () => {
           viewState={scaleCamera}
         >
           <NativeMarkerOverlay
-            id="controlled"
             lngLat={[10, 20]}
             anchor="top-left"
             offset={[0, 0]}
@@ -822,7 +821,7 @@ describe("TF07 native UI composition", () => {
   );
 
   test("MapLibre live and annotation activation each notify once", async () => {
-    const fixture = sessionFixture();
+    const fixture = sessionFixture("maplibre-native");
     const clicked = jest.fn();
     const stopPropagation = jest.fn();
     const event = {
@@ -1353,17 +1352,19 @@ describe("TF07 native UI composition", () => {
     {
       label: "maplibre live",
       MarkerComponent: maplibreNativeUI.Marker,
+      backend: "maplibre-native" as const,
       renderMode: "view" as const,
     },
     {
       label: "maplibre annotation",
       MarkerComponent: maplibreNativeUI.Marker,
+      backend: "maplibre-native" as const,
       renderMode: "annotation" as const,
     },
   ])(
     "$label marker keeps a stable MarkerRef identity across coordinate rerenders",
-    async ({ MarkerComponent, renderMode }) => {
-      const fixture = sessionFixture();
+    async ({ MarkerComponent, renderMode, backend }) => {
+      const fixture = sessionFixture(backend);
       const refSpy = jest.fn<(handle: MarkerRef | null) => void>();
       const tree = (longitude: number) => (
         <FixtureSessionProvider value={fixture.session}>

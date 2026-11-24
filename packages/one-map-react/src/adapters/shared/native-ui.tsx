@@ -36,32 +36,39 @@ export interface NativeMarkerProps extends Omit<MarkerProps, "anchor"> {
   readonly hostProps?: ViewProps;
 }
 
-/** Renderer-neutral native marker host after wrapper conversion. */
-export interface NativeMarkerHostProps {
-  /** Stable native annotation identity. */
-  readonly id: string;
+interface NativeMarkerContentProps {
   /** Geographic location. */
   readonly lngLat: LngLat;
   /** Named anchor on the content bounds. */
   readonly anchor: Anchor;
   /** Logical-unit displacement of drawing and touch bounds. */
   readonly offset: Point;
+  /** One measured content element. */
+  readonly children: ReactElement;
+}
+
+/** Props for the live marker overlay. */
+export interface NativeMarkerOverlayProps extends NativeMarkerContentProps {
+  /** Reports asynchronous live-overlay projection failures. */
+  readonly onProjectionError?: (error: unknown) => void;
+}
+
+/** Props for the native snapshot annotation. */
+export interface NativeAnnotationHostProps extends NativeMarkerContentProps {
+  /** Stable native annotation identity. */
+  readonly id: string;
   /** Activation callback. */
   readonly onClick?: (event: MarkerEvent) => void;
   /** Snapshot refresh handle. */
   readonly ref?: Ref<MarkerRef>;
-  /** Reports asynchronous live-overlay projection failures. */
-  readonly onProjectionError?: (error: unknown) => void;
-  /** One measured content element. */
-  readonly children: ReactElement;
 }
 
 /** Wrapper components needed by native UI compositions. */
 interface NativeUIOptions {
   /** Live-view wrapper. */
-  readonly Marker: ComponentType<NativeMarkerHostProps>;
+  readonly Marker: ComponentType<NativeMarkerOverlayProps>;
   /** Snapshot annotation wrapper. */
-  readonly Annotation: ComponentType<NativeMarkerHostProps>;
+  readonly Annotation: ComponentType<NativeAnnotationHostProps>;
   /** Selected native backend. */
   readonly backend: "mapbox-native" | "maplibre-native";
 }
@@ -112,7 +119,6 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         [isAnnotation]
       );
 
-      const Host = isAnnotation ? options.Annotation : options.Marker;
       const markerClick = useActiveCallback((event: MarkerEvent): void => {
         props.onClick?.(event);
         // RNMapbox toggles selection on taps. Reset until it exposes per-tap events.
@@ -121,24 +127,39 @@ export const createNativeUI = (options: NativeUIOptions): NativeUI => {
         }
       });
 
-      return (
-        <Host
-          key={isAnnotation ? annotationRevision : "view"}
-          ref={annotationRef}
-          id={markerId}
-          lngLat={[coordinate[0], coordinate[1]]}
-          anchor={props.anchor}
-          offset={offset}
-          onProjectionError={reportError}
-          onClick={isAnnotation ? markerClick : undefined}
+      const content = (
+        <View
+          {...composeViewResponders(responders, props.hostProps)}
+          collapsable={false}
         >
-          <View
-            {...composeViewResponders(responders, props.hostProps)}
-            collapsable={false}
-          >
-            {props.children ?? <DefaultPin />}
-          </View>
-        </Host>
+          {props.children ?? <DefaultPin />}
+        </View>
+      );
+      const hostProps: NativeMarkerContentProps = {
+        lngLat: coordinate,
+        anchor: props.anchor,
+        offset,
+        children: content,
+      };
+
+      if (isAnnotation) {
+        return (
+          <options.Annotation
+            {...hostProps}
+            key={annotationRevision}
+            ref={annotationRef}
+            id={markerId}
+            onClick={markerClick}
+          />
+        );
+      }
+
+      return (
+        <options.Marker
+          {...hostProps}
+          key="view"
+          onProjectionError={reportError}
+        />
       );
     }
   );

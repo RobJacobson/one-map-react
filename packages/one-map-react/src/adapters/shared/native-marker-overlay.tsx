@@ -9,6 +9,7 @@ import {
 import { View } from "react-native";
 import { Portal } from "react-native-teleport";
 
+import type { NativeBackend } from "../../contracts/backend.js";
 import type { Point } from "../../contracts/camera-types.js";
 import type { Anchor } from "../../contracts/ui-types.js";
 import { useMapSession } from "../../facade/map-context.js";
@@ -16,18 +17,20 @@ import {
   NativeCameraContext,
   useNativeMapPresentation,
 } from "./native-map-presentation.js";
-import type { NativeMarkerHostProps } from "./native-ui.js";
+import type { NativeMarkerOverlayProps } from "./native-ui.js";
 
 /**
  * Projects live children into the map's native overlay, outside SDK recognizers.
  * Native reparenting retains their original React providers and component state.
+ *
+ * @param props - Live marker content and its placement on the map.
+ * @returns The projected marker in the native portal.
  */
 export const NativeMarkerOverlay = (
-  props: NativeMarkerHostProps & {
-    readonly backend?: "mapbox-native" | "maplibre-native";
-  }
+  props: NativeMarkerOverlayProps
 ): ReactElement => {
   const session = useMapSession();
+  const { backend } = session.components;
   const presentation = useNativeMapPresentation();
   const observed = useContext(NativeCameraContext)?.viewState;
   const name = useId();
@@ -47,8 +50,8 @@ export const NativeMarkerOverlay = (
       if (!map || !session.ready) return;
       try {
         const next = await map.project([longitude, latitude]);
-        // Reserve the off-screen (-1, -1) sentinel for Mapbox.
-        if (active) setPoint(visiblePoint(next, props.backend));
+        // Reserve the off-screen (-1, -1) sentinel for RNMapbox.
+        if (active) setPoint(visiblePoint(next, backend));
       } catch (error) {
         if (active) {
           setPoint(null);
@@ -67,7 +70,7 @@ export const NativeMarkerOverlay = (
     presentation.nativeLayout,
     longitude,
     latitude,
-    props.backend,
+    backend,
   ]);
 
   const [horizontal, vertical] = anchorFraction(props.anchor);
@@ -119,10 +122,7 @@ const fractionOnAxis = (anchor: Anchor, start: string, end: string): number => {
   return anchor.includes(end) ? 1 : 0.5;
 };
 
-const visiblePoint = (
-  point: Point,
-  backend: "mapbox-native" | "maplibre-native" | undefined
-): Point | null =>
+const visiblePoint = (point: Point, backend: NativeBackend): Point | null =>
   backend === "mapbox-native" && point[0] === -1 && point[1] === -1
     ? null
     : point;
