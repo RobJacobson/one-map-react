@@ -1,5 +1,4 @@
 import type { MapStyle } from "../../contracts/style-types.js";
-import type { GestureSettings } from "./gesture-settings.js";
 
 /**
  * Converts a shared `mapStyle` into RNMapbox `styleURL` or serialized
@@ -16,22 +15,4 @@ export const toRnmapboxStyleProps = (
   }
 
   return { styleURL: undefined, styleJSON: JSON.stringify(mapStyle) };
-};
-
-/**
- * Merges two gesture settings objects. The second object wins for shared keys.
- *
- * @param base - Settings to use as a starting point.
- * @param overrides - Settings to apply over the base.
- * @returns The merged settings, or `undefined` when both inputs are absent.
- */
-export const mergeGestureSettings = (
-  base: GestureSettings | undefined,
-  overrides: GestureSettings | undefined
-): GestureSettings | undefined => {
-  if (base === undefined && overrides === undefined) {
-    return undefined;
-  }
-
-  return { ...base, ...overrides };
 };

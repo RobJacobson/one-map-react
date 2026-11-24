@@ -6,7 +6,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { Platform } from "react-native";
 
 import type { MapErrorEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { NativeMapProps } from "../../mapbox-native.js";
@@ -32,7 +31,6 @@ import {
   toRnmapboxDefaultSettings,
   toRnmapboxPadding,
 } from "./convert-camera.js";
-import { toRnmapboxGestures } from "./convert-gestures.js";
 import {
   clickEventFromRnmapbox,
   moveEventFromRnmapbox,
@@ -41,9 +39,9 @@ import {
   GeoJsonSourceContext,
   createGeoJsonSourceRegistry,
 } from "./geojson-source-registry.js";
-import { useMapboxGestureSettings } from "./gesture-settings.js";
+import { useRnmapboxGestures } from "./gesture-settings.js";
 import { createMapboxMapRef, type NativeAdvancedMapRef } from "./map-ref.js";
-import { mergeGestureSettings, toRnmapboxStyleProps } from "./style-props.js";
+import { toRnmapboxStyleProps } from "./style-props.js";
 import { useMapboxScalePosition } from "./use-mapbox-scale-position.js";
 
 type RnPressFeature = Parameters<
@@ -89,7 +87,7 @@ const MapboxNativeMapImplementation = forwardRef<
   const sawMove = useRef(false);
   const [geoJsonSources] = useState(createGeoJsonSourceRegistry);
   const frozenViewState = useFrozenValue(initialViewState ?? viewState);
-  const extraGestureSettings = useMapboxGestureSettings();
+  const gestures = useRnmapboxGestures(props, props.options);
   // RNMapbox class event handlers read this.props, including props from a suspended render.
   const report = useActiveCallbacks({
     onMove,
@@ -103,25 +101,6 @@ const MapboxNativeMapImplementation = forwardRef<
     onError,
   });
   const styleProps = toRnmapboxStyleProps(mapStyle);
-  const gestures = toRnmapboxGestures(props);
-  const selectedGestureSettings = mergeGestureSettings(
-    props.options?.gestureSettings,
-    extraGestureSettings
-  );
-  // Android's scalar zoomEnabled setter also disables both double-tap variants.
-  // A temporary lock needs no synthesized map. Removing it would send null to
-  // the pinned Android setter, which unconditionally reads a ReadableMap.
-  const portableGestureSettings =
-    Platform.OS === "android" &&
-    props.interactive === false &&
-    selectedGestureSettings === undefined &&
-    props.doubleTapZoom === undefined
-      ? undefined
-      : gestures.gestureSettings;
-  const gestureSettings = mergeGestureSettings(
-    selectedGestureSettings,
-    portableGestureSettings
-  );
 
   useNativeMapHandle(ref, () =>
     createMapboxMapRef(cameraRef, mapViewRef, geoJsonSources)
@@ -153,15 +132,6 @@ const MapboxNativeMapImplementation = forwardRef<
           style={{ flex: 1 }}
           {...styleProps}
           {...gestures}
-          {...(Platform.OS === "android"
-            ? {
-                // Unlike the other flags, the wrapper has no zoom default.
-                // Restore its enabled baseline instead of clearing to null.
-                zoomEnabled:
-                  gestures.zoomEnabled ?? props.options?.zoomEnabled ?? true,
-              }
-            : {})}
-          gestureSettings={gestureSettings}
           onDidFinishLoadingMap={() => {
             report.onLoad();
           }}
