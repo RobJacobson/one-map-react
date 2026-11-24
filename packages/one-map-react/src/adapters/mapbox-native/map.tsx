@@ -3,7 +3,6 @@ import {
   type ComponentProps,
   type ComponentRef,
   forwardRef,
-  useImperativeHandle,
   useRef,
   useState,
 } from "react";
@@ -11,6 +10,7 @@ import { Platform } from "react-native";
 
 import type { MapErrorEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { NativeMapProps } from "../../mapbox-native.js";
+import { useNativeMapHandle } from "../index.js";
 import {
   type NativeMoveCallbacks,
   type NativeViewportBounds,
@@ -123,18 +123,9 @@ const MapboxNativeMapImplementation = forwardRef<
     portableGestureSettings
   );
 
-  const mapHandle = useRef<NativeAdvancedMapRef | null>(null);
-  useImperativeHandle(ref, () => {
-    // Keep the attachment identity when a callback ref changes mid-query.
-    if (mapHandle.current === null) {
-      mapHandle.current = createMapboxMapRef(
-        cameraRef,
-        mapViewRef,
-        geoJsonSources
-      );
-    }
-    return mapHandle.current;
-  }, [geoJsonSources]);
+  useNativeMapHandle(ref, () =>
+    createMapboxMapRef(cameraRef, mapViewRef, geoJsonSources)
+  );
 
   const reportChanging = (state: MapState) => {
     sawMove.current = true;

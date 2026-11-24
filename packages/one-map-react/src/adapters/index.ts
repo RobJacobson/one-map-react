@@ -1,1 +1,5 @@
-export { missingMapError, requireAttachedMap } from "./map-attachment.js";
+export {
+  missingMapError,
+  requireAttachedMap,
+  useNativeMapHandle,
+} from "./map-attachment.js";
