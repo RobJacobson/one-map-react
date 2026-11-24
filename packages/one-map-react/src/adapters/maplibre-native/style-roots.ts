@@ -50,7 +50,6 @@ export const assertMaplibreExpressions = (value: unknown): void => {
 
 /** Native wrapper/style-document layer values checked before dispatch. */
 interface NativeLayerValues {
-  readonly type?: unknown;
   readonly paint?: unknown;
   readonly layout?: unknown;
   readonly filter?: unknown;

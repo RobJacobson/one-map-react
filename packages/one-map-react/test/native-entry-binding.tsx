@@ -111,15 +111,18 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     expect(gestureProps()[rotate]).toBe(false);
   });
 
-  test.each([
-    { "icon-overlap": "always" },
-    { "text-overlap": "always" },
-    { "text-variable-anchor-offset": ["top", [0, 1]] },
-  ] as const)("rejects unsupported native symbol layout %j", async (layout) => {
-    const [field] = Object.keys(layout);
+  test("rejects the wrapper-only text-variable-anchor-offset layout", async () => {
     await expect(
-      render(<Layer id="symbol" type="symbol" layout={layout} />)
-    ).rejects.toThrow(`${field} is not available on ${backend}.`);
+      render(
+        <Layer
+          id="symbol"
+          type="symbol"
+          layout={{ "text-variable-anchor-offset": ["top", [0, 1]] }}
+        />
+      )
+    ).rejects.toThrow(
+      `text-variable-anchor-offset is not available on ${backend}.`
+    );
   });
 
   test.each([
@@ -136,7 +139,7 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
           </Source>
         </NativeMap>
       );
-      const message = `${field} is not available on ${backend}.`;
+      const message = overlapError(field, backend);
       await expect(render(scene(unsupported))).rejects.toThrow(message);
 
       const valid: SymbolLayout = { "text-field": ["get", "name"] };
@@ -151,11 +154,12 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     const view = await render(
       <Layer id="symbol" type="symbol" layout={{ "text-overlap": undefined }} />
     );
-    // Exercise a JavaScript value outside the style-spec types.
-    const rawLayout = { "text-overlap": false } as unknown as SymbolLayout;
     await expect(
-      view.rerender(<Layer id="symbol" type="symbol" layout={rawLayout} />)
-    ).rejects.toThrow(`text-overlap is not available on ${backend}.`);
+      view.rerender(
+        // @ts-expect-error Exercise a JavaScript value outside the style-spec types.
+        <Layer id="symbol" type="symbol" layout={{ "text-overlap": false }} />
+      )
+    ).rejects.toThrow(overlapError("text-overlap", backend));
   });
 
   test("a new key permits creation changes while an update keeps the committed source layer", async () => {
@@ -719,3 +723,8 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     await view.unmount();
   });
 };
+
+const overlapError = (field: string, backend: NativeBackend): string =>
+  backend === "maplibre-native"
+    ? `Layer property "${field}" is unsupported`
+    : `${field} is not available on ${backend}.`;
