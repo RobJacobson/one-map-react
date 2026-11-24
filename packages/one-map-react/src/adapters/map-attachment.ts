@@ -1,3 +1,19 @@
+import { type Ref, useImperativeHandle, useState } from "react";
+
+/**
+ * Attaches the same handle for the lifetime of a mounted native map.
+ *
+ * @param ref - Current consumer of the handle.
+ * @param createHandle - Pure initializer whose methods read the live attachment.
+ */
+export const useNativeMapHandle = <Handle>(
+  ref: Ref<Handle>,
+  createHandle: () => Handle
+): void => {
+  const [handle] = useState(createHandle);
+  useImperativeHandle(ref, () => handle, [handle]);
+};
+
 /**
  * Returns the attached map with its concrete type.
  *

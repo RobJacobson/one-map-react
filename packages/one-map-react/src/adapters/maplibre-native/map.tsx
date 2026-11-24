@@ -7,7 +7,6 @@ import {
   type ComponentProps,
   type ComponentRef,
   forwardRef,
-  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -15,6 +14,7 @@ import {
 import type { NativeSyntheticEvent } from "react-native";
 
 import type { NativeMapProps } from "../../maplibre-native.js";
+import { useNativeMapHandle } from "../index.js";
 import {
   type NativeMoveCallbacks,
   moveEventFromNative,
@@ -107,19 +107,9 @@ const MaplibreNativeMapImplementation = forwardRef<
   });
   const gestures = toMaplibreGestures(props);
 
-  const mapHandle = useRef<NativeAdvancedMapRef | null>(null);
-  useImperativeHandle(ref, () => {
-    // Keep the attachment identity when a callback ref changes mid-query.
-    if (mapHandle.current === null) {
-      mapHandle.current = createMaplibreMapRef(
-        cameraRef,
-        mapRef,
-        mapLoaded,
-        sources
-      );
-    }
-    return mapHandle.current;
-  }, [sources]);
+  useNativeMapHandle(ref, () =>
+    createMaplibreMapRef(cameraRef, mapRef, mapLoaded, sources)
+  );
 
   const reportRegion = (
     event: NativeSyntheticEvent<ViewStateChangeEvent>,
