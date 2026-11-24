@@ -1,7 +1,10 @@
 import type { LightSpecification } from "@maplibre/maplibre-react-native";
 
 import type { LegacyLight } from "../../contracts/map-types.js";
-import { snapshotNativeStyleValue } from "../shared/index.js";
+import {
+  snapshotNativeStyleValue,
+  toNativeLayerStyleKey,
+} from "../shared/index.js";
 
 const hasDefinedOwn = (value: object, key: string): boolean =>
   Object.hasOwn(value, key) && Reflect.get(value, key) !== undefined;
@@ -68,18 +71,9 @@ interface NativeLayerValues {
  */
 export const assertMaplibreLayerStyle = (layer: NativeLayerValues): void => {
   for (const [values, keys] of [
-    [layer.paint, ["resampling", "fill-layer-opacity", "line-layer-opacity"]],
-    [layer.layout, ["icon-overlap", "text-overlap"]],
-    [
-      layer.style,
-      [
-        "resampling",
-        "fillLayerOpacity",
-        "lineLayerOpacity",
-        "iconOverlap",
-        "textOverlap",
-      ],
-    ],
+    [layer.paint, unsupportedPaintKeys],
+    [layer.layout, unsupportedLayoutKeys],
+    [layer.style, unsupportedLegacyStyleKeys],
   ] as const) {
     if (!values || typeof values !== "object") continue;
     for (const key of keys) {
@@ -92,6 +86,17 @@ export const assertMaplibreLayerStyle = (layer: NativeLayerValues): void => {
   for (const value of [layer.paint, layer.layout, layer.filter, layer.style])
     assertMaplibreExpressions(value);
 };
+
+const unsupportedPaintKeys = [
+  "resampling",
+  "fill-layer-opacity",
+  "line-layer-opacity",
+];
+const unsupportedLayoutKeys = ["icon-overlap", "text-overlap"];
+const unsupportedLegacyStyleKeys = [
+  ...unsupportedPaintKeys,
+  ...unsupportedLayoutKeys,
+].map(toNativeLayerStyleKey);
 
 /**
  * Rejects explicit style roots ignored by the pinned native SDK parser.
