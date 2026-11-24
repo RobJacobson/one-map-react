@@ -70,17 +70,19 @@ export const normalizePadding = (
 };
 
 /**
- * Checks southwest-then-northeast bounds without sorting them.
+ * Validates southwest-then-northeast bounds while preserving corner order.
  *
  * @param bounds - Candidate bounds.
- * @returns The same corner pair.
+ * @returns Fresh southwest and northeast coordinate tuples.
  * @throws When either corner is not a finite longitude and latitude.
  */
 export const assertBounds = (bounds: Bounds): Bounds => {
-  const southwest = bounds?.[0];
-  const northeast = bounds?.[1];
+  const southwestCorner = bounds?.[0];
+  const northeastCorner = bounds?.[1];
+  const southwest = readFinitePair(southwestCorner);
+  const northeast = southwest && readFinitePair(northeastCorner);
 
-  if (!isLngLat(southwest) || !isLngLat(northeast)) {
+  if (!southwest || !northeast) {
     throw new Error("Bounds must be [[west, south], [east, north]].");
   }
 
@@ -92,7 +94,7 @@ export const assertBounds = (bounds: Bounds): Bounds => {
  *
  * @param bounds - Southwest then northeast corners.
  * @returns A new mutable flat bounds tuple. West may be greater than east.
- * @throws When a corner is missing.
+ * @throws When either corner is not a finite longitude and latitude.
  */
 export const toFlatBounds = (
   bounds: Bounds
@@ -107,10 +109,10 @@ export const toFlatBounds = (
  *
  * @param flat - Wrapper bounds in west, south, east, north order.
  * @returns Common bounds.
- * @throws When the tuple does not contain four finite numbers.
+ * @throws When the input is not a tuple of exactly four finite numbers.
  */
 export const boundsFromFlat = (flat: unknown): Bounds => {
-  const bounds = Array.isArray(flat) ? parseFlatBounds(flat) : undefined;
+  const bounds = parseFlatBounds(flat);
 
   if (!bounds) {
     throw new Error("Flat bounds must be [west, south, east, north].");
@@ -122,21 +124,22 @@ export const boundsFromFlat = (flat: unknown): Bounds => {
 /**
  * Reads RNMapbox `getVisibleBounds()`.
  *
- * The pinned wrapper documents the pair as northeast, then southwest:
- * `[[rightLon, topLat], [leftLon, bottomLat]]`. This does not sort a
- * two-element array that lacks that documented order.
+ * The pinned wrapper returns `[[rightLon, topLat], [leftLon, bottomLat]]`.
+ * Conversion uses that order, including for bounds crossing the antimeridian.
  *
  * @param corners - Northeast corner, then southwest corner.
- * @returns Common southwest-then-northeast bounds.
- * @throws When either corner is missing.
+ * @returns Fresh southwest and northeast coordinate tuples.
+ * @throws When either corner is not a finite longitude and latitude.
  */
 export const boundsFromRnmapboxVisible = (
   corners: readonly (readonly number[])[]
 ): Bounds => {
-  const northeast = corners[0];
-  const southwest = corners[1];
+  const northeastCorner = corners[0];
+  const southwestCorner = corners[1];
+  const northeast = readFinitePair(northeastCorner);
+  const southwest = northeast && readFinitePair(southwestCorner);
 
-  if (!isLngLat(northeast) || !isLngLat(southwest)) {
+  if (!northeast || !southwest) {
     throw new Error(
       "RNMapbox visible bounds must be a northeast corner and a southwest corner."
     );
@@ -146,21 +149,16 @@ export const boundsFromRnmapboxVisible = (
 };
 
 /**
- * Reads a web bounds object or a flat tuple.
+ * Reads a flat tuple or falls back to geographic bounds methods.
  *
- * A two-element array is rejected. RNMapbox's northeast-then-southwest pair
- * uses {@link boundsFromRnmapboxVisible} instead of this function.
+ * Use {@link boundsFromRnmapboxVisible} for RNMapbox's northeast-then-southwest pair.
  *
  * @param value - `LngLatBounds` methods or `[west, south, east, north]`.
  * @returns Common bounds.
- * @throws When the value has neither four numbers nor corner methods.
+ * @throws When neither representation provides four finite coordinates.
  */
 export const boundsFromGeographic = (value: unknown): Bounds => {
-  const fromFlat =
-    Array.isArray(value) && value.length === 4
-      ? parseFlatBounds(value)
-      : undefined;
-  const bounds = fromFlat ?? boundsFromCornerMethods(value);
+  const bounds = parseFlatBounds(value) ?? boundsFromCornerMethods(value);
 
   if (bounds) {
     return bounds;
@@ -329,11 +327,13 @@ const readFinitePair = (
   return isFiniteNumber(second) ? [first, second] : undefined;
 };
 
-const parseFlatBounds = (flat: readonly unknown[]): Bounds | undefined => {
-  const west = flat[0];
-  const south = flat[1];
-  const east = flat[2];
-  const north = flat[3];
+const parseFlatBounds = (flat: unknown): Bounds | undefined => {
+  if (!Array.isArray(flat) || flat.length !== 4) return undefined;
+
+  const west: unknown = flat[0];
+  const south: unknown = flat[1];
+  const east: unknown = flat[2];
+  const north: unknown = flat[3];
 
   if (
     !isFiniteNumber(west) ||
@@ -398,12 +398,6 @@ const finiteField = (
 
   return isFiniteNumber(field) ? field : undefined;
 };
-
-const isLngLat = (value: unknown): value is LngLat =>
-  Array.isArray(value) &&
-  value.length === 2 &&
-  isFiniteNumber(value[0]) &&
-  isFiniteNumber(value[1]);
 
 const isFiniteNumber = (value: unknown): value is number =>
   typeof value === "number" && Number.isFinite(value);
