@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 
+import { requireAttachedMap } from "../adapters/index.js";
 import type { MapRef } from "../contracts/camera-types.js";
 import type { ClickEvent, MoveEvent } from "../contracts/event-types.js";
 import type { MapProps } from "../contracts/map-types.js";
@@ -70,9 +71,4 @@ export const useMapInteractions = <Event extends ClickEvent>(
   };
 
   return { move, click };
-};
-
-const requireAttachedMap = (map: MapRef | null): MapRef => {
-  if (!map) throw new Error("Map is not attached.");
-  return map;
 };

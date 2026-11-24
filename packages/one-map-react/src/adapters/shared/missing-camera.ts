@@ -1,9 +1,9 @@
 /**
  * Error thrown when a camera command has no call the wrapper will apply.
  *
- * The camera or map ref is missing, or MapLibre Native has not reported style
- * load. Before that load, `setStop` can resolve after the native map drops the
- * stop.
+ * The camera ref is missing, or MapLibre React Native has yet to finish loading
+ * the map. Before that load, `setStop` can resolve after the native map drops
+ * the stop.
  *
  * @returns An error describing the missing camera.
  */

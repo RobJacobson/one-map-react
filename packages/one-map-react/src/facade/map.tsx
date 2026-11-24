@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 
+import { missingMapError } from "../adapters/index.js";
 import { useActiveCallback } from "../adapters/shared/use-active-callback.js";
 import type { MapRef } from "../contracts/camera-types.js";
 import type { MapProps } from "../contracts/map-types.js";
@@ -170,7 +171,7 @@ const useMapAttachment = <
         const map = mapRef.current;
         if (!map) {
           if (key === "getSource") return undefined;
-          return Promise.reject(new Error("Map is not attached."));
+          return Promise.reject(missingMapError());
         }
         const method: unknown = Reflect.get(map, key);
         if (typeof method !== "function") {

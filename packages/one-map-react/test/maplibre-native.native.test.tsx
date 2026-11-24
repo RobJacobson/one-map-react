@@ -446,8 +446,10 @@ describe("maplibre-native adapter", () => {
       await view.unmount();
       const detached = getWrapperMap();
       expect(detached).toBeInstanceOf(Promise);
-      await expect(detached).rejects.toThrow("not attached");
-      await expect(retained.getWrapperMap()).rejects.toThrow("not attached");
+      await expect(detached).rejects.toThrow("Map is not attached.");
+      await expect(retained.getWrapperMap()).rejects.toThrow(
+        "Map is not attached."
+      );
       await expect(Promise.resolve(retained)).resolves.toBe(retained);
     }
   );
