@@ -9,7 +9,6 @@ import {
   forwardRef,
   type ReactNode,
   useContext,
-  useId,
   useImperativeHandle,
   useLayoutEffect,
   useState,
@@ -143,25 +142,14 @@ jest.mock("@maplibre/maplibre-react-native", () => {
     LayerAnnotation: () => null,
   };
 });
-const Host = forwardRef<
-  MarkerRef,
-  Pick<NativeAnnotationHostProps, "anchor" | "children">
->((props, ref) => {
-  const nativeID = useId();
-  useImperativeHandle(ref, () => ({ refresh }), []);
-  return (
-    <View
-      testID="native-marker"
-      nativeID={nativeID}
-      accessibilityLabel={props.anchor}
-    >
-      {props.children}
-    </View>
-  );
-});
+const AnnotationHost = forwardRef<MarkerRef, NativeAnnotationHostProps>(
+  ({ children }, ref) => {
+    useImperativeHandle(ref, () => ({ refresh }), []);
+    return <View>{children}</View>;
+  }
+);
 const ui = createNativeUI({
-  Marker: Host,
-  Annotation: Host,
+  Annotation: AnnotationHost,
   backend: "mapbox-native",
 });
 
@@ -987,6 +975,7 @@ describe("TF07 native UI composition", () => {
           />
         </FixtureSessionProvider>
       );
+      const projectionCount = fixture.project.mock.calls.length;
       const marker = view.getByTestId("activation");
       await beginTouch(marker, touch(0, 0));
       if (ending === "movement")
@@ -1000,7 +989,7 @@ describe("TF07 native UI composition", () => {
       await nativeTouch(marker, "touchEnd", touch(0, 0, 0));
       await act(async () => jest.advanceTimersByTime(1000));
       expect(clicked).not.toHaveBeenCalled();
-      expect(fixture.project).not.toHaveBeenCalled();
+      expect(fixture.project).toHaveBeenCalledTimes(projectionCount);
       expect(fixture.unproject).not.toHaveBeenCalled();
       expect(fixture.lock).not.toHaveBeenCalled();
       await beginTouch(marker, touch(0, 0));
@@ -1033,6 +1022,7 @@ describe("TF07 native UI composition", () => {
           />
         </FixtureSessionProvider>
       );
+      const projectionCount = fixture.project.mock.calls.length;
       const marker = view.getByTestId("activation");
       await beginTouch(marker, touch(0, 0));
       await act(async () => change("background"));
@@ -1047,7 +1037,7 @@ describe("TF07 native UI composition", () => {
       expect(clicked).toHaveBeenCalledTimes(1);
       await view.unmount();
       expect(remove).toHaveBeenCalledTimes(1);
-      expect(fixture.project).not.toHaveBeenCalled();
+      expect(fixture.project).toHaveBeenCalledTimes(projectionCount);
       expect(fixture.unproject).not.toHaveBeenCalled();
       expect(fixture.lock).not.toHaveBeenCalled();
     } finally {
@@ -1091,10 +1081,11 @@ describe("TF07 native UI composition", () => {
     marker = view.getByTestId("activation");
     await beginTouch(marker, touch(0, 0));
     const detachedEnd = marker.props.onTouchEnd;
+    const projectionCount = fixture.project.mock.calls.length;
     await view.unmount();
     await act(async () => detachedEnd(touch(0, 0, 0)));
     expect(latest).toHaveBeenCalledTimes(1);
-    expect(fixture.project).not.toHaveBeenCalled();
+    expect(fixture.project).toHaveBeenCalledTimes(projectionCount);
     expect(fixture.unproject).not.toHaveBeenCalled();
     expect(fixture.lock).not.toHaveBeenCalled();
   });
@@ -1394,6 +1385,16 @@ describe("TF07 native UI composition", () => {
   );
 });
 
+type MarkerView = Awaited<ReturnType<typeof render>>;
+
+const measureLiveMarker = async (view: MarkerView): Promise<void> =>
+  fireEvent(view.getByTestId("native-marker-overlay"), "layout", {
+    nativeEvent: { layout: { width: 20, height: 40 } },
+  });
+
+const markerTop = (view: MarkerView): number =>
+  StyleSheet.flatten(view.getByTestId("native-marker-overlay").props.style).top;
+
 test("native creation defaults compare by their effective values", async () => {
   const fixture = sessionFixture();
   const tree = (explicit: boolean) => (
@@ -1407,17 +1408,12 @@ test("native creation defaults compare by their effective values", async () => {
     </FixtureSessionProvider>
   );
   const mounted = await render(tree(false));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  await measureLiveMarker(mounted);
+  expect(markerTop(mounted)).toBe(160);
   await mounted.rerender(tree(true));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  expect(markerTop(mounted)).toBe(160);
   await mounted.rerender(tree(false));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  expect(markerTop(mounted)).toBe(160);
   await mounted.unmount();
 });
 
@@ -1433,9 +1429,8 @@ test.each([false, true])(
       </FixtureSessionProvider>
     );
     const mounted = await render(tree("top"));
-    expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-      "top"
-    );
+    await measureLiveMarker(mounted);
+    expect(markerTop(mounted)).toBe(200);
     await expect(mounted.rerender(tree())).rejects.toThrow(
       'Marker changed the creation option "anchor"'
     );
@@ -1452,21 +1447,14 @@ test("native marker defaults stay frozen when content changes", async () => {
     </FixtureSessionProvider>
   );
   const mounted = await render(tree(false));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  await measureLiveMarker(mounted);
+  expect(markerTop(mounted)).toBe(160);
   await mounted.rerender(tree(true));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  expect(markerTop(mounted)).toBe(160);
   await mounted.rerender(tree(true, "bottom"));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  expect(markerTop(mounted)).toBe(160);
   await mounted.rerender(tree(true));
-  expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-    "bottom"
-  );
+  expect(markerTop(mounted)).toBe(160);
   await expect(mounted.rerender(tree(true, "center"))).rejects.toThrow(
     'creation option "anchor"'
   );
@@ -1475,31 +1463,27 @@ test("native marker defaults stay frozen when content changes", async () => {
 test.each([false, true])(
   "native marker effective defaults work when initially explicit (custom content: %s)",
   async (custom) => {
-    const expected = custom ? "center" : "bottom";
+    const expectedAnchor = custom ? "center" : "bottom";
+    const expectedTop = custom ? 180 : 160;
     const fixture = sessionFixture();
     const tree = (explicit: boolean) => (
       <FixtureSessionProvider value={fixture.session}>
         <BoundMarker
           longitude={10}
           latitude={20}
-          anchor={explicit ? expected : undefined}
+          anchor={explicit ? expectedAnchor : undefined}
         >
           {custom ? <Text>custom</Text> : undefined}
         </BoundMarker>
       </FixtureSessionProvider>
     );
     const mounted = await render(tree(true));
-    expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-      expected
-    );
+    await measureLiveMarker(mounted);
+    expect(markerTop(mounted)).toBe(expectedTop);
     await mounted.rerender(tree(false));
-    expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-      expected
-    );
+    expect(markerTop(mounted)).toBe(expectedTop);
     await mounted.rerender(tree(true));
-    expect(mounted.getByTestId("native-marker").props.accessibilityLabel).toBe(
-      expected
-    );
+    expect(markerTop(mounted)).toBe(expectedTop);
     await mounted.unmount();
   }
 );

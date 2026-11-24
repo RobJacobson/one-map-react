@@ -14,7 +14,6 @@ import {
 } from "react";
 
 import type { MarkerRef } from "../../contracts/ui-types.js";
-import { NativeMarkerOverlay } from "../shared/native-marker-overlay.js";
 import {
   createNativeUI,
   type NativeAnnotationHostProps,
@@ -69,7 +68,6 @@ const MaplibreAnnotationHost = forwardRef<MarkerRef, NativeAnnotationHostProps>(
 
 /** Native MapLibre annotations and controls used by the selected adapter. */
 export const maplibreNativeUI = createNativeUI({
-  Marker: NativeMarkerOverlay,
   Annotation: MaplibreAnnotationHost,
   backend: "maplibre-native",
 });
