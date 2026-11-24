@@ -16,7 +16,11 @@ import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
-import { reportSettledMove } from "../shared/move-event.js";
+import {
+  type NativeMoveCallbacks,
+  type NativeViewportBounds,
+  reportSettledMove,
+} from "../shared/move-event.js";
 import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
 import {
@@ -53,11 +57,12 @@ type RnPressFeature = Parameters<
 /** Mapbox-native map that renders RNMapbox `MapView` with a `Camera` child. */
 const MapboxNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
-  NativeMapInputs & {
-    locationOptions?: NativeLocationOptions;
-    hostProps?: ViewProps;
-    options?: Partial<ComponentProps<typeof MapView>>;
-  }
+  NativeMapInputs &
+    Partial<NativeMoveCallbacks> & {
+      locationOptions?: NativeLocationOptions;
+      hostProps?: ViewProps;
+      options?: Partial<ComponentProps<typeof MapView>>;
+    }
 >((props, ref) => {
   const session = useNativeMapPresentation();
   if (nativeCameraTarget(props) && props.locationOptions?.followUserLocation)
@@ -149,11 +154,11 @@ const MapboxNativeMapImplementation = forwardRef<
   const reportChanging = (state: MapState) => {
     sawMove.current = true;
     const event = moveFromState(state);
-    report.onMove(event);
+    report.onMove(event, viewportBoundsFromState(state));
   };
   const reportSettled = (state: MapState) => {
     const event = moveFromState(state);
-    reportSettledMove(sawMove, event, report);
+    reportSettledMove(sawMove, event, report, viewportBoundsFromState(state));
     report.onIdle();
   };
   const controlled = viewState
@@ -267,6 +272,15 @@ const moveFromState = (state: MapState): MoveEvent =>
     state.properties.pitch,
     state.gestures.isGestureActive
   );
+
+const viewportBoundsFromState = (
+  state: MapState
+): NativeViewportBounds | undefined => {
+  const bounds = state.properties.bounds;
+  if (!bounds?.sw || !bounds.ne) return undefined;
+  const { sw, ne } = bounds;
+  return [sw[0], sw[1], ne[0], ne[1]];
+};
 
 /**
  * Copies the error string RNMapbox passes at runtime.

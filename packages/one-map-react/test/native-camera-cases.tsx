@@ -21,9 +21,11 @@ import type {
   NativeMapRef,
 } from "../src/contracts/native-types.js";
 
+type CameraBounds = readonly [number, number, number, number];
+
 type CameraEvents = {
-  move(viewState: ViewState, isGesture: boolean): void;
-  settle(viewState: ViewState): void;
+  move(viewState: ViewState, isGesture: boolean, bounds?: CameraBounds): void;
+  settle(viewState: ViewState, bounds?: CameraBounds): void;
 };
 
 type CameraFixture = {
@@ -297,12 +299,54 @@ export const testNativeCamera = <Handle extends NativeMapRef>(
     expect(onMove).toHaveBeenCalledTimes(1);
     expect(onMoveEnd).toHaveBeenCalledTimes(1);
 
+    const settledProjections = project.mock.calls.length;
+    await act(async () => settle({ ...observed }));
+    expect(onMoveEnd).toHaveBeenCalledTimes(2);
+    expect(project).toHaveBeenCalledTimes(settledProjections);
+
+    await act(async () => move({ ...observed }, true));
+    expect(onMove).toHaveBeenCalledTimes(2);
+    expect(project).toHaveBeenCalledTimes(settledProjections);
+
+    const settledCamera = { ...observed, bearing: 10 };
+    project.mockResolvedValueOnce([80, 90]);
+    await act(async () => settle(settledCamera, [-10, -20, 30, 40]));
+    expect(onMoveEnd).toHaveBeenCalledTimes(3);
+    expect(project).toHaveBeenCalledTimes(settledProjections + 1);
+    expect(view.getByTestId("native-marker-overlay").props.style.left).toBe(80);
+
+    project.mockResolvedValueOnce([100, 110]);
+    await act(async () => move(settledCamera, true, [-15, -20, 25, 40]));
+    expect(onMove).toHaveBeenLastCalledWith({
+      viewState: settledCamera,
+      origin: "user",
+    });
+    expect(project).toHaveBeenCalledTimes(settledProjections + 2);
+    expect(view.getByTestId("native-marker-overlay").props.style.left).toBe(
+      100
+    );
+
+    project.mockResolvedValueOnce([120, 130]);
+    const paddedBounds = [-20, -20, 20, 40] as const;
+    await act(async () => settle(settledCamera, paddedBounds));
+    expect(onMoveEnd).toHaveBeenLastCalledWith({
+      viewState: settledCamera,
+      origin: "unknown",
+    });
+    expect(project).toHaveBeenCalledTimes(settledProjections + 3);
+    expect(view.getByTestId("native-marker-overlay").props.style.left).toBe(
+      120
+    );
+
+    await act(async () => settle({ ...settledCamera }, [...paddedBounds]));
+    expect(project).toHaveBeenCalledTimes(settledProjections + 3);
+
     await view.unmount();
     await act(async () => {
       move({ ...observed, bearing: 80 }, false);
       settle({ ...observed, bearing: 90 });
     });
-    expect(onMove).toHaveBeenCalledTimes(1);
-    expect(onMoveEnd).toHaveBeenCalledTimes(1);
+    expect(onMove).toHaveBeenCalledTimes(3);
+    expect(onMoveEnd).toHaveBeenCalledTimes(5);
   });
 };
