@@ -296,7 +296,7 @@ const useNativeMarkerActivation = (
 
   useLayoutEffect(() => {
     cancel();
-  }, [props.longitude, props.latitude, props.renderMode, cancel]);
+  }, [props.longitude, props.latitude, cancel]);
 
   if (!enabled) return undefined;
   return {

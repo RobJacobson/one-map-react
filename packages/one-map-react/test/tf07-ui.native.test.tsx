@@ -1162,6 +1162,32 @@ describe("TF07 native UI composition", () => {
     }
   });
 
+  test("making the default live marker mode explicit preserves a pending tap", async () => {
+    const fixture = sessionFixture();
+    const clicked = jest.fn();
+    const tree = (renderMode?: "view") => (
+      <FixtureSessionProvider value={fixture.session}>
+        <BoundMarker
+          longitude={10}
+          latitude={20}
+          renderMode={renderMode}
+          onClick={clicked}
+        >
+          <Text testID="activation">Marker</Text>
+        </BoundMarker>
+      </FixtureSessionProvider>
+    );
+    const view = await render(tree());
+    await beginTouch(view.getByTestId("activation"), touch(0, 0));
+    await view.rerender(tree("view"));
+    await nativeTouch(
+      view.getByTestId("activation"),
+      "touchEnd",
+      touch(0, 0, 0)
+    );
+    expect(clicked).toHaveBeenCalledTimes(1);
+  });
+
   test("coordinate and mode changes cancel pending activation and detached handlers stay silent", async () => {
     const fixture = sessionFixture();
     const first = jest.fn();
