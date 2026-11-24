@@ -13,7 +13,7 @@ import type { ComponentType, ReactElement } from "react";
 
 import type { LayerProps } from "../../contracts/layer-types.js";
 import { useLayerOptions } from "../../facade/layer.js";
-import { useNativeLayerKey } from "../shared/native-layer-updates.js";
+import { toNativeLayerStyleKey, useNativeLayerKey } from "../shared/index.js";
 
 /**
  * Renders a style-spec layer through RNMapbox.
@@ -60,10 +60,7 @@ const toRnmapboxLayerStyle = (props: LayerProps): Record<string, unknown> => {
   })) {
     if (value === undefined) continue;
 
-    const styleKey = key.replace(/-([a-z])/g, (_match, letter: string) =>
-      letter.toUpperCase()
-    );
-    entries.push([styleKey, value]);
+    entries.push([toNativeLayerStyleKey(key), value]);
   }
   return Object.fromEntries(entries);
 };
