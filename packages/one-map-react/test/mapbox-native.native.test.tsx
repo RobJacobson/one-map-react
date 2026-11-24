@@ -2212,16 +2212,19 @@ describe("mapbox-native entry binding", () => {
       properties: { screenPointX: 23, screenPointY: 41 },
     },
     () => {
-      let complete: () => void = () => {
+      let complete: (error?: Error) => void = () => {
         throw new Error("Rendered query was never dispatched.");
       };
       mockQueryRenderedFeaturesAtPoint.mockImplementationOnce(
         () =>
-          new Promise((resolve) => {
-            complete = () => resolve(queryCollection);
+          new Promise((resolve, reject) => {
+            complete = (error) => {
+              if (error) reject(error);
+              else resolve(queryCollection);
+            };
           })
       );
-      return () => complete();
+      return (error) => complete(error);
     },
     mockGetClusterExpansionZoom,
     () =>

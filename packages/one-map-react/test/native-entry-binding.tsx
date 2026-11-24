@@ -59,7 +59,7 @@ type WrapperEvents = {
  * @param entry - Native entry under test.
  * @param backend - SDK represented by this entry.
  * @param press - The selected wrapper's press payload.
- * @param beginPressQuery - Fakes a pending rendered-feature query and returns its completion.
+ * @param beginPressQuery - Fakes a pending rendered-feature query and returns a function to resolve it or reject it with an error.
  * @param clusterZoom - Mock cluster call exposed by mounted source refs.
  * @param checkLayer - Verifies style conversion and source injection on the wrapper layer.
  */
@@ -67,14 +67,15 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
   entry: NativeEntry<Handle>,
   backend: NativeBackend,
   press: object,
-  beginPressQuery: () => () => void,
+  beginPressQuery: () => (error?: Error) => void,
   clusterZoom: jest.Mock<(...args: never[]) => Promise<number>>,
   checkLayer: () => void
 ): void => {
   const { Map: NativeMap, MapProvider, Source, Layer, Marker, useMap } = entry;
 
-  test("omits wrapper onPress when neither onClick nor interactiveLayerIds is supplied", async () => {
+  test("attaches wrapper onPress only for click delivery or filtered query errors", async () => {
     const onClick = jest.fn();
+    const onError = jest.fn();
     const view = await render(<NativeMap mapStyle={emptyStyle} />);
     expect(view.getByTestId("wrapper-map").props.onPress).toBeUndefined();
 
@@ -86,11 +87,22 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     await view.rerender(
       <NativeMap mapStyle={emptyStyle} interactiveLayerIds={["route-line"]} />
     );
-    expect(view.getByTestId("wrapper-map").props.onPress).toEqual(
-      expect.any(Function)
-    );
+    expect(view.getByTestId("wrapper-map").props.onPress).toBeUndefined();
 
-    await view.rerender(<NativeMap mapStyle={emptyStyle} />);
+    await view.rerender(
+      <NativeMap
+        mapStyle={emptyStyle}
+        interactiveLayerIds={["route-line"]}
+        onError={onError}
+      />
+    );
+    const error = new Error("native feature query failed");
+    const completePress = beginPressQuery();
+    await fireEvent(view.getByTestId("wrapper-map"), "press", press);
+    await act(async () => completePress(error));
+    expect(onError).toHaveBeenCalledWith({ error });
+
+    await view.rerender(<NativeMap mapStyle={emptyStyle} onError={onError} />);
     expect(view.getByTestId("wrapper-map").props.onPress).toBeUndefined();
   });
 

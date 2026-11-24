@@ -2118,16 +2118,19 @@ describe("maplibre-native entry binding", () => {
       nativeEvent: { lngLat: [-122.34, 47.61], point: [23, 41] },
     },
     () => {
-      let complete: () => void = () => {
+      let complete: (error?: Error) => void = () => {
         throw new Error("Rendered query was never dispatched.");
       };
       mockQueryRenderedFeatures.mockImplementationOnce(
         () =>
-          new Promise((resolve) => {
-            complete = () => resolve(queryFeatures);
+          new Promise((resolve, reject) => {
+            complete = (error) => {
+              if (error) reject(error);
+              else resolve(queryFeatures);
+            };
           })
       );
-      return () => complete();
+      return (error) => complete(error);
     },
     mockGetClusterExpansionZoom,
     () =>
