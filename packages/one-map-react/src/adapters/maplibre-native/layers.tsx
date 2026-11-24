@@ -5,8 +5,9 @@ import type { LayerProps } from "../../contracts/layer-types.js";
 import { useLayerOptions } from "../../facade/layer.js";
 import {
   omitUndefinedFields,
+  toNativeLayerStyleKey,
   useNativeLayerKey,
-} from "../shared/native-layer-updates.js";
+} from "../shared/index.js";
 import { assertMaplibreLayerStyle } from "./style-roots.js";
 
 /** Style-spec and SDK-specific options for a MapLibre native Layer. */
@@ -74,7 +75,7 @@ const maplibreStyleFields = (style: Record<string, unknown> | undefined) =>
   Object.fromEntries(Object.entries(style ?? {}).map(toMaplibreStyleEntry));
 
 const toMaplibreStyleEntry = ([key, value]: [string, unknown]) => [
-  key.replace(/-([a-z])/g, (_match, letter: string) => letter.toUpperCase()),
+  toNativeLayerStyleKey(key),
   value,
 ];
 

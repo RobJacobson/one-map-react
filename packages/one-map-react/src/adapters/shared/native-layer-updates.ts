@@ -46,6 +46,15 @@ export const snapshotNativeStyleValue = (
   return Object.fromEntries(entries);
 };
 
+/**
+ * Converts a portable style field name to the native wrappers' camelCase key.
+ *
+ * @param key - Paint or layout field name.
+ * @returns The native style key.
+ */
+export const toNativeLayerStyleKey = (key: string): string =>
+  key.replace(/-([a-z])/g, (_match, letter: string) => letter.toUpperCase());
+
 /** Recreates only the wrapper layer when a setting must return to its SDK default. */
 export const useNativeLayerKey = (
   style: object,
