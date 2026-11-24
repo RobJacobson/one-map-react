@@ -12,18 +12,14 @@ import {
   useRef,
   useState,
 } from "react";
-import { type NativeSyntheticEvent, type ViewProps } from "react-native";
+import type { NativeSyntheticEvent } from "react-native";
 
-import type { NativeMapInputs } from "../../contracts/native-types.js";
-import type { NativeLocationOptions } from "../../maplibre-native.js";
-import {
-  assertNativeDesktopOptions,
-  assertNativeMapOptions,
-} from "../native-map-options.js";
+import type { NativeMapProps } from "../../maplibre-native.js";
 import {
   type NativeMoveCallbacks,
+  moveEventFromNative,
   reportSettledMove,
-} from "../shared/move-event.js";
+} from "../shared/index.js";
 import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
 import { withNativeMapPresentation } from "../shared/native-map-presentation.js";
@@ -36,7 +32,6 @@ import {
   toMaplibreViewState,
 } from "./convert-camera.js";
 import { toMaplibreGestures } from "./convert-gestures.js";
-import { moveEventFromMaplibreNative } from "./convert-move-event.js";
 import { createMaplibreMapRef, type NativeAdvancedMapRef } from "./map-ref.js";
 import {
   MaplibreSourceContext,
@@ -58,12 +53,7 @@ type MaplibreRegionEvent = Parameters<
 /** Maplibre-native map that renders MapLibre React Native `Map` with a `Camera` child. */
 const MaplibreNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
-  NativeMapInputs &
-    Partial<NativeMoveCallbacks> & {
-      locationOptions?: NativeLocationOptions;
-      hostProps?: ViewProps;
-      options?: Partial<ComponentProps<typeof MaplibreMap>>;
-    }
+  NativeMapProps & Partial<NativeMoveCallbacks>
 >((props, ref) => {
   // This component is not compiled, so reuse the serialized document while
   // the style object keeps its identity. WrapperMap caches the same way.
@@ -76,6 +66,8 @@ const MaplibreNativeMapImplementation = forwardRef<
   );
   validateMaplibreMapOptions(props);
   const viewState = nativeCameraTarget(props);
+  if (viewState && props.locationOptions?.trackUserLocation)
+    throw new Error("Selected location follow conflicts with viewState.");
   const {
     initialViewState,
     minZoom,
@@ -91,8 +83,6 @@ const MaplibreNativeMapImplementation = forwardRef<
     onLoad,
     onStyleLoad,
     onError,
-    reuseMaps,
-    gl,
     children,
   } = props;
   const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
@@ -134,16 +124,15 @@ const MaplibreNativeMapImplementation = forwardRef<
   // Descendant control effects must retain the attached ref during prop updates.
   useImperativeHandle(ref, () => mapHandle, [mapHandle]);
 
-  assertNativeMapOptions(reuseMaps, gl);
-  assertNativeDesktopOptions(props);
-
   const reportRegion = (
     event: NativeSyntheticEvent<ViewStateChangeEvent>,
     phase: "start" | "change" | "end"
   ) => {
     const nativeEvent = event.nativeEvent;
-    const move = moveEventFromMaplibreNative(
-      nativeEvent.center,
+    const [longitude, latitude] = nativeEvent.center;
+    const move = moveEventFromNative(
+      longitude,
+      latitude,
       nativeEvent.zoom,
       nativeEvent.bearing,
       nativeEvent.pitch,
@@ -243,14 +232,12 @@ const MaplibreNativeMapImplementation = forwardRef<
 
 /** Rejects portable requests the selected MapLibre native map cannot honor. */
 const validateMaplibreMapOptions = (
-  props: NativeMapInputs & { readonly locationOptions?: NativeLocationOptions }
+  props: Pick<NativeMapProps, "terrain" | "projection">
 ): void => {
   if (props.terrain != null)
     throw new Error("Terrain is unsupported on MapLibre Native.");
   if (props.projection === "globe")
     throw new Error("Globe projection is unsupported on MapLibre Native.");
-  if (nativeCameraTarget(props) && props.locationOptions?.trackUserLocation)
-    throw new Error("Selected location follow conflicts with viewState.");
 };
 
 const pressEvent = (nativeEvent: {

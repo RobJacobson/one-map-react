@@ -1,4 +1,10 @@
 export {
+  moveEventFromNative,
+  type NativeMoveCallbacks,
+  type NativeViewportBounds,
+  reportSettledMove,
+} from "./move-event.js";
+export {
   omitUndefinedFields,
   snapshotNativeStyleValue,
   toNativeLayerStyleKey,

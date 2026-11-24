@@ -83,6 +83,11 @@ export const testNativeRendering = <Handle extends NativeMapRef>(
       message:
         "gl is a web drawing context and is not available on native maps.",
     },
+    {
+      option: "scrollZoom",
+      props: { scrollZoom: false },
+      message: "scrollZoom is not available on native maps.",
+    },
   ])(
     "rejects $option before creating a wrapper",
     async ({ props, message }) => {

@@ -7,20 +7,15 @@ import {
   useRef,
   useState,
 } from "react";
-import { Platform, type ViewProps } from "react-native";
+import { Platform } from "react-native";
 
 import type { MapErrorEvent, MoveEvent } from "../../contracts/event-types.js";
-import type { NativeMapInputs } from "../../contracts/native-types.js";
-import type { NativeLocationOptions } from "../../mapbox-native.js";
-import {
-  assertNativeDesktopOptions,
-  assertNativeMapOptions,
-} from "../native-map-options.js";
+import type { NativeMapProps } from "../../mapbox-native.js";
 import {
   type NativeMoveCallbacks,
   type NativeViewportBounds,
   reportSettledMove,
-} from "../shared/move-event.js";
+} from "../shared/index.js";
 import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
 import {
@@ -57,15 +52,11 @@ type RnPressFeature = Parameters<
 /** Mapbox-native map that renders RNMapbox `MapView` with a `Camera` child. */
 const MapboxNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
-  NativeMapInputs &
-    Partial<NativeMoveCallbacks> & {
-      locationOptions?: NativeLocationOptions;
-      hostProps?: ViewProps;
-      options?: Partial<ComponentProps<typeof MapView>>;
-    }
+  NativeMapProps & Partial<NativeMoveCallbacks>
 >((props, ref) => {
   const session = useNativeMapPresentation();
-  if (nativeCameraTarget(props) && props.locationOptions?.followUserLocation)
+  const viewState = nativeCameraTarget(props);
+  if (viewState && props.locationOptions?.followUserLocation)
     throw new Error("Selected location follow conflicts with viewState.");
   const scaleBarPosition = props.options?.scaleBarPosition;
   const refreshScalePosition = useMapboxScalePosition(
@@ -74,7 +65,6 @@ const MapboxNativeMapImplementation = forwardRef<
     session.nativeLayout?.height,
     props.options?.scaleBarEnabled
   );
-  const viewState = nativeCameraTarget(props);
   const {
     mapStyle,
     initialViewState,
@@ -91,8 +81,6 @@ const MapboxNativeMapImplementation = forwardRef<
     onLoad,
     onStyleLoad,
     onError,
-    reuseMaps,
-    gl,
     children,
   } = props;
   const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
@@ -147,9 +135,6 @@ const MapboxNativeMapImplementation = forwardRef<
   );
   // Descendant control effects must retain the attached ref during prop updates.
   useImperativeHandle(ref, () => mapHandle, [mapHandle]);
-
-  assertNativeMapOptions(reuseMaps, gl);
-  assertNativeDesktopOptions(props);
 
   const reportChanging = (state: MapState) => {
     sawMove.current = true;

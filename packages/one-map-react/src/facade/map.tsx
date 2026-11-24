@@ -14,7 +14,6 @@ import {
 import { missingMapError } from "../adapters/index.js";
 import { useActiveCallback } from "../adapters/shared/use-active-callback.js";
 import type { MapRef } from "../contracts/camera-types.js";
-import type { MapProps } from "../contracts/map-types.js";
 import type {
   NativeMapInputs,
   NativeMapRef,
@@ -96,10 +95,8 @@ export const MountedMap = <
   );
 };
 
-/** Validates portable projection and terrain inputs before adapter rendering. */
-const validateMapOptions = (
-  props: Pick<MapProps, "projection" | "terrain">
-): void => {
+/** Validates portable options and rejects desktop-only inputs before adapter rendering. */
+const validateMapOptions = (props: NativeMapInputs): void => {
   if (
     props.projection !== undefined &&
     props.projection !== "mercator" &&
@@ -121,7 +118,53 @@ const validateMapOptions = (
       "Terrain requires a nonempty source and finite nonnegative exaggeration."
     );
   }
+
+  if (props.reuseMaps === true) {
+    throw new Error(
+      "reuseMaps is not available on native maps. Remounting creates a new map."
+    );
+  }
+
+  if (props.gl !== undefined) {
+    throw new Error(
+      "gl is a web drawing context and is not available on native maps."
+    );
+  }
+
+  for (const name of nativeDesktopOptions) {
+    if (props[name] !== undefined) {
+      throw new Error(`${name} is not available on native maps.`);
+    }
+  }
 };
+
+const nativeDesktopOptions = [
+  "scrollZoom",
+  "doubleClickZoom",
+  "dragRotate",
+  "boxZoom",
+  "keyboard",
+  "cooperativeGestures",
+  "clickTolerance",
+  "hash",
+  "onDblClick",
+  "onContextMenu",
+  "onMouseDown",
+  "onMouseUp",
+  "onMouseMove",
+  "onMouseEnter",
+  "onMouseLeave",
+  "onMouseOver",
+  "onMouseOut",
+  "onWheel",
+  "onDrag",
+  "onDragStart",
+  "onDragEnd",
+  "onTouchStart",
+  "onTouchMove",
+  "onTouchEnd",
+  "onTouchCancel",
+] as const;
 
 const nativeMapMethods = {
   getSource: true,
