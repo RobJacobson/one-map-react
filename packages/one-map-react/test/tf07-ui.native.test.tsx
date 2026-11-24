@@ -201,6 +201,16 @@ const sessionFixture = (backend: NativeBackend = "mapbox-native") => {
   return { session, project, unproject, easeTo, lock };
 };
 
+const deferredPoint = () => {
+  let resolve = (_point: Point): void => {};
+  let reject = (_reason: unknown): void => {};
+  const promise = new Promise<Point>((accept, fail) => {
+    resolve = accept;
+    reject = fail;
+  });
+  return { promise, resolve, reject };
+};
+
 const scaleCamera: ViewState = {
   longitude: 10,
   latitude: 20,
@@ -361,18 +371,54 @@ describe("TF07 native UI composition", () => {
     );
   });
 
+  test("live overlay publishes completed projections while camera changes keep arriving", async () => {
+    const fixture = sessionFixture();
+    const first = deferredPoint();
+    const second = deferredPoint();
+    const third = deferredPoint();
+    fixture.project
+      .mockReturnValueOnce(first.promise)
+      .mockReturnValueOnce(second.promise)
+      .mockReturnValueOnce(third.promise);
+    const scene = (zoom: number) => (
+      <FixtureSessionProvider
+        value={{ ...fixture.session, viewState: { ...scaleCamera, zoom } }}
+      >
+        <NativeMarkerOverlay lngLat={[10, 20]} anchor="center" offset={[0, 0]}>
+          <Text>Content</Text>
+        </NativeMarkerOverlay>
+      </FixtureSessionProvider>
+    );
+    const view = await render(scene(4));
+    const style = () =>
+      StyleSheet.flatten(view.getByTestId("native-marker-overlay").props.style);
+    await view.rerender(scene(5));
+    await view.rerender(scene(6));
+    await act(async () => first.resolve([110, 210]));
+    expect(style()).toMatchObject({ left: 110, top: 210, opacity: 1 });
+    expect(fixture.project).toHaveBeenCalledTimes(2);
+
+    await view.rerender(scene(7));
+    await view.rerender(scene(8));
+    expect(fixture.project).toHaveBeenCalledTimes(2);
+    await act(async () => second.resolve([120, 220]));
+    expect(style()).toMatchObject({ left: 120, top: 220, opacity: 1 });
+    expect(fixture.project).toHaveBeenCalledTimes(3);
+
+    await act(async () => third.resolve([130, 230]));
+    expect(style()).toMatchObject({ left: 130, top: 230, opacity: 1 });
+    expect(fixture.project).toHaveBeenCalledTimes(3);
+  });
+
   test("live overlay discards projection results from earlier coordinates and after unmount", async () => {
     const fixture = sessionFixture();
-    let resolveOld: (point: Point) => void = () => {};
-    fixture.project.mockImplementationOnce(
-      () =>
-        new Promise((resolve) => {
-          resolveOld = resolve;
-        })
-    );
+    const old = deferredPoint();
+    fixture.project.mockReturnValueOnce(old.promise);
     const error = jest.fn();
-    const scene = (longitude: number) => (
-      <FixtureSessionProvider value={fixture.session}>
+    const scene = (longitude: number, zoom = 4) => (
+      <FixtureSessionProvider
+        value={{ ...fixture.session, viewState: { ...scaleCamera, zoom } }}
+      >
         <NativeMarkerOverlay
           lngLat={[longitude, 20]}
           anchor="center"
@@ -384,7 +430,9 @@ describe("TF07 native UI composition", () => {
       </FixtureSessionProvider>
     );
     const view = await render(scene(10));
-    await view.rerender(scene(11));
+    await view.rerender(scene(10, 5));
+    await view.rerender(scene(11, 5));
+    expect(fixture.project.mock.calls).toEqual([[[10, 20]], [[11, 20]]]);
     await waitFor(() =>
       expect(
         StyleSheet.flatten(
@@ -392,33 +440,102 @@ describe("TF07 native UI composition", () => {
         )
       ).toMatchObject({ left: 100, top: 200 })
     );
-    await act(async () => resolveOld([999, 999]));
+    await act(async () => old.resolve([999, 999]));
     expect(
       StyleSheet.flatten(view.getByTestId("native-marker-overlay").props.style)
     ).toMatchObject({ left: 100, top: 200 });
-    let rejectLate: (reason: unknown) => void = () => {};
-    fixture.project.mockImplementationOnce(
-      () =>
-        new Promise((_resolve, reject) => {
-          rejectLate = reject;
-        })
-    );
+    expect(fixture.project).toHaveBeenCalledTimes(2);
+
+    const late = deferredPoint();
+    fixture.project.mockReturnValueOnce(late.promise);
     await view.rerender(scene(12));
+    await view.rerender(scene(12, 6));
     await view.unmount();
-    await act(async () => rejectLate(new Error("Detached")));
+    await act(async () => late.reject(new Error("Detached")));
     expect(error).not.toHaveBeenCalled();
+    expect(fixture.project).toHaveBeenCalledTimes(3);
+  });
+
+  test("live overlay starts on a replacement attachment while the old projection is pending", async () => {
+    const fixture = sessionFixture();
+    const replacement = sessionFixture();
+    const old = deferredPoint();
+    fixture.project.mockReturnValueOnce(old.promise);
+    replacement.project.mockResolvedValueOnce([130, 230]);
+    const error = jest.fn();
+    const scene = (zoom: number) => (
+      <FixtureSessionProvider
+        value={{ ...fixture.session, viewState: { ...scaleCamera, zoom } }}
+      >
+        <NativeMarkerOverlay
+          lngLat={[10, 20]}
+          anchor="center"
+          offset={[0, 0]}
+          onProjectionError={error}
+        >
+          <Text>Content</Text>
+        </NativeMarkerOverlay>
+      </FixtureSessionProvider>
+    );
+    const view = await render(scene(4));
+    await view.rerender(scene(5));
+    fixture.session.ref.current = replacement.session.map;
+    await view.rerender(scene(6));
+    expect(replacement.project).toHaveBeenCalledWith([10, 20]);
+
+    await act(async () => old.reject(new Error("Detached")));
+    expect(error).not.toHaveBeenCalled();
+    expect(fixture.project).toHaveBeenCalledTimes(1);
+    expect(
+      StyleSheet.flatten(view.getByTestId("native-marker-overlay").props.style)
+    ).toMatchObject({ left: 130, top: 230, opacity: 1 });
+  });
+
+  test("live overlay resumes projection when Suspense reveals its map", async () => {
+    const fixture = sessionFixture();
+    const suspended = deferredPoint();
+    const old = deferredPoint();
+    fixture.project.mockReturnValueOnce(old.promise);
+    const MaybeSuspend = ({ hidden }: { readonly hidden: boolean }) => {
+      if (hidden) throw suspended.promise;
+      return null;
+    };
+    const marker = (
+      <FixtureSessionProvider value={fixture.session}>
+        <NativeMarkerOverlay lngLat={[10, 20]} anchor="center" offset={[0, 0]}>
+          <Text>Content</Text>
+        </NativeMarkerOverlay>
+      </FixtureSessionProvider>
+    );
+    const AttachedMap = ({ hidden }: { readonly hidden: boolean }) => {
+      useImperativeHandle(fixture.session.ref, () => fixture.session.map, []);
+      return (
+        <>
+          {marker}
+          <MaybeSuspend hidden={hidden} />
+        </>
+      );
+    };
+    const scene = (hidden: boolean) => (
+      <Suspense fallback={<Text>Loading</Text>}>
+        <AttachedMap hidden={hidden} />
+      </Suspense>
+    );
+    const view = await render(scene(false));
+    await view.rerender(scene(true));
+    expect(view.getByText("Loading")).toBeTruthy();
+
+    await view.rerender(scene(false));
+    await act(async () => old.resolve([999, 999]));
+    expect(fixture.project).toHaveBeenCalledTimes(2);
+    expect(
+      StyleSheet.flatten(view.getByTestId("native-marker-overlay").props.style)
+    ).toMatchObject({ left: 100, top: 200, opacity: 1 });
   });
 
   test("live overlay follows observed cameras under an unchanged controlled target", async () => {
     const fixture = sessionFixture();
     const error = jest.fn();
-    let resolveOld: (point: Point) => void = () => {};
-    fixture.project.mockImplementationOnce(
-      () =>
-        new Promise((resolve) => {
-          resolveOld = resolve;
-        })
-    );
     const view = await render(
       <MapSessionContext.Provider value={fixture.session}>
         <ScaleMap
@@ -437,13 +554,14 @@ describe("TF07 native UI composition", () => {
         </ScaleMap>
       </MapSessionContext.Provider>
     );
+    fixture.project.mockResolvedValueOnce([120, 220]);
     await act(async () =>
       moveScale({ viewState: { ...scaleCamera, zoom: 5 }, origin: "user" })
     );
     const host = () => view.getByTestId("native-marker-overlay");
     expect(StyleSheet.flatten(host().props.style)).toMatchObject({
-      left: 100,
-      top: 200,
+      left: 120,
+      top: 220,
     });
     fixture.project.mockResolvedValueOnce([150, 250]);
     await act(async () =>
@@ -452,7 +570,6 @@ describe("TF07 native UI composition", () => {
         origin: "unknown",
       })
     );
-    await act(async () => resolveOld([999, 999]));
     expect(StyleSheet.flatten(host().props.style)).toMatchObject({
       left: 150,
       top: 250,
