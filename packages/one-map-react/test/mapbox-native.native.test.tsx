@@ -991,30 +991,37 @@ describe("mapbox-native adapter", () => {
   });
 
   test("the first idle reports onMove once, then onMoveEnd and onIdle", async () => {
-    const onMove = jest.fn();
-    const onMoveEnd = jest.fn();
-    const onIdle = jest.fn();
+    const report = jest.fn();
+    const onMove = () => report("onMove");
+    const onMoveEnd = () => report("onMoveEnd");
+    const onIdle = () => report("onIdle");
 
     await render(example(undefined, onMove, { onMoveEnd, onIdle }));
     const props = lastMapProps<{
       onMapIdle: (state: object) => void;
     }>();
 
+    const state = {
+      properties: {
+        center: [-122.34, 47.61],
+        zoom: 11,
+        heading: 0,
+        pitch: 0,
+      },
+      gestures: { isGestureActive: false },
+    };
     await act(async () => {
-      props.onMapIdle({
-        properties: {
-          center: [-122.34, 47.61],
-          zoom: 11,
-          heading: 0,
-          pitch: 0,
-        },
-        gestures: { isGestureActive: false },
-      });
+      props.onMapIdle(state);
+      props.onMapIdle(state);
     });
 
-    expect(onMove).toHaveBeenCalledTimes(1);
-    expect(onMoveEnd).toHaveBeenCalledTimes(1);
-    expect(onIdle).toHaveBeenCalledTimes(1);
+    expect(report.mock.calls).toEqual([
+      ["onMove"],
+      ["onMoveEnd"],
+      ["onIdle"],
+      ["onMoveEnd"],
+      ["onIdle"],
+    ]);
   });
 
   test.each(["success", "failure", "unmount"] as const)(
