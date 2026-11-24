@@ -4,7 +4,12 @@ import {
   createContext,
   type ReactNode,
   useContext,
+  useState,
 } from "react";
+import { Platform } from "react-native";
+
+import type { NativeGestureSelection } from "../native-gestures.js";
+import { toRnmapboxGestures } from "./convert-gestures.js";
 
 /**
  * RNMapbox touch-gesture settings.
@@ -44,9 +49,82 @@ export const MapboxGestureSettings = ({
 );
 
 /**
- * Reads the enclosing {@link MapboxGestureSettings} value.
+ * Resolves wrapper gesture props and restores fields from retired overrides.
  *
- * @returns The supplied settings, or `undefined` when none encloses the map.
+ * @param selection - Portable gesture flags.
+ * @param options - Explicitly selected RNMapbox options.
+ * @returns Gesture props for the mounted RNMapbox map.
  */
-export const useMapboxGestureSettings = (): GestureSettings | undefined =>
-  useContext(MapboxGestureSettingsContext);
+export const useRnmapboxGestures = (
+  selection: NativeGestureSelection,
+  options:
+    | {
+        readonly gestureSettings?: GestureSettings;
+        readonly zoomEnabled?: boolean;
+      }
+    | undefined
+): {
+  scrollEnabled?: boolean;
+  zoomEnabled?: boolean;
+  rotateEnabled?: boolean;
+  pitchEnabled?: boolean;
+  gestureSettings?: GestureSettings;
+} => {
+  const contextSettings = useContext(MapboxGestureSettingsContext);
+  const selected = mergeGestureSettings(
+    options?.gestureSettings,
+    contextSettings
+  );
+  const { gestureSettings: portable, ...scalars } =
+    toRnmapboxGestures(selection);
+  const isAndroid = Platform.OS === "android";
+  // Android requires a boolean and its zoom setter also toggles both tap gestures.
+  const zoomEnabled =
+    scalars.zoomEnabled ??
+    options?.zoomEnabled ??
+    (isAndroid ? true : undefined);
+  const useScalarLock =
+    isAndroid &&
+    selection.interactive === false &&
+    selected === undefined &&
+    selection.doubleTapZoom === undefined;
+  const override = useScalarLock ? undefined : portable;
+  const [hasAppliedDoubleTapOverride, setHasAppliedDoubleTapOverride] =
+    useState(false);
+  if (override !== undefined && !hasAppliedDoubleTapOverride) {
+    setHasAppliedDoubleTapOverride(true);
+  }
+
+  const restored =
+    hasAppliedDoubleTapOverride && override === undefined
+      ? restoredDoubleTapSettings(selected, zoomEnabled ?? true, isAndroid)
+      : undefined;
+
+  return {
+    ...scalars,
+    zoomEnabled,
+    gestureSettings: mergeGestureSettings(selected, override ?? restored),
+  };
+};
+
+/** RNMapbox retains both double-tap fields when a dictionary key is removed. */
+const restoredDoubleTapSettings = (
+  selected: GestureSettings | undefined,
+  zoomEnabled: boolean,
+  isAndroid: boolean
+): GestureSettings => ({
+  doubleTapToZoomInEnabled: selected?.doubleTapToZoomInEnabled ?? zoomEnabled,
+  doubleTouchToZoomOutEnabled:
+    selected?.doubleTouchToZoomOutEnabled ?? (isAndroid ? zoomEnabled : true),
+});
+
+const mergeGestureSettings = (
+  base: GestureSettings | undefined,
+  overrides: GestureSettings | undefined
+): GestureSettings | undefined => {
+  if (base === undefined && overrides === undefined) {
+    return undefined;
+  }
+
+  return { ...base, ...overrides };
+};

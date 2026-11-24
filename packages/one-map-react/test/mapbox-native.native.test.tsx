@@ -590,6 +590,138 @@ describe("mapbox-native adapter", () => {
     }
   );
 
+  describe.each(["ios", "android"] as const)("%s double-tap gestures", (os) => {
+    const forwardedSettings = () =>
+      lastMapProps<{ gestureSettings?: object }>().gestureSettings;
+
+    test("restores both defaults when doubleTapZoom is removed from the mounted map", async () => {
+      const platform = jest.replaceProperty(Platform, "OS", os);
+      const scene = (doubleTapZoom?: boolean) =>
+        example(undefined, undefined, { doubleTapZoom });
+      try {
+        const view = await render(scene());
+        const mapId = view.getByTestId("wrapper-map").props.mapId;
+        expect(forwardedSettings()).toBeUndefined();
+
+        await view.rerender(scene(false));
+        expect(forwardedSettings()).toEqual({
+          doubleTapToZoomInEnabled: false,
+          doubleTouchToZoomOutEnabled: false,
+        });
+
+        await view.rerender(scene());
+        expect(view.getByTestId("wrapper-map").props.mapId).toBe(mapId);
+        expect(forwardedSettings()).toEqual({
+          doubleTapToZoomInEnabled: true,
+          doubleTouchToZoomOutEnabled: true,
+        });
+        await view.unmount();
+      } finally {
+        platform.restore();
+      }
+    });
+
+    test("restores the latest selected settings and fills only the retired fields", async () => {
+      const platform = jest.replaceProperty(Platform, "OS", os);
+      const scene = (zoomInEnabled: boolean, doubleTapZoom?: boolean) => (
+        <MapboxGestureSettings
+          settings={{
+            doubleTapToZoomInEnabled: zoomInEnabled,
+            quickZoomEnabled: false,
+          }}
+        >
+          {example(undefined, undefined, {
+            doubleTapZoom,
+            options: {
+              gestureSettings: {
+                doubleTapToZoomInEnabled: !zoomInEnabled,
+                pinchPanEnabled: false,
+              },
+            },
+          })}
+        </MapboxGestureSettings>
+      );
+      try {
+        const view = await render(scene(true));
+        expect(forwardedSettings()).toEqual({
+          doubleTapToZoomInEnabled: true,
+          quickZoomEnabled: false,
+          pinchPanEnabled: false,
+        });
+
+        await view.rerender(scene(false, false));
+        await view.rerender(scene(false));
+        expect(forwardedSettings()).toEqual({
+          doubleTapToZoomInEnabled: false,
+          doubleTouchToZoomOutEnabled: true,
+          quickZoomEnabled: false,
+          pinchPanEnabled: false,
+        });
+        await view.unmount();
+      } finally {
+        platform.restore();
+      }
+    });
+
+    test("releases a temporary lock to the selected zoom scalar and independent double-touch baseline", async () => {
+      const platform = jest.replaceProperty(Platform, "OS", os);
+      const scene = (interactive: boolean) =>
+        example(undefined, undefined, {
+          interactive,
+          options: {
+            zoomEnabled: false,
+            gestureSettings: { quickZoomEnabled: false },
+          },
+        });
+      try {
+        const view = await render(scene(false));
+        expect(forwardedSettings()).toEqual({
+          doubleTapToZoomInEnabled: false,
+          doubleTouchToZoomOutEnabled: false,
+          quickZoomEnabled: false,
+        });
+        await view.rerender(scene(true));
+        expect(lastMapProps<object>()).toMatchObject({
+          zoomEnabled: false,
+          gestureSettings: {
+            doubleTapToZoomInEnabled: false,
+            doubleTouchToZoomOutEnabled: os === "ios",
+            quickZoomEnabled: false,
+          },
+        });
+        await view.unmount();
+      } finally {
+        platform.restore();
+      }
+    });
+  });
+
+  test("iOS restores both double-tap gestures after an interaction lock without selected settings", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", "ios");
+    const scene = (interactive: boolean) =>
+      example(undefined, undefined, { interactive });
+    try {
+      const view = await render(scene(false));
+      expect(lastMapProps<object>()).toMatchObject({
+        zoomEnabled: false,
+        gestureSettings: {
+          doubleTapToZoomInEnabled: false,
+          doubleTouchToZoomOutEnabled: false,
+        },
+      });
+      await view.rerender(scene(true));
+      expect(lastMapProps<object>()).toMatchObject({
+        gestureSettings: {
+          doubleTapToZoomInEnabled: true,
+          doubleTouchToZoomOutEnabled: true,
+        },
+      });
+      await view.unmount();
+    } finally {
+      platform.restore();
+    }
+  });
+
   test.each<["ios" | "android", boolean]>([
     ["ios", true],
     ["ios", false],
