@@ -7,15 +7,18 @@ import {
   copyValidatedFeatureState,
   featureStateFromWrapper,
 } from "../shared/feature-values.js";
-import { toRnmapboxFeatureArgs } from "./convert-query.js";
 
-/** Validates and copies bridge arguments before dispatch to the attached map. */
+/**
+ * Validates and copies bridge arguments before dispatch to the attached map.
+ *
+ * @param getMap - Resolves the current map ref or throws when detached.
+ * @returns Feature-state methods for this map.
+ */
 export const createMapboxFeatureStateMethods = (
   getMap: () => ComponentRef<typeof MapView>
 ): FeatureStateMethods => ({
   setFeatureState: async (identifier, state) => {
-    const target = assertFeatureIdentifier(identifier);
-    const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
+    const [featureId, sourceId, sourceLayerId] = toFeatureArgs(identifier);
     const mutableState = copyValidatedFeatureState(state);
 
     await getMap().setFeatureState(
@@ -26,16 +29,14 @@ export const createMapboxFeatureStateMethods = (
     );
   },
   getFeatureState: async (identifier) => {
-    const target = assertFeatureIdentifier(identifier);
-    const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
+    const [featureId, sourceId, sourceLayerId] = toFeatureArgs(identifier);
 
     return featureStateFromWrapper(
       await getMap().getFeatureState(featureId, sourceId, sourceLayerId)
     );
   },
   removeFeatureState: async (identifier, key) => {
-    const target = assertFeatureIdentifier(identifier);
-    const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
+    const [featureId, sourceId, sourceLayerId] = toFeatureArgs(identifier);
 
     await getMap().removeFeatureState(
       featureId,
@@ -45,3 +46,8 @@ export const createMapboxFeatureStateMethods = (
     );
   },
 });
+
+const toFeatureArgs = (identifier: unknown) => {
+  const { id, source, sourceLayer } = assertFeatureIdentifier(identifier);
+  return [String(id), source, sourceLayer ?? null] as const;
+};

@@ -1,7 +1,6 @@
 import type { Feature, Point as GeoJsonPoint } from "geojson";
 
 import type {
-  FeatureIdentifier,
   QueryRenderedFeaturesOptions,
   QuerySourceFeaturesOptions,
 } from "../../contracts/query-types.js";
@@ -65,24 +64,6 @@ export const toRnmapboxSourceQueryArgs = (
 ): readonly [filter: unknown[], sourceLayerIds: string[]] => [
   options?.filter === undefined ? [] : [...options.filter],
   options?.sourceLayer === undefined ? [] : [options.sourceLayer],
-];
-
-/**
- * Converts a feature identifier into RNMapbox's positional arguments.
- *
- * @param identifier - Source, feature id, and optional vector source layer.
- * @returns Feature id, source id, and source layer id for the wrapper call.
- */
-export const toRnmapboxFeatureArgs = (
-  identifier: FeatureIdentifier
-): readonly [
-  featureId: string,
-  sourceId: string,
-  sourceLayerId: string | null,
-] => [
-  String(identifier.id),
-  identifier.source,
-  identifier.sourceLayer === undefined ? null : identifier.sourceLayer,
 ];
 
 /**
