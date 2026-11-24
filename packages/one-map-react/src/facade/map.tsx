@@ -72,7 +72,8 @@ export const MountedMap = <
   });
   const { move, click } = useMapInteractions(props, mapRef);
   const handlesClick =
-    props.onClick !== undefined || props.interactiveLayerIds !== undefined;
+    props.onClick !== undefined ||
+    (props.onError !== undefined && props.interactiveLayerIds !== undefined);
   const session = useMemo<MapSession>(
     () => ({ ref: mapRef, map: handle, ready, components }),
     [mapRef, handle, ready, components]
