@@ -20,6 +20,7 @@ import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
+import { reportSettledMove } from "../shared/move-event.js";
 import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
 import { omitUndefinedFields } from "../shared/native-layer-updates.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
@@ -158,12 +159,7 @@ const MaplibreNativeMapImplementation = forwardRef<
       return;
     }
 
-    if (!sawMove.current) {
-      sawMove.current = true;
-      report.onMove(move);
-    }
-
-    report.onMoveEnd(move);
+    reportSettledMove(sawMove, move, report);
   };
   const controlled = viewState ? toMaplibreViewState(viewState) : undefined;
   const flatMaxBounds =

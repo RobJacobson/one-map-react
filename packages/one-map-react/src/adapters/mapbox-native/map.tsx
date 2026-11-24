@@ -16,6 +16,7 @@ import {
   assertNativeDesktopOptions,
   assertNativeMapOptions,
 } from "../native-map-options.js";
+import { reportSettledMove } from "../shared/move-event.js";
 import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
 import {
@@ -152,13 +153,7 @@ const MapboxNativeMapImplementation = forwardRef<
   };
   const reportSettled = (state: MapState) => {
     const event = moveFromState(state);
-
-    if (!sawMove.current) {
-      sawMove.current = true;
-      report.onMove(event);
-    }
-
-    report.onMoveEnd(event);
+    reportSettledMove(sawMove, event, report);
     report.onIdle();
   };
   const controlled = viewState
