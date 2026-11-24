@@ -2328,6 +2328,7 @@ describe("mapbox-native entry binding", () => {
     centerProp: "centerCoordinate",
     zoomProp: "zoomLevel",
     bearingProp: "heading",
+    initialProp: "defaultSettings",
     getZoom: mockGetZoom,
     project: mockGetPointInView,
   });
