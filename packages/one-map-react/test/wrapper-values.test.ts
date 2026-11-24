@@ -22,6 +22,24 @@ describe("camera conversion", () => {
     ).toEqual([1, 2]);
   });
 
+  test("an invalid first tuple coordinate leaves the second getter unread", () => {
+    const value = Object.assign([NaN, 2], {
+      lng: 0,
+      lon: 1,
+      lat: 2,
+      x: 0,
+      y: 2,
+    });
+    Object.defineProperty(value, 1, {
+      get: () => {
+        throw new Error("Unexpected second coordinate read.");
+      },
+    });
+
+    expect(lngLatFromWrapper(value)).toEqual([0, 2]);
+    expect(pointFromWrapper(value)).toEqual([0, 2]);
+  });
+
   test("a point tuple contains the finite coordinates read from its getters", () => {
     const point = [0, 0];
     let xReads = 0;
