@@ -104,12 +104,11 @@ export const nativeRenderedQuery = (
   if (target === undefined) return [undefined, options];
   if ("x" in target) return [pointFromWrapper(target), options];
   if (Array.isArray(target)) {
-    if (typeof target[0] === "number")
-      return [pointFromWrapper(target), options];
-    return [
-      [pointFromWrapper(target[0]), pointFromWrapper(target[1])],
-      options,
-    ];
+    const first: unknown = target[0];
+    if (typeof first === "number") {
+      return [pointFromWrapper(target, first), options];
+    }
+    return [[pointFromWrapper(first), pointFromWrapper(target[1])], options];
   }
   return [undefined, target as QueryRenderedFeaturesOptions];
 };

@@ -187,12 +187,22 @@ export const lngLatFromWrapper = (value: unknown): LngLat => {
  * Reads a view point from a tuple or `{ x, y }`.
  *
  * @param value - `[x, y]` or a point with `x` and `y`.
+ * @param tupleX - First tuple element already read when resolving a query overload.
  * @returns A fresh mutable x/y tuple in logical map-view units.
  * @throws When both numbers are not present.
  */
-export const pointFromWrapper = (value: unknown): [x: number, y: number] => {
-  if (isLngLat(value)) {
-    return [value[0], value[1]];
+export const pointFromWrapper = (
+  value: unknown,
+  tupleX?: number
+): [x: number, y: number] => {
+  if (Array.isArray(value) && value.length === 2) {
+    const x: unknown = tupleX ?? value[0];
+    if (isFiniteNumber(x)) {
+      const y: unknown = value[1];
+      if (isFiniteNumber(y)) {
+        return [x, y];
+      }
+    }
   }
 
   if (isRecord(value)) {
