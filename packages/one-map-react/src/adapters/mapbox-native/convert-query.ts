@@ -88,17 +88,6 @@ export const toRnmapboxFeatureArgs = (
 ];
 
 /**
- * Reads the state key argument for RNMapbox `removeFeatureState`.
- *
- * The wrapper takes `null` to remove the whole state.
- *
- * @param key - State key to remove, when the caller passed one.
- * @returns The key, or `null` for the whole state.
- */
-export const toRnmapboxStateKey = (key: string | undefined): string | null =>
-  key === undefined ? null : key;
-
-/**
  * Wraps a numeric cluster id in the Point feature RNMapbox expects.
  * @param clusterId - Renderer cluster id.
  * @returns A cluster feature for the three ShapeSource cluster methods.

@@ -7,7 +7,7 @@ import {
   copyValidatedFeatureState,
   featureStateFromWrapper,
 } from "../shared/feature-values.js";
-import { toRnmapboxFeatureArgs, toRnmapboxStateKey } from "./convert-query.js";
+import { toRnmapboxFeatureArgs } from "./convert-query.js";
 
 /** Validates and copies bridge arguments before dispatch to the attached map. */
 export const createMapboxFeatureStateMethods = (
@@ -36,11 +36,10 @@ export const createMapboxFeatureStateMethods = (
   removeFeatureState: async (identifier, key) => {
     const target = assertFeatureIdentifier(identifier);
     const [featureId, sourceId, sourceLayerId] = toRnmapboxFeatureArgs(target);
-    const stateKey = toRnmapboxStateKey(key);
 
     await getMap().removeFeatureState(
       featureId,
-      stateKey,
+      key ?? null,
       sourceId,
       sourceLayerId
     );
