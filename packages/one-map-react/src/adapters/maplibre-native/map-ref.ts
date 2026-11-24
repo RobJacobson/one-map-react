@@ -5,14 +5,13 @@ import type {
 import type { ComponentRef } from "react";
 
 import type { NativeMapRefWithWrapper } from "../../contracts/native-types.js";
-import { requireAttachedMap } from "../index.js";
+import { missingCameraError, requireAttachedMap } from "../index.js";
 import {
   rejectNativeResize,
   rejectNativeStop,
   unavailableMapMethod,
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
-import { missingCameraError } from "../shared/missing-camera.js";
 import { createNativeClusterLookup } from "../shared/native-clusters.js";
 import {
   isScreenBounds,

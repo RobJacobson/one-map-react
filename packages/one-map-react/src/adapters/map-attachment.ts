@@ -15,3 +15,15 @@ export const requireAttachedMap = <Map extends object>(
 
 /** Creates the error reported by commands that require an attached map. */
 export const missingMapError = (): Error => new Error("Map is not attached.");
+
+/**
+ * Creates the error for a camera command whose wrapper is unavailable.
+ *
+ * The camera ref is missing, or MapLibre React Native has yet to finish loading
+ * the map. Before that load, `setStop` can resolve after the native map drops
+ * the stop.
+ *
+ * @returns An error describing the missing camera.
+ */
+export const missingCameraError = (): Error =>
+  new Error("Map camera is not attached.");

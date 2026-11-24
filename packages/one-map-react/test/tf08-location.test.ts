@@ -1,7 +1,7 @@
 import { expect, test, vi } from "vite-plus/test";
 
-import { validatePosition } from "../src/adapters/shared/location-values.js";
 import type { LngLat } from "../src/contracts/camera-types.js";
+import { validatePosition } from "../src/facade/location-values.js";
 
 test("display validation preserves measured units and rejects invalid measurements", () => {
   const position = {

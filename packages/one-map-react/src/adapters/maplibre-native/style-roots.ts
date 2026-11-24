@@ -1,10 +1,7 @@
 import type { LightSpecification } from "@maplibre/maplibre-react-native";
 
 import type { LegacyLight } from "../../contracts/map-types.js";
-import {
-  snapshotNativeStyleValue,
-  toNativeLayerStyleKey,
-} from "../shared/index.js";
+import { isRecord, toNativeLayerStyleKey } from "../shared/index.js";
 
 const hasDefinedOwn = (value: object, key: string): boolean =>
   Object.hasOwn(value, key) && Reflect.get(value, key) !== undefined;
@@ -20,8 +17,7 @@ export const assertMaplibreExpressions = (value: unknown): void => {
     if (operator === "literal") return;
     if (
       operator === "number-format" &&
-      value[2] &&
-      typeof value[2] === "object" &&
+      isRecord(value[2]) &&
       hasDefinedOwn(value[2], "unit")
     ) {
       throw new Error(
@@ -40,8 +36,7 @@ export const assertMaplibreExpressions = (value: unknown): void => {
       if (
         operator === "format" &&
         index % 2 === 0 &&
-        member &&
-        typeof member === "object" &&
+        isRecord(member) &&
         hasDefinedOwn(member, "vertical-align")
       ) {
         throw new Error(
@@ -50,7 +45,7 @@ export const assertMaplibreExpressions = (value: unknown): void => {
       }
       assertMaplibreExpressions(member);
     }
-  } else if (value && typeof value === "object") {
+  } else if (isRecord(value)) {
     for (const member of Object.values(value))
       assertMaplibreExpressions(member);
   }
@@ -75,7 +70,7 @@ export const assertMaplibreLayerStyle = (layer: NativeLayerValues): void => {
     [layer.layout, unsupportedLayoutKeys],
     [layer.style, unsupportedLegacyStyleKeys],
   ] as const) {
-    if (!values || typeof values !== "object") continue;
+    if (!isRecord(values)) continue;
     for (const key of keys) {
       if (hasDefinedOwn(values, key))
         throw new Error(
@@ -111,7 +106,7 @@ export const assertMaplibreStyleRoots = (input: unknown): void => {
     typeof input === "string" && input.trimStart().startsWith("{")
       ? JSON.parse(input)
       : input;
-  if (style === null || typeof style !== "object") return;
+  if (!isRecord(style)) return;
   // Native SDK android-v13.6.1/ios-v6.31.0 parser.cpp has no transport for these roots.
   for (const key of ["terrain", "sky", "state"]) {
     if (hasDefinedOwn(style, key))
@@ -123,8 +118,7 @@ export const assertMaplibreStyleRoots = (input: unknown): void => {
     const projection: unknown = Reflect.get(style, "projection");
     if (
       projection !== undefined &&
-      (!projection ||
-        typeof projection !== "object" ||
+      (!isRecord(projection) ||
         !("type" in projection) ||
         projection.type !== "mercator")
     ) {
@@ -134,18 +128,13 @@ export const assertMaplibreStyleRoots = (input: unknown): void => {
   if ("light" in style) assertMaplibreExpressions(style.light);
   if ("layers" in style && Array.isArray(style.layers)) {
     for (const layer of style.layers) {
-      if (!layer || typeof layer !== "object") continue;
+      if (!isRecord(layer)) continue;
       assertMaplibreLayerStyle(layer);
     }
   }
-  if (
-    "sources" in style &&
-    style.sources &&
-    typeof style.sources === "object"
-  ) {
+  if ("sources" in style && isRecord(style.sources)) {
     for (const source of Object.values(style.sources)) {
-      if (!source || typeof source !== "object" || !("type" in source))
-        continue;
+      if (!isRecord(source) || !("type" in source)) continue;
       const unsupported = ["volatile"];
       if (source.type === "video")
         throw new Error(
@@ -198,4 +187,41 @@ export const maplibreLightForNative = (
   assertMaplibreExpressions(light);
   // The snapshot preserves the bridge shape and copies any readonly position tuple.
   return light as LightSpecification | undefined;
+};
+
+/**
+ * Copies arrays and objects, dropping object fields whose values are undefined.
+ *
+ * @param value - Expression, style object, or other field forwarded to the wrapper.
+ * @returns A snapshot with undefined object fields removed.
+ */
+export const omitUndefinedFields = (value: unknown): unknown =>
+  snapshotNativeStyleValue(value, true);
+
+/**
+ * Copies the arrays and enumerable string-keyed fields the style bridge reads.
+ * A getter cannot change the forwarded value after validation.
+ *
+ * @param value - Expression, style object, or other field forwarded to the wrapper.
+ * @param skipUndefinedFields - Drop undefined object fields for managed inputs.
+ * @returns A copied array or record, or the original value for a non-container.
+ */
+const snapshotNativeStyleValue = (
+  value: unknown,
+  skipUndefinedFields = false
+): unknown => {
+  if (Array.isArray(value)) {
+    const copy: unknown[] = [];
+    for (const member of value)
+      copy.push(snapshotNativeStyleValue(member, skipUndefinedFields));
+    return copy;
+  }
+  if (!isRecord(value)) return value;
+
+  const entries: [string, unknown][] = [];
+  for (const [key, member] of Object.entries(value)) {
+    if (skipUndefinedFields && member === undefined) continue;
+    entries.push([key, snapshotNativeStyleValue(member, skipUndefinedFields)]);
+  }
+  return Object.fromEntries(entries);
 };

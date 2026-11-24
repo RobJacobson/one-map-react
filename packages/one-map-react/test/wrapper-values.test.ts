@@ -1,11 +1,11 @@
 import { describe, expect, test } from "vite-plus/test";
 
+import { boundsFromRnmapboxVisible } from "../src/adapters/mapbox-native/map-results.js";
 import { nativeBoundsInput } from "../src/adapters/shared/native-values.js";
 import {
   assertBounds,
   boundsFromFlat,
   boundsFromGeographic,
-  boundsFromRnmapboxVisible,
   finiteNumber,
   lngLatFromWrapper,
   normalizePadding,

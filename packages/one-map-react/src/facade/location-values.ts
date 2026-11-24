@@ -1,5 +1,5 @@
-import type { GeolocationPosition } from "../../contracts/ui-types.js";
-import { lngLatFromWrapper } from "./wrapper-values.js";
+import { lngLatFromWrapper } from "../adapters/shared/index.js";
+import type { GeolocationPosition } from "../contracts/ui-types.js";
 
 /**
  * Snapshots a supplied location, preserving its available measurements.

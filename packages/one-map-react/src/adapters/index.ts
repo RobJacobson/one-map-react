@@ -1,1 +1,5 @@
-export { missingMapError, requireAttachedMap } from "./map-attachment.js";
+export {
+  missingCameraError,
+  missingMapError,
+  requireAttachedMap,
+} from "./map-attachment.js";

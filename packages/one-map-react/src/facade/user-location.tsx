@@ -1,9 +1,9 @@
 import { type JSX, useContext, useId } from "react";
 
-import { validatePosition } from "../adapters/shared/location-values.js";
 import type { UserLocationProps } from "../contracts/location-types.js";
 import type { GeoJsonFeatureCollection } from "../contracts/source-types.js";
 import type { GeolocationPosition } from "../contracts/ui-types.js";
+import { validatePosition } from "./location-values.js";
 import { MapSessionContext } from "./map-context.js";
 
 /**
