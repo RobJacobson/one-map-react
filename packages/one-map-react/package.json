@@ -63,6 +63,7 @@
   "files": [
     "dist",
     "!dist/index.js",
+    "!dist/contracts/*.js",
     "patches",
     "README.md",
     "LICENSE"
