@@ -95,18 +95,32 @@ export type NativeQueryTarget = QueryPoint | QueryBounds | undefined;
  * @param target - A point, screen rectangle, options object, or omitted viewport.
  * @param options - Layer ids and filter for the geometry form.
  * @returns Fresh mutable coordinates in logical map-view units and query options.
- * @throws When the supplied coordinates lack a finite x or y value.
+ * @throws When the target has an invalid shape or coordinates lack a finite x or y value.
  */
 export const nativeRenderedQuery = (
   target?: RenderedTarget,
   options?: QueryRenderedFeaturesOptions
 ): readonly [NativeQueryTarget, QueryRenderedFeaturesOptions | undefined] => {
   if (target === undefined) return [undefined, options];
+  if (
+    target === null ||
+    (typeof target !== "object" && typeof target !== "function")
+  ) {
+    throw new TypeError(
+      "A rendered query target must be a point, rectangle, or options object."
+    );
+  }
   if ("x" in target) return [pointFromWrapper(target), options];
   if (Array.isArray(target)) {
+    const { length } = target;
     const first: unknown = target[0];
     if (typeof first === "number") {
       return [pointFromWrapper(target, first), options];
+    }
+    if (length !== 2) {
+      throw new TypeError(
+        "A rendered query rectangle must contain exactly two corners."
+      );
     }
     return [[pointFromWrapper(first), pointFromWrapper(target[1])], options];
   }
