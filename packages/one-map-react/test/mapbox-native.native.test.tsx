@@ -2017,6 +2017,54 @@ test("native fitBounds maxZoom rejects before camera dispatch", async () => {
   expect(mockSetCamera).not.toHaveBeenCalled();
 });
 
+test("invalid terrain coordinates reject before options and native dispatch", async () => {
+  const ref = createRef<MapRef>();
+  await render(example(ref));
+  mockTerrainElevation.mockClear();
+  const options = { exaggerated: false };
+  const malformed = [
+    null,
+    undefined,
+    {},
+    [0],
+    // eslint-disable-next-line unicorn/no-new-array -- Exercise a sparse coordinate with two missing elements.
+    new Array(2),
+    [0, "1"],
+    [NaN, 0],
+    { lng: 0, lat: Infinity },
+  ];
+
+  for (const coordinate of malformed) {
+    await expect(
+      // Bypass the public input type to exercise invalid runtime shapes.
+      ref.current?.queryTerrainElevation(
+        coordinate as Parameters<MapRef["queryTerrainElevation"]>[0],
+        options
+      )
+    ).rejects.toMatchObject({
+      name: "Error",
+      message: "A map coordinate must contain longitude and latitude.",
+    });
+  }
+
+  for (const latitude of [-91, 91]) {
+    await expect(
+      ref.current?.queryTerrainElevation([0, latitude], options)
+    ).rejects.toMatchObject({
+      name: "RangeError",
+      message:
+        "Terrain coordinates require finite longitude and latitude within -90 to 90 degrees.",
+    });
+  }
+
+  await expect(
+    ref.current?.queryTerrainElevation([0, 0], options)
+  ).rejects.toThrow(
+    "queryTerrainElevation.exaggerated=false is unavailable on mapbox-native."
+  );
+  expect(mockTerrainElevation).not.toHaveBeenCalled();
+});
+
 test("terrain/light/projection and hillshade use native public components, including zero and explicit disable", async () => {
   const ref = createRef<MapRef>();
   const mounted = await render(
@@ -2053,13 +2101,18 @@ test("terrain/light/projection and hillshade use native public components, inclu
     hillshadeShadowColor: "#000000",
   });
   expect(lastMapProps<{ projection: string }>().projection).toBe("globe");
-  await expect(ref.current?.queryTerrainElevation([0, 0])).resolves.toBe(0);
+  await expect(ref.current?.queryTerrainElevation([1, 90])).resolves.toBe(0);
+  expect(mockTerrainElevation).toHaveBeenLastCalledWith([1, 90]);
   mockTerrainElevation.mockResolvedValueOnce(null);
-  await expect(ref.current?.queryTerrainElevation([0, 0])).resolves.toBeNull();
+  await expect(
+    ref.current?.queryTerrainElevation({ lon: 2, lat: -90 })
+  ).resolves.toBeNull();
+  expect(mockTerrainElevation).toHaveBeenLastCalledWith([2, -90]);
   mockTerrainElevation.mockRejectedValueOnce(new Error("bridge failure"));
-  await expect(ref.current?.queryTerrainElevation([0, 0])).rejects.toThrow(
-    "bridge failure"
-  );
+  await expect(
+    ref.current?.queryTerrainElevation({ lng: 3, lat: 0 })
+  ).rejects.toThrow("bridge failure");
+  expect(mockTerrainElevation).toHaveBeenLastCalledWith([3, 0]);
   await mounted.rerender(
     <NativeMap
       mapStyle={emptyStyle}

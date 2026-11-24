@@ -18,10 +18,7 @@ import {
   nativePoint,
   nativeRenderedQuery,
 } from "../shared/native-values.js";
-import {
-  normalizeElevation,
-  validateTerrainCoordinate,
-} from "../shared/terrain-values.js";
+import { normalizeElevation } from "../shared/terrain-values.js";
 import {
   boundsFromRnmapboxVisible,
   finiteNumber,
@@ -72,7 +69,11 @@ export const createMapboxMapRef = (
 
     queryTerrainElevation: async (input, options) => {
       const coordinate = lngLatFromWrapper(input);
-      validateTerrainCoordinate(coordinate);
+      if (Math.abs(coordinate[1]) > 90) {
+        throw new RangeError(
+          "Terrain coordinates require finite longitude and latitude within -90 to 90 degrees."
+        );
+      }
       if (options?.exaggerated === false) {
         throw new Error(
           "queryTerrainElevation.exaggerated=false is unavailable on mapbox-native."
