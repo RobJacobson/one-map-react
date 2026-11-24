@@ -4,11 +4,9 @@ import {
   clickEventFromRnmapbox,
   moveEventFromRnmapbox,
 } from "../src/adapters/mapbox-native/convert-move-event.js";
-import {
-  clickEventFromMaplibreNative,
-  moveEventFromMaplibreNative,
-} from "../src/adapters/maplibre-native/convert-move-event.js";
+import { moveEventFromMaplibreNative } from "../src/adapters/maplibre-native/convert-move-event.js";
 import { originFromUserInteraction } from "../src/adapters/shared/move-event.js";
+import { nativeClick } from "../src/adapters/shared/native-values.js";
 
 const viewState = {
   longitude: -122.34,
@@ -62,7 +60,7 @@ describe("move event conversion", () => {
       lngLat: [-122.34, 47.61],
       point: [8, 9],
     });
-    expect(clickEventFromMaplibreNative([-122.34, 47.61], [8, 9])).toEqual({
+    expect(nativeClick([-122.34, 47.61], [8, 9])).toEqual({
       lngLat: [-122.34, 47.61],
       point: [8, 9],
     });

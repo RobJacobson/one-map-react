@@ -10,6 +10,8 @@ import { useContext, useLayoutEffect, useRef } from "react";
 
 import type {
   GeoJsonSourceProps,
+  RasterDemSourceProps,
+  RasterSourceProps,
   SourceProps,
   VectorSourceProps,
 } from "../../contracts/source-types.js";
@@ -31,11 +33,7 @@ export const MaplibreNativeSource = (props: SourceProps) => {
     case "raster":
       return (
         <RasterSource
-          id={props.id}
-          url={props.url}
-          tiles={mutableTiles(props.tiles)}
-          minzoom={props.minzoom}
-          maxzoom={props.maxzoom}
+          {...toMaplibreTileSource(props)}
           tileSize={props.tileSize}
           scheme={props.scheme}
           attribution={props.attribution}
@@ -48,11 +46,7 @@ export const MaplibreNativeSource = (props: SourceProps) => {
 
       return (
         <RasterDEMSource
-          id={props.id}
-          url={props.url}
-          tiles={mutableTiles(props.tiles)}
-          minzoom={props.minzoom}
-          maxzoom={props.maxzoom}
+          {...toMaplibreTileSource(props)}
           tileSize={props.tileSize}
           encoding={props.encoding}
           attribution={props.attribution}
@@ -159,11 +153,7 @@ const MaplibreNativeVectorSource = (props: VectorSourceProps) => {
   return (
     <VectorSource
       ref={sourceRef}
-      id={props.id}
-      url={props.url}
-      tiles={mutableTiles(props.tiles)}
-      minzoom={props.minzoom}
-      maxzoom={props.maxzoom}
+      {...toMaplibreTileSource(props)}
       scheme={props.scheme}
       attribution={props.attribution}
     >
@@ -181,3 +171,17 @@ const mutableCorner = (corner: readonly [number, number]): [number, number] => [
   corner[0],
   corner[1],
 ];
+
+const toMaplibreTileSource = ({
+  id,
+  url,
+  tiles,
+  minzoom,
+  maxzoom,
+}: VectorSourceProps | RasterSourceProps | RasterDemSourceProps) => ({
+  id,
+  url,
+  tiles: mutableTiles(tiles),
+  minzoom,
+  maxzoom,
+});

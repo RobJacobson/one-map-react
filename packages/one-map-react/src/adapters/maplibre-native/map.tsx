@@ -24,20 +24,16 @@ import { nativeCameraTarget } from "../shared/native-camera-inputs.js";
 import { omitUndefinedFields } from "../shared/native-layer-updates.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
 import { withNativeMapPresentation } from "../shared/native-map-presentation.js";
-import { nativeBoundsInput } from "../shared/native-values.js";
+import { nativeBoundsInput, nativeClick } from "../shared/native-values.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
 import { useFrozenValue } from "../shared/use-frozen-value.js";
-import { normalizePadding } from "../shared/wrapper-values.js";
+import { normalizePadding, toFlatBounds } from "../shared/wrapper-values.js";
 import {
-  mutableFlatBounds,
   toMaplibreInitialViewState,
   toMaplibreViewState,
 } from "./convert-camera.js";
 import { toMaplibreGestures } from "./convert-gestures.js";
-import {
-  clickEventFromMaplibreNative,
-  moveEventFromMaplibreNative,
-} from "./convert-move-event.js";
+import { moveEventFromMaplibreNative } from "./convert-move-event.js";
 import { createMaplibreMapRef, type NativeAdvancedMapRef } from "./map-ref.js";
 import {
   MaplibreSourceContext,
@@ -169,7 +165,7 @@ const MaplibreNativeMapImplementation = forwardRef<
   const flatMaxBounds =
     maxBounds === undefined
       ? undefined
-      : mutableFlatBounds(nativeBoundsInput(maxBounds));
+      : toFlatBounds(nativeBoundsInput(maxBounds));
 
   return (
     <NativeMapHost style={style} hostProps={props.hostProps}>
@@ -259,12 +255,7 @@ const pressEvent = (nativeEvent: {
   readonly lngLat: readonly [number, number];
   readonly point: readonly [number, number];
   readonly features?: readonly object[];
-}) =>
-  clickEventFromMaplibreNative(
-    nativeEvent.lngLat,
-    nativeEvent.point,
-    nativeEvent.features
-  );
+}) => nativeClick(nativeEvent.lngLat, nativeEvent.point, nativeEvent.features);
 
 /** Selected native map with adapter-owned presentation. */
 export const MaplibreNativeMap = withNativeMapPresentation(

@@ -13,10 +13,7 @@ import type { ComponentType, ReactElement } from "react";
 
 import type { LayerProps } from "../../contracts/layer-types.js";
 import { useLayerOptions } from "../../facade/layer.js";
-import {
-  definedStyle,
-  useNativeLayerKey,
-} from "../shared/native-layer-updates.js";
+import { useNativeLayerKey } from "../shared/native-layer-updates.js";
 
 /**
  * Renders a style-spec layer through RNMapbox.
@@ -55,17 +52,21 @@ const nativeLayers = {
 } satisfies Record<LayerProps["type"], ComponentType<never>>;
 
 /** Renames style fields while leaving values and validation to RNMapbox. */
-const toRnmapboxLayerStyle = (props: LayerProps): Record<string, unknown> =>
-  Object.fromEntries(
-    Object.entries(definedStyle({ ...props.paint, ...props.layout }) ?? {}).map(
-      ([key, value]) => [
-        key.replace(/-([a-z])/g, (_match, letter: string) =>
-          letter.toUpperCase()
-        ),
-        value,
-      ]
-    )
-  );
+const toRnmapboxLayerStyle = (props: LayerProps): Record<string, unknown> => {
+  const entries: [string, unknown][] = [];
+  for (const [key, value] of Object.entries({
+    ...props.paint,
+    ...props.layout,
+  })) {
+    if (value === undefined) continue;
+
+    const styleKey = key.replace(/-([a-z])/g, (_match, letter: string) =>
+      letter.toUpperCase()
+    );
+    entries.push([styleKey, value]);
+  }
+  return Object.fromEntries(entries);
+};
 
 /** Portable layer fields every RNMapbox layer converter reads. */
 interface PortableLayerFields {
