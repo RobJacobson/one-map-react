@@ -3,8 +3,8 @@ import type { Feature, Point as GeoJsonPoint } from "geojson";
 import type {
   QueryRenderedFeaturesOptions,
   QuerySourceFeaturesOptions,
+  ScreenBounds,
 } from "../../contracts/query-types.js";
-import { toRnmapboxRect } from "../shared/feature-values.js";
 import { isScreenBounds, type NativeQueryTarget } from "../shared/index.js";
 
 /**
@@ -78,3 +78,19 @@ export const toRnmapboxClusterFeature = (
   geometry: { type: "Point", coordinates: [0, 0] },
   properties: { cluster: true, cluster_id: clusterId },
 });
+
+/**
+ * Converts screen corners into RNMapbox's `[top, left, bottom, right]` rect.
+ *
+ * RNMapbox documents the rect as `[minY, minX, maxY, maxX]`, which is the
+ * common top-left/bottom-right corner order with each corner flattened.
+ *
+ * @param bounds - Top-left then bottom-right corners.
+ * @returns A mutable four-number rect for the wrapper call.
+ */
+const toRnmapboxRect = (bounds: ScreenBounds): number[] => [
+  bounds[0][1],
+  bounds[0][0],
+  bounds[1][1],
+  bounds[1][0],
+];

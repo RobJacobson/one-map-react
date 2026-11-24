@@ -5,7 +5,7 @@ import type {
 import type { ComponentRef } from "react";
 
 import type { NativeMapRefWithWrapper } from "../../contracts/native-types.js";
-import { requireAttachedMap } from "../index.js";
+import { missingCameraError, requireAttachedMap } from "../index.js";
 import {
   rejectNativeResize,
   rejectNativeStop,
@@ -21,7 +21,6 @@ import {
   nativeRenderedQuery,
   prepareNativeRenderedQueryLayers,
 } from "../shared/index.js";
-import { missingCameraError } from "../shared/missing-camera.js";
 import { createNativeClusterLookup } from "../shared/native-clusters.js";
 import {
   boundsFromFlat,

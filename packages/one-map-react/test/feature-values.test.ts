@@ -1,11 +1,11 @@
 import { describe, expect, test } from "vite-plus/test";
 
+import { toRnmapboxQueryRect } from "../src/adapters/mapbox-native/convert-query.js";
 import {
   assertFeatureIdentifier,
   copyValidatedFeatureState,
   featureStateFromWrapper,
   featuresFromWrapper,
-  toRnmapboxRect,
 } from "../src/adapters/shared/feature-values.js";
 import {
   isScreenBounds,
@@ -164,15 +164,13 @@ test.each([null, 42, "viewport", true, 1n, Symbol("viewport")])(
   }
 );
 
-describe("toRnmapboxRect", () => {
-  test("reorders corners into top, left, bottom, right", () => {
-    expect(
-      toRnmapboxRect([
-        [10, 20],
-        [30, 40],
-      ])
-    ).toEqual([20, 10, 40, 30]);
-  });
+test("RNMapbox rendered queries reorder corners into top, left, bottom, right", () => {
+  expect(
+    toRnmapboxQueryRect([
+      [10, 20],
+      [30, 40],
+    ])
+  ).toEqual({ kind: "rect", rect: [20, 10, 40, 30] });
 });
 
 describe("assertFeatureIdentifier", () => {

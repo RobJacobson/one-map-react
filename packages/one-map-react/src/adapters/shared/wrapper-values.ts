@@ -122,36 +122,7 @@ export const boundsFromFlat = (flat: unknown): Bounds => {
 };
 
 /**
- * Reads RNMapbox `getVisibleBounds()`.
- *
- * The pinned wrapper returns `[[rightLon, topLat], [leftLon, bottomLat]]`.
- * Conversion uses that order, including for bounds crossing the antimeridian.
- *
- * @param corners - Northeast corner, then southwest corner.
- * @returns Fresh southwest and northeast coordinate tuples.
- * @throws When either corner is not a finite longitude and latitude.
- */
-export const boundsFromRnmapboxVisible = (
-  corners: readonly (readonly number[])[]
-): Bounds => {
-  const northeastCorner = corners[0];
-  const southwestCorner = corners[1];
-  const northeast = readFinitePair(northeastCorner);
-  const southwest = northeast && readFinitePair(southwestCorner);
-
-  if (!northeast || !southwest) {
-    throw new Error(
-      "RNMapbox visible bounds must be a northeast corner and a southwest corner."
-    );
-  }
-
-  return [southwest, northeast];
-};
-
-/**
  * Reads a flat tuple or falls back to geographic bounds methods.
- *
- * Use {@link boundsFromRnmapboxVisible} for RNMapbox's northeast-then-southwest pair.
  *
  * @param value - `LngLatBounds` methods or `[west, south, east, north]`.
  * @returns Common bounds.
@@ -314,7 +285,14 @@ const copyCorner = (corner: LngLat): MutableCorner => [corner[0], corner[1]];
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 
-const readFinitePair = (
+/**
+ * Snapshots an array containing exactly two finite coordinates.
+ *
+ * @param value - Candidate coordinate pair.
+ * @param firstCoordinate - First coordinate already read by a query overload.
+ * @returns A fresh pair, or undefined for an invalid coordinate pair.
+ */
+export const readFinitePair = (
   value: unknown,
   firstCoordinate?: number
 ): [number, number] | undefined => {

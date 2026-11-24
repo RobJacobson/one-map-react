@@ -1,26 +1,9 @@
 import type {
   FeatureIdentifier,
   FeatureState,
-  ScreenBounds,
 } from "../../contracts/query-types.js";
 import type { GeoJsonFeature } from "../../contracts/source-types.js";
 import { isRecord } from "./wrapper-values.js";
-
-/**
- * Converts screen corners into RNMapbox's `[top, left, bottom, right]` rect.
- *
- * RNMapbox documents the rect as `[minY, minX, maxY, maxX]`, which is the
- * common top-left/bottom-right corner order with each corner flattened.
- *
- * @param bounds - Top-left then bottom-right corners.
- * @returns A mutable four-number rect for the wrapper call.
- */
-export const toRnmapboxRect = (bounds: ScreenBounds): number[] => [
-  bounds[0][1],
-  bounds[0][0],
-  bounds[1][1],
-  bounds[1][0],
-];
 
 /**
  * Normalizes a wrapper query result into a feature array.
@@ -75,7 +58,7 @@ export const featuresFromWrapper = (
 export const assertFeatureIdentifier = (
   identifier: unknown
 ): FeatureIdentifier => {
-  if (!isRecord(identifier) || Array.isArray(identifier)) {
+  if (!isNonArrayRecord(identifier)) {
     throw new Error(
       "A feature identifier must name a source with a nonempty string."
     );
@@ -136,7 +119,7 @@ export const requireSourceLayerName = (sourceLayer: unknown): string => {
 export const copyValidatedFeatureState = (
   state: FeatureState
 ): Record<string, unknown> => {
-  if (!isRecord(state) || Array.isArray(state)) {
+  if (!isNonArrayRecord(state)) {
     throw new Error("Feature state must be an object.");
   }
 
@@ -156,7 +139,7 @@ export const featureStateFromWrapper = (value: unknown): FeatureState => {
     return {};
   }
 
-  if (!isRecord(value) || Array.isArray(value)) {
+  if (!isNonArrayRecord(value)) {
     throw new Error("Feature state must be an object.");
   }
 
@@ -214,3 +197,6 @@ const copyRecord = (
       copyStateValue(value, topKey ?? key),
     ])
   );
+
+const isNonArrayRecord = (value: unknown): value is Record<string, unknown> =>
+  isRecord(value) && !Array.isArray(value);

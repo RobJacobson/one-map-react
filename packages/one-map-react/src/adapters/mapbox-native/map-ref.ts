@@ -2,7 +2,7 @@ import type { Camera, MapView } from "@rnmapbox/maps";
 import type { ComponentRef } from "react";
 
 import type { NativeMapRefWithWrapper } from "../../contracts/native-types.js";
-import { requireAttachedMap } from "../index.js";
+import { missingCameraError, requireAttachedMap } from "../index.js";
 import {
   rejectNativeResize,
   rejectNativeStop,
@@ -17,11 +17,8 @@ import {
   nativeRenderedQuery,
   prepareNativeRenderedQueryLayers,
 } from "../shared/index.js";
-import { missingCameraError } from "../shared/missing-camera.js";
 import { createNativeClusterLookup } from "../shared/native-clusters.js";
-import { normalizeElevation } from "../shared/terrain-values.js";
 import {
-  boundsFromRnmapboxVisible,
   finiteNumber,
   lngLatFromWrapper,
   pointFromWrapper,
@@ -40,6 +37,10 @@ import {
 } from "./convert-query.js";
 import { createMapboxFeatureStateMethods } from "./feature-state-methods.js";
 import type { GeoJsonSourceRegistry } from "./geojson-source-registry.js";
+import {
+  boundsFromRnmapboxVisible,
+  normalizeElevation,
+} from "./map-results.js";
 
 /** Common map operations and access to the RNMapbox `MapView` wrapper. */
 export type NativeAdvancedMapRef = NativeMapRefWithWrapper<

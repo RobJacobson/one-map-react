@@ -1,4 +1,5 @@
 export {
+  missingCameraError,
   missingMapError,
   requireAttachedMap,
   useNativeMapHandle,

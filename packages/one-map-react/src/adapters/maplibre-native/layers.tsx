@@ -3,12 +3,11 @@ import type { ComponentProps, ReactElement } from "react";
 
 import type { LayerProps } from "../../contracts/layer-types.js";
 import { useLayerOptions } from "../../facade/layer.js";
+import { toNativeLayerStyleKey, useNativeLayerKey } from "../shared/index.js";
 import {
+  assertMaplibreLayerStyle,
   omitUndefinedFields,
-  toNativeLayerStyleKey,
-  useNativeLayerKey,
-} from "../shared/index.js";
-import { assertMaplibreLayerStyle } from "./style-roots.js";
+} from "./style-roots.js";
 
 /** Style-spec and SDK-specific options for a MapLibre native Layer. */
 export type NativeLayerProps =
