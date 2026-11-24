@@ -43,7 +43,11 @@ export const MaplibreNativeLayer = (props: NativeLayerProps): ReactElement => {
   assertMaplibreLayerStyle({ paint, layout, filter, style: legacyStyle });
   const source = "source" in props ? (props.source ?? sourceID) : sourceID;
   const key = useNativeLayerKey(
-    { ...legacyStyle, ...layout, ...paint },
+    {
+      ...legacyStyle,
+      ...maplibreStyleFields(layout),
+      ...maplibreStyleFields(paint),
+    },
     {
       ...wrapperProps,
       filter,
@@ -64,6 +68,15 @@ export const MaplibreNativeLayer = (props: NativeLayerProps): ReactElement => {
     />
   );
 };
+
+// Match the pinned wrapper's mergeStyleProps for paint and layout keys.
+const maplibreStyleFields = (style: Record<string, unknown> | undefined) =>
+  Object.fromEntries(Object.entries(style ?? {}).map(toMaplibreStyleEntry));
+
+const toMaplibreStyleEntry = ([key, value]: [string, unknown]) => [
+  key.replace(/-([a-z])/g, (_match, letter: string) => letter.toUpperCase()),
+  value,
+];
 
 /**
  * Copies a style object with undefined fields removed at every depth.

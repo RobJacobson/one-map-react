@@ -1988,6 +1988,37 @@ describe("maplibre-native entry binding", () => {
     });
   });
 
+  test("equivalent legacy and portable style keys preserve the selected Layer host", async () => {
+    const view = await render(
+      <nativeEntry.Layer
+        id="water"
+        type="fill"
+        style={{ fillColor: "#2563eb", fillSortKey: 1 }}
+      />
+    );
+    const original = view.getByTestId("Layer");
+
+    await view.rerender(
+      <nativeEntry.Layer
+        id="water"
+        type="fill"
+        paint={{ "fill-color": "#2563eb" }}
+        layout={{ "fill-sort-key": 1 }}
+      />
+    );
+    expect(view.getByTestId("Layer")).toBe(original);
+
+    await view.rerender(
+      <nativeEntry.Layer
+        id="water"
+        type="fill"
+        paint={{ "fill-color": "#2563eb" }}
+        layout={{ "fill-sort-key": undefined }}
+      />
+    );
+    expect(view.getByTestId("Layer")).not.toBe(original);
+  });
+
   testNativeEntryBinding(
     nativeEntry,
     "maplibre-native",
