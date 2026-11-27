@@ -828,6 +828,80 @@ describe("mapbox-native adapter", () => {
     }
   });
 
+  test.each([undefined, true])(
+    "iOS layout with no custom scale position avoids follow-up renders (enabled=%s)",
+    async (enabled) => {
+      const platform = jest.replaceProperty(Platform, "OS", "ios");
+      jest.useFakeTimers();
+      try {
+        const view = await render(
+          <NativeMap
+            mapStyle={emptyStyle}
+            initialViewState={initialViewState}
+            hostProps={{ testID: "default-scale-host" }}
+            options={{ scaleBarEnabled: enabled }}
+          />
+        );
+        const before = MapViewMock.mock.calls.length;
+        await fireEvent(view.getByTestId("default-scale-host"), "layout", {
+          nativeEvent: { layout: { x: 0, y: 0, width: 375, height: 237 } },
+        });
+        await act(async () => jest.advanceTimersByTime(32));
+        const calls = MapViewMock.mock.calls.slice(before);
+        expect(calls.length).toBeLessThanOrEqual(1);
+        expect(calls.flat()).not.toContainEqual(
+          expect.objectContaining({ scaleBarEnabled: false })
+        );
+        expect(lastMapProps<MapProps["options"]>()?.scaleBarEnabled).toBe(
+          enabled
+        );
+        await view.unmount();
+      } finally {
+        jest.useRealTimers();
+        platform.restore();
+      }
+    }
+  );
+
+  test("iOS refreshes retained native margins after clearing the scale position", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", "ios");
+    const scene = (
+      scaleBarPosition?: NonNullable<MapProps["options"]>["scaleBarPosition"]
+    ) => (
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={initialViewState}
+        hostProps={{ testID: "cleared-scale-host" }}
+        options={{ scaleBarPosition, scaleBarEnabled: true }}
+      />
+    );
+    jest.useFakeTimers();
+    try {
+      const view = await render(scene());
+      await view.rerender(scene({ top: 96, left: 8 }));
+      await act(async () => jest.advanceTimersByTime(32));
+
+      await view.rerender(scene());
+      expect(lastMapProps<MapProps["options"]>()).toMatchObject({
+        scaleBarPosition: undefined,
+        scaleBarEnabled: false,
+      });
+      await act(async () => jest.advanceTimersByTime(32));
+      expect(lastMapProps<MapProps["options"]>()?.scaleBarEnabled).toBe(true);
+
+      await fireEvent(view.getByTestId("cleared-scale-host"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 0, width: 375, height: 237 } },
+      });
+      expect(lastMapProps<MapProps["options"]>()?.scaleBarEnabled).toBe(false);
+      await act(async () => jest.advanceTimersByTime(32));
+      expect(lastMapProps<MapProps["options"]>()?.scaleBarEnabled).toBe(true);
+      await view.unmount();
+    } finally {
+      jest.useRealTimers();
+      platform.restore();
+    }
+  });
+
   test("iOS keeps scale position key synchronized while scaleBarEnabled is false", async () => {
     const platform = jest.replaceProperty(Platform, "OS", "ios");
     const scene = (top: number, enabled: boolean) => (

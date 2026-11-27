@@ -2,7 +2,15 @@ import type { MapView } from "@rnmapbox/maps";
 import { type ComponentProps, useEffect, useState } from "react";
 import { Platform } from "react-native";
 
-/** Keeps the RNMapbox iOS scale hide/restore commits separated by a frame. */
+/**
+ * Keeps the RNMapbox iOS scale hide/restore commits separated by a frame.
+ *
+ * @param scaleBarPosition - The position passed to RNMapbox.
+ * @param width - Measured map host width.
+ * @param height - Measured map host height.
+ * @param enabled - The requested scale visibility or the SDK default.
+ * @returns Whether to hide the scale on this commit to trigger a native refresh.
+ */
 export const useMapboxScalePosition = (
   scaleBarPosition: ComponentProps<typeof MapView>["scaleBarPosition"],
   width: number | undefined,
@@ -10,9 +18,18 @@ export const useMapboxScalePosition = (
   enabled: boolean | undefined
 ): boolean => {
   const isIos = Platform.OS === "ios";
-  const scalePositionKey = isIos
-    ? JSON.stringify([scaleBarPosition, width, height])
-    : "";
+  const hasScalePosition = isIos && scaleBarPosition !== undefined;
+  const [hasConfiguredScalePosition, setHasConfiguredScalePosition] =
+    useState(hasScalePosition);
+  // RNMapbox iOS retains custom margins when the position prop is removed.
+  if (hasScalePosition && !hasConfiguredScalePosition) {
+    setHasConfiguredScalePosition(true);
+  }
+
+  const scalePositionKey =
+    isIos && (hasScalePosition || hasConfiguredScalePosition)
+      ? JSON.stringify([scaleBarPosition, width, height])
+      : "";
   const [appliedScalePosition, setAppliedScalePosition] =
     useState(scalePositionKey);
   // RNMapbox iOS stores position updates without marking its scale dirty.
