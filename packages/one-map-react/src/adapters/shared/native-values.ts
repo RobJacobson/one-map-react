@@ -114,10 +114,7 @@ export const nativeRenderedQuery = (
   options?: QueryRenderedFeaturesOptions
 ): readonly [NativeQueryTarget, QueryRenderedFeaturesOptions | undefined] => {
   if (target === undefined) return [undefined, options];
-  if (
-    target === null ||
-    (typeof target !== "object" && typeof target !== "function")
-  ) {
+  if (target === null || typeof target !== "object") {
     throw new TypeError(
       "A rendered query target must be a point, rectangle, or options object."
     );
@@ -136,6 +133,7 @@ export const nativeRenderedQuery = (
     }
     return [[pointFromWrapper(first), pointFromWrapper(target[1])], options];
   }
+  if ("y" in target) return [pointFromWrapper(target), options];
   return [undefined, target as QueryRenderedFeaturesOptions];
 };
 

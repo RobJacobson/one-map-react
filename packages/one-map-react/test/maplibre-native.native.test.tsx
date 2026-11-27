@@ -2184,6 +2184,7 @@ describe("maplibre-native entry binding", () => {
       expect(mockQueryRenderedFeatures).toHaveBeenLastCalledWith([10, 20], {
         layers,
       }),
+    () => mockQueryRenderedFeatures.mock.calls.length,
     () =>
       expect(LayerMock.mock.lastCall?.[0]).toMatchObject({
         source: "routes",

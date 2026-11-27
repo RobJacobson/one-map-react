@@ -151,7 +151,7 @@ test.each([
   ).toThrow("A rendered query rectangle must contain exactly two corners.");
 });
 
-test.each([null, 42, "viewport", true, 1n, Symbol("viewport")])(
+test.each([null, 42, "viewport", true, 1n, Symbol("viewport"), () => {}])(
   "native rendered query rejects a non-object target (%s)",
   (target) => {
     expect(() =>
@@ -163,6 +163,27 @@ test.each([null, 42, "viewport", true, 1n, Symbol("viewport")])(
     );
   }
 );
+
+test.each([{ x: 10 }, { y: 20 }])(
+  "native rendered query rejects an incomplete point (%j)",
+  (target) => {
+    expect(() =>
+      // @ts-expect-error Exercise a raw JavaScript point.
+      nativeRenderedQuery(target, { layers: ["roads"] })
+    ).toThrow("A map point must contain x and y.");
+  }
+);
+
+test("native rendered query preserves a rectangle with a named y property", () => {
+  const corners = [
+    [0, 20],
+    [30, 40],
+  ] as const;
+  const rectangle = Object.assign([...corners] as const, { y: 20 });
+  const options = { layers: ["roads"] };
+
+  expect(nativeRenderedQuery(rectangle, options)).toEqual([corners, options]);
+});
 
 test("RNMapbox rendered queries reorder corners into top, left, bottom, right", () => {
   expect(
