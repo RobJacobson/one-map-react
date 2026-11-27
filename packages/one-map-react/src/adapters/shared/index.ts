@@ -9,6 +9,10 @@ export {
   useNativeLayerKey,
 } from "./native-layer-updates.js";
 export {
+  omitUndefinedFields,
+  snapshotNativeStyleValue,
+} from "./native-style-values.js";
+export {
   isScreenBounds,
   nativeBounds,
   nativeBoundsInput,

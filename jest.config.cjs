@@ -32,7 +32,7 @@ module.exports = {
         ...extensionlessImports,
       },
       transformIgnorePatterns: [
-        "/node_modules/(?!.*(@react-native|react-native|@testing-library|test-renderer))",
+        "/node_modules/(?!.*(@react-native|react-native|@testing-library|test-renderer|@rnmapbox/maps/lib/module/utils/))",
       ],
     },
   ],

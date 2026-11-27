@@ -13,6 +13,7 @@ import { useNativeMapHandle } from "../index.js";
 import {
   type NativeMoveCallbacks,
   type NativeViewportBounds,
+  omitUndefinedFields,
   reportSettledMove,
 } from "../shared/index.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
@@ -98,6 +99,8 @@ const MapboxNativeMapImplementation = forwardRef<
     onError,
   });
   const styleProps = toRnmapboxStyleProps(mapStyle);
+  // The snapshot preserves the light fields and removes omitted transition values.
+  const light = omitUndefinedFields(props.light) as NativeMapProps["light"];
 
   useNativeMapHandle(ref, () =>
     createMapboxMapRef(cameraRef, mapViewRef, geoJsonSources)
@@ -185,19 +188,19 @@ const MapboxNativeMapImplementation = forwardRef<
               style={{ exaggeration: props.terrain?.exaggeration }}
             />
           )}
-          {props.light && (
+          {light && (
             <Light
               style={{
-                anchor: props.light.anchor,
-                color: props.light.color,
-                intensity: props.light.intensity,
+                anchor: light.anchor,
+                color: light.color,
+                intensity: light.intensity,
                 position:
-                  props.light.position === undefined
+                  light.position === undefined
                     ? undefined
-                    : [...props.light.position],
-                colorTransition: props.light["color-transition"],
-                intensityTransition: props.light["intensity-transition"],
-                positionTransition: props.light["position-transition"],
+                    : [...light.position],
+                colorTransition: light["color-transition"],
+                intensityTransition: light["intensity-transition"],
+                positionTransition: light["position-transition"],
               }}
             />
           )}

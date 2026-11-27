@@ -13,7 +13,11 @@ import type { ComponentType, ReactElement } from "react";
 
 import type { LayerProps } from "../../contracts/layer-types.js";
 import { useLayerOptions } from "../../facade/layer.js";
-import { toNativeLayerStyleKey, useNativeLayerKey } from "../shared/index.js";
+import {
+  omitUndefinedFields,
+  toNativeLayerStyleKey,
+  useNativeLayerKey,
+} from "../shared/index.js";
 
 /**
  * Renders a style-spec layer through RNMapbox.
@@ -23,19 +27,23 @@ import { toNativeLayerStyleKey, useNativeLayerKey } from "../shared/index.js";
  * @throws When a creation option changes or a symbol layout key is unsupported.
  */
 export const MapboxNativeLayer = (props: LayerProps): ReactElement => {
-  useLayerOptions(props, "mapbox-native");
+  const { paint, layout: rawLayout, ...layerProps } = props;
+  // Keep explicit undefined keys until layout has overridden paint.
+  const layout = { ...rawLayout };
+  const style = toRnmapboxLayerStyle({ ...paint, ...layout });
+  const rawFilter = "filter" in layerProps ? layerProps.filter : undefined;
+  // The snapshot preserves the filter array and all of its positions.
+  const filter = omitUndefinedFields(rawFilter) as typeof rawFilter;
+  const layer = { ...layerProps, layout, filter };
+  useLayerOptions(layer, "mapbox-native");
 
   // Wrapper style unions are narrower than the preserved portable expressions.
   const NativeLayer = nativeLayers[props.type] as ComponentType<
     ReturnType<typeof rnmapboxLayerFields> & { style: Record<string, unknown> }
   >;
-  const style = toRnmapboxLayerStyle(props);
-  const key = useNativeLayerKey(Object.keys(style), {
-    ...props,
-    filter: "filter" in props ? props.filter : undefined,
-  });
+  const key = useNativeLayerKey(Object.keys(style), layer);
   return (
-    <NativeLayer key={key} {...rnmapboxLayerFields(props)} style={style} />
+    <NativeLayer key={key} {...rnmapboxLayerFields(layer)} style={style} />
   );
 };
 
@@ -51,16 +59,12 @@ const nativeLayers = {
   "fill-extrusion": FillExtrusionLayer,
 } satisfies Record<LayerProps["type"], ComponentType<never>>;
 
-/** Renames style fields while leaving values and validation to RNMapbox. */
-const toRnmapboxLayerStyle = (props: LayerProps): Record<string, unknown> => {
+/** Snapshots the merged style with the field names RNMapbox expects. */
+const toRnmapboxLayerStyle = (style: object): Record<string, unknown> => {
   const entries: [string, unknown][] = [];
-  for (const [key, value] of Object.entries({
-    ...props.paint,
-    ...props.layout,
-  })) {
+  for (const [key, value] of Object.entries(style)) {
     if (value === undefined) continue;
-
-    entries.push([toNativeLayerStyleKey(key), value]);
+    entries.push([toNativeLayerStyleKey(key), omitUndefinedFields(value)]);
   }
   return Object.fromEntries(entries);
 };
