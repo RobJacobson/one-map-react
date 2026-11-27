@@ -60,38 +60,98 @@ test("supplied location display needs no acquisition manager", async () => {
   expect(release).toHaveBeenCalledTimes(1);
 });
 
-test("supplied location draws a finite accuracy ring after an absent position", () => {
-  const { NativeMap, source } = fixture();
-  const scene = (position?: UserLocationProps["position"]) => (
-    <NativeMap mapStyle={{ version: 8, sources: {}, layers: [] }}>
-      <UserLocation position={position} showAccuracyCircle />
-    </NativeMap>
-  );
-  const mounted = render(scene());
-  expect(source).not.toHaveBeenCalled();
-
-  const accuracy = vi.fn(() => NaN).mockReturnValueOnce(30);
-  mounted.rerender(
-    scene({
-      lngLat: [7, 8],
-      get accuracy() {
-        return accuracy();
-      },
-    })
-  );
-
-  const props = source.mock.lastCall?.[0];
-  const data = props?.type === "geojson" ? props.data : undefined;
-  if (!data || typeof data === "string" || !("features" in data)) {
-    throw new Error("Expected a location feature collection.");
+test.each([
+  undefined,
+  { lngLat: [7, 8] },
+] satisfies UserLocationProps["position"][])(
+  "supplied location requires an enclosing map with position %j",
+  (position) => {
+    expect(() => render(<UserLocation position={position} />)).toThrow(
+      "UserLocation must render inside Map."
+    );
   }
-  const polygon = data.features[1]?.geometry;
-  expect(polygon?.type).toBe("Polygon");
-  const coordinates = polygon?.coordinates;
-  const ring: unknown = Array.isArray(coordinates) ? coordinates[0] : undefined;
-  const isFinitePair = (point: unknown) =>
-    Array.isArray(point) && point.length === 2 && point.every(Number.isFinite);
-  expect(ring).toHaveLength(65);
-  expect(Array.isArray(ring) && ring.every(isFinitePair)).toBe(true);
-  expect(accuracy).toHaveBeenCalledTimes(1);
-});
+);
+
+test.each([
+  { radius: undefined, showAccuracyCircle: true },
+  { radius: 0, showAccuracyCircle: true },
+  { radius: 30, showAccuracyCircle: false },
+])(
+  "draws only the position without an accuracy ring (%j)",
+  ({ radius, showAccuracyCircle }) => {
+    const { NativeMap, source } = fixture();
+    render(
+      <NativeMap mapStyle={{ version: 8, sources: {}, layers: [] }}>
+        <UserLocation
+          position={{ lngLat: [7, 8], accuracy: radius }}
+          showAccuracyCircle={showAccuracyCircle}
+        />
+      </NativeMap>
+    );
+    expect(source.mock.lastCall?.[0]).toMatchObject({
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: [
+          {
+            properties: { kind: "position" },
+            geometry: { type: "Point", coordinates: [7, 8] },
+          },
+        ],
+      },
+    });
+  }
+);
+
+test.each([
+  { latitude: 8, radius: 30 },
+  // The geodesic calculation can round past either end of the asin domain.
+  { latitude: -88, radius: 19792724.281568855 },
+  { latitude: 88, radius: 19792724.281568855 },
+  { latitude: -90, radius: 30 },
+  { latitude: 90, radius: 30 },
+])(
+  "draws a finite, closed accuracy ring at latitude $latitude",
+  ({ latitude, radius }) => {
+    const { NativeMap, source } = fixture();
+    const scene = (position?: UserLocationProps["position"]) => (
+      <NativeMap mapStyle={{ version: 8, sources: {}, layers: [] }}>
+        <UserLocation position={position} showAccuracyCircle />
+      </NativeMap>
+    );
+    const mounted = render(scene());
+    expect(source).not.toHaveBeenCalled();
+
+    const accuracy = vi.fn(() => NaN).mockReturnValueOnce(radius);
+    mounted.rerender(
+      scene({
+        lngLat: [7, latitude],
+        get accuracy() {
+          return accuracy();
+        },
+      })
+    );
+
+    const props = source.mock.lastCall?.[0];
+    const data = props?.type === "geojson" ? props.data : undefined;
+    if (!data || typeof data === "string" || !("features" in data)) {
+      throw new Error("Expected a location feature collection.");
+    }
+    const polygon = data.features[1]?.geometry;
+    expect(polygon?.type).toBe("Polygon");
+    const coordinates = polygon?.coordinates;
+    const ring: unknown = Array.isArray(coordinates)
+      ? coordinates[0]
+      : undefined;
+    if (!Array.isArray(ring)) throw new Error("Expected an accuracy ring.");
+
+    const isFinitePair = (point: unknown) =>
+      Array.isArray(point) &&
+      point.length === 2 &&
+      point.every(Number.isFinite);
+    expect(ring).toHaveLength(65);
+    expect(ring.every(isFinitePair)).toBe(true);
+    expect(ring.at(-1)).toStrictEqual(ring[0]);
+    expect(accuracy).toHaveBeenCalledTimes(1);
+  }
+);
