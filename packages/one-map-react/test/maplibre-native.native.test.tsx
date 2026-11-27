@@ -1225,6 +1225,25 @@ describe("maplibre-native layers", () => {
     }
   );
 
+  test("rejects vertical alignment after an unstyled format section in JSX", async () => {
+    await expect(
+      render(
+        <Layer
+          id="labels"
+          type="symbol"
+          layout={{
+            "text-field": [
+              "format",
+              ["image", "icon"],
+              "world",
+              { "vertical-align": "top" },
+            ],
+          }}
+        />
+      )
+    ).rejects.toThrow("format.vertical-align");
+  });
+
   test("omitted expression modifiers reach the pinned style converter", async () => {
     const { transformStyle, mergeStyleProps } = pinnedMaplibreConverter();
     const convert = (layout: object) =>
