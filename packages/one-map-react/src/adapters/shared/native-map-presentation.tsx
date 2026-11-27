@@ -13,16 +13,20 @@ import {
 
 import type { MapRef, ViewState } from "../../contracts/camera-types.js";
 import type { MapProps } from "../../contracts/map-types.js";
-import type { NativeMapInputs } from "../../contracts/native-types.js";
+import type {
+  NativeCameraTarget,
+  NativeMapInputs,
+} from "../../contracts/native-types.js";
 import type {
   NativeMoveCallbacks,
   NativeViewportBounds,
 } from "./move-event.js";
 import {
+  nativeCameraCenter,
   nativeCameraTarget,
   nativeInitialCamera,
+  snapshotNativeInitialCamera,
 } from "./native-camera-inputs.js";
-import { useFrozenValue } from "./use-frozen-value.js";
 import { type NativeLayoutSize, updateLayoutSize } from "./wrapper-values.js";
 
 /** Native-only presentation owned by the selected adapter's map. */
@@ -61,21 +65,22 @@ export const withNativeMapPresentation = <
 ): ForwardRefExoticComponent<PropsWithoutRef<Props> & RefAttributes<Handle>> =>
   forwardRef<Handle, Props>((props, ref) => {
     const viewState = nativeCameraTarget(props);
-    const initialViewState = useFrozenValue(
-      props.initialViewState ?? viewState
+    const [initialViewState] = useState(() =>
+      snapshotNativeInitialCamera(props.initialViewState ?? viewState)
     );
     return (
       <NativePresentationProvider>
         <NativeCameraProvider
           initial={initialViewState}
+          target={viewState}
           onMove={props.onMove}
           onMoveEnd={props.onMoveEnd}
         >
-          {(callbacks) => (
+          {(callbacks, resolvedTarget) => (
             <Implementation
               {...(props as Props)}
               {...callbacks}
-              viewState={viewState}
+              viewState={resolvedTarget}
               initialViewState={initialViewState}
               ref={ref}
             />
@@ -125,18 +130,41 @@ const NativePresentationProvider = ({
 
 const NativeCameraProvider = ({
   initial,
+  target,
   onMove,
   onMoveEnd,
   children,
 }: {
   readonly initial: NativeMapInputs["initialViewState"];
+  readonly target: NativeCameraTarget | undefined;
   readonly onMove?: MapProps["onMove"];
   readonly onMoveEnd?: MapProps["onMoveEnd"];
-  readonly children: (callbacks: NativeMoveCallbacks) => ReactNode;
+  readonly children: (
+    callbacks: NativeMoveCallbacks,
+    target: NativeCameraTarget | undefined
+  ) => ReactNode;
 }) => {
-  const [observed, setObserved] = useState<NativeCameraState>(() => ({
+  const [initialCamera] = useState<NativeCameraState>(() => ({
     viewState: nativeInitialCamera(initial),
   }));
+  const [observed, setObserved] = useState(initialCamera);
+  const waitsForInitialFit = initial?.bounds !== undefined;
+  const currentCamera =
+    waitsForInitialFit && observed === initialCamera
+      ? undefined
+      : observed.viewState;
+
+  // A changed target samples the camera once so subsequent gestures cannot replay it.
+  const [selection, setSelection] = useState(() =>
+    selectCameraTarget(target, currentCamera)
+  );
+  if (
+    !isSameCameraTarget(selection.target, target) ||
+    (selection.waitsForCenter && currentCamera !== undefined)
+  ) {
+    setSelection(selectCameraTarget(target, currentCamera));
+  }
+
   const callbacks = useMemo<NativeMoveCallbacks>(() => {
     const observeCamera = (
       viewState: ViewState,
@@ -144,6 +172,7 @@ const NativeCameraProvider = ({
     ): void => {
       setObserved((previous) => {
         if (
+          !(waitsForInitialFit && previous === initialCamera) &&
           isSameCamera(previous.viewState, viewState) &&
           isSameBounds(previous.bounds, bounds)
         ) {
@@ -163,9 +192,12 @@ const NativeCameraProvider = ({
         onMoveEnd?.(event);
       },
     };
-  }, [onMove, onMoveEnd]);
+  }, [initialCamera, onMove, onMoveEnd, waitsForInitialFit]);
   // Observations update camera consumers without recreating the renderer child.
-  const content = useMemo(() => children(callbacks), [children, callbacks]);
+  const content = useMemo(
+    () => children(callbacks, selection.resolved),
+    [children, callbacks, selection.resolved]
+  );
   return (
     <NativeCameraContext.Provider value={observed}>
       {content}
@@ -173,12 +205,53 @@ const NativeCameraProvider = ({
   );
 };
 
-const isSameCamera = (previous: ViewState, next: ViewState): boolean =>
-  previous.longitude === next.longitude &&
-  previous.latitude === next.latitude &&
-  previous.zoom === next.zoom &&
-  previous.bearing === next.bearing &&
-  previous.pitch === next.pitch;
+const selectCameraTarget = (
+  target: NativeCameraTarget | undefined,
+  observed: ViewState | undefined
+) => {
+  const center = target && nativeCameraCenter(target, observed);
+  return {
+    target,
+    waitsForCenter:
+      center === undefined &&
+      (target?.longitude !== undefined || target?.latitude !== undefined),
+    resolved: center
+      ? { ...target, longitude: center[0], latitude: center[1] }
+      : target,
+  };
+};
+
+const isSameCameraTarget = (
+  previous: NativeCameraTarget | undefined,
+  next: NativeCameraTarget | undefined
+): boolean => {
+  if (!previous || !next) return previous === next;
+
+  const from = previous.padding;
+  const to = next.padding;
+  return (
+    isSameCamera(previous, next) &&
+    isSameNumber(from?.top, to?.top) &&
+    isSameNumber(from?.right, to?.right) &&
+    isSameNumber(from?.bottom, to?.bottom) &&
+    isSameNumber(from?.left, to?.left)
+  );
+};
+
+const isSameCamera = (
+  previous: Partial<ViewState>,
+  next: Partial<ViewState>
+): boolean =>
+  isSameNumber(previous.longitude, next.longitude) &&
+  isSameNumber(previous.latitude, next.latitude) &&
+  isSameNumber(previous.zoom, next.zoom) &&
+  isSameNumber(previous.bearing, next.bearing) &&
+  isSameNumber(previous.pitch, next.pitch);
+
+const isSameNumber = (
+  previous: number | undefined,
+  next: number | undefined
+): boolean => previous === next || Object.is(previous, next);
 
 const isSameBounds = (
   previous: NativeViewportBounds | undefined,
