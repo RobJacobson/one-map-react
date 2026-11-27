@@ -117,6 +117,14 @@ test("silent native formatting modifiers reject without dropping supported optio
   ).toThrow("format.vertical-align");
   expect(() =>
     assertMaplibreExpressions([
+      "format",
+      "text",
+      1,
+      { "vertical-align": "top" },
+    ])
+  ).toThrow("format.vertical-align");
+  expect(() =>
+    assertMaplibreExpressions([
       "number-format",
       1,
       { currency: "USD", locale: "en" },
@@ -124,6 +132,53 @@ test("silent native formatting modifiers reject without dropping supported optio
   ).not.toThrow();
   expect(() =>
     assertMaplibreExpressions(["format", "text", { "font-scale": 1 }])
+  ).not.toThrow();
+});
+
+test.each([{ firstSection: "hello" }, { firstSection: ["image", "icon"] }])(
+  "rejects vertical alignment after an unstyled $firstSection section",
+  ({ firstSection }) => {
+    const layout = {
+      "text-field": [
+        "format",
+        firstSection,
+        "world",
+        { "vertical-align": "top" },
+      ],
+    };
+    const layer = { id: "labels", type: "symbol", layout };
+
+    expect(() => assertMaplibreLayerStyle(layer)).toThrow(
+      "format.vertical-align"
+    );
+    expect(() => maplibreStyleForNative({ layers: [layer] })).toThrow(
+      "format.vertical-align"
+    );
+  }
+);
+
+test("checks the first item in a non-operator array in layer layout", () => {
+  expect(() =>
+    assertMaplibreLayerStyle({
+      layout: {
+        "text-field": [["format", "label", { "vertical-align": "top" }]],
+      },
+    })
+  ).toThrow("format.vertical-align");
+});
+
+test("leaves literal payloads, match labels, and misplaced format options to the parser", () => {
+  const options = { "vertical-align": "top" };
+  const format = ["format", "hello", "world", options];
+  const layer = { layout: { "text-field": ["literal", [format]] } };
+
+  expect(() => assertMaplibreLayerStyle(layer)).not.toThrow();
+  expect(() =>
+    assertMaplibreExpressions(["match", ["get", "kind"], format, "yes", "no"])
+  ).not.toThrow();
+  expect(() => assertMaplibreExpressions(["format", options])).not.toThrow();
+  expect(() =>
+    assertMaplibreExpressions(["format", "hello", {}, options])
   ).not.toThrow();
 });
 

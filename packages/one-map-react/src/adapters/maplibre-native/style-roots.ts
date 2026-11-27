@@ -24,7 +24,9 @@ export const assertMaplibreExpressions = (value: unknown): void => {
         "number-format.unit is unsupported by the pinned MapLibre Native SDK."
       );
     }
-    for (let index = 1; index < value.length; index += 1) {
+    const firstArgument = typeof operator === "string" ? 1 : 0;
+    let formatOptionsAllowed = false;
+    for (let index = firstArgument; index < value.length; index += 1) {
       if (
         operator === "match" &&
         index >= 2 &&
@@ -33,15 +35,19 @@ export const assertMaplibreExpressions = (value: unknown): void => {
       )
         continue;
       const member: unknown = value[index];
-      if (
-        operator === "format" &&
-        index % 2 === 0 &&
-        isRecord(member) &&
-        hasDefinedOwn(member, "vertical-align")
-      ) {
-        throw new Error(
-          "format.vertical-align is unsupported by the pinned MapLibre Native SDK."
-        );
+      if (operator === "format") {
+        const isOptionsObject = isRecord(member) && !Array.isArray(member);
+        if (
+          formatOptionsAllowed &&
+          isOptionsObject &&
+          hasDefinedOwn(member, "vertical-align")
+        ) {
+          throw new Error(
+            "format.vertical-align is unsupported by the pinned MapLibre Native SDK."
+          );
+        }
+        // Each format section can be followed by one options object.
+        formatOptionsAllowed = !isOptionsObject;
       }
       assertMaplibreExpressions(member);
     }
