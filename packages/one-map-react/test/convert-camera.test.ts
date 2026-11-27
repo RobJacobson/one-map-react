@@ -73,6 +73,31 @@ describe("camera conversion", () => {
     expect(toMaplibreViewState({ zoom: 8 }).center).toBeUndefined();
   });
 
+  test("rejects non-finite declarative coordinates, including lone axes", () => {
+    for (const convert of [
+      toRnmapboxDefaultSettings,
+      toMaplibreInitialViewState,
+      toRnmapboxControlledCamera,
+      toMaplibreViewState,
+    ]) {
+      expect(() => convert({ longitude: NaN })).toThrow(/longitude.*finite/);
+      expect(() => convert({ latitude: Infinity })).toThrow(/latitude.*finite/);
+      expect(() => convert({ longitude: 0, latitude: -Infinity })).toThrow(
+        /latitude.*finite/
+      );
+    }
+  });
+
+  test("validates supplied coordinates even when initial bounds set the center", () => {
+    const initial = { bounds: fitBounds, latitude: NaN };
+    expect(() => toRnmapboxDefaultSettings(initial)).toThrow(
+      /latitude.*finite/
+    );
+    expect(() => toMaplibreInitialViewState(initial)).toThrow(
+      /latitude.*finite/
+    );
+  });
+
   test("fits initial bounds with orientation and fit padding", () => {
     const initial = {
       ...viewState,

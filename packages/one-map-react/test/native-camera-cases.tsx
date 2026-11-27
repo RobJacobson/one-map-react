@@ -89,6 +89,101 @@ export const testNativeCamera = <Handle extends NativeMapRef>(
     await mounted.unmount();
   });
 
+  test.each([
+    { axis: "longitude", firstCenter: [7, 6], movedCenter: [0, 20] },
+    { axis: "latitude", firstCenter: [5, 7], movedCenter: [10, 0] },
+  ] as const)(
+    "applies a changed $axis target against the observed center",
+    async ({ axis, firstCenter, movedCenter }) => {
+      const scene = (
+        target: Pick<
+          NativeMapInputs,
+          "viewState" | "longitude" | "latitude" | "zoom"
+        > = {}
+      ) => (
+        <NativeMap
+          mapStyle={emptyStyle}
+          initialViewState={{ longitude: 5, latitude: 6 }}
+          {...target}
+        />
+      );
+      const mounted = await render(scene({ [axis]: 7 }));
+      const camera = () => mounted.getByTestId("wrapper-camera").props;
+      expect(camera()[centerProp]).toEqual(firstCenter);
+      expect(camera()[initialProp][centerProp]).toEqual([5, 6]);
+
+      const { move, settle } = captureEvents();
+      const observed = { ...initialViewState, longitude: 10, latitude: 20 };
+      await act(async () => move(observed, true));
+      const target = { [axis]: 0 };
+      await mounted.rerender(scene({ viewState: target }));
+      expect(camera()[centerProp]).toEqual(movedCenter);
+      expect(camera()[initialProp][centerProp]).toEqual([5, 6]);
+
+      await act(async () =>
+        settle({ ...observed, longitude: 30, latitude: 40 })
+      );
+      expect(camera()[centerProp]).toEqual(movedCenter);
+      await mounted.rerender(scene({ viewState: { ...target } }));
+      expect(camera()[centerProp]).toEqual(movedCenter);
+      await mounted.rerender(scene(target));
+      expect(camera()[centerProp]).toEqual(movedCenter);
+
+      const latestCenter = axis === "longitude" ? [0, 40] : [30, 0];
+      await mounted.rerender(scene({ viewState: { ...target, zoom: 8 } }));
+      expect(camera()[centerProp]).toEqual(latestCenter);
+      expect(camera()[zoomProp]).toBe(8);
+
+      await mounted.rerender(scene({ zoom: 9 }));
+      expect(camera()[centerProp]).toBeUndefined();
+      expect(camera()[zoomProp]).toBe(9);
+      await mounted.rerender(scene());
+      expect(camera()[centerProp]).toBeUndefined();
+      await mounted.rerender(scene({ viewState: target }));
+      expect(camera()[centerProp]).toEqual(latestCenter);
+      await mounted.unmount();
+    }
+  );
+
+  test("a partial target waits for the center of the initial fit", async () => {
+    const scene = (latitude: number) => (
+      <NativeMap
+        mapStyle={emptyStyle}
+        initialViewState={{ bounds: [10, 20, 30, 40] }}
+        viewState={{ latitude }}
+      />
+    );
+    const mounted = await render(scene(0));
+    const center = () =>
+      mounted.getByTestId("wrapper-camera").props[centerProp];
+    expect(center()).toBeUndefined();
+
+    await mounted.rerender(scene(6));
+    expect(center()).toBeUndefined();
+    const { settle } = captureEvents();
+    await act(async () => settle({ ...initialViewState, longitude: 23 }));
+    expect(center()).toEqual([23, 6]);
+    await act(async () => settle({ ...initialViewState, longitude: 24 }));
+    expect(center()).toEqual([23, 6]);
+    await mounted.unmount();
+  });
+
+  test.each([
+    { initialViewState: { longitude: NaN }, axis: "longitude" },
+    { viewState: { latitude: Infinity }, axis: "latitude" },
+  ])("rejects a non-finite declarative $axis", async ({ axis, ...props }) => {
+    await expect(
+      render(<NativeMap mapStyle={emptyStyle} {...props} />)
+    ).rejects.toThrow(`${axis} must be a finite number.`);
+  });
+
+  test("rejects a non-finite named coordinate on update", async () => {
+    const mounted = await render(<NativeMap mapStyle={emptyStyle} />);
+    await expect(
+      mounted.rerender(<NativeMap mapStyle={emptyStyle} latitude={-Infinity} />)
+    ).rejects.toThrow("latitude must be a finite number.");
+  });
+
   test("native movement does not dispatch an unchanged target, including an equal new object", async () => {
     const frames = new Map<number, FrameRequestCallback>();
     let nextFrame = 0;
