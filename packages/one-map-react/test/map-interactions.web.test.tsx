@@ -36,6 +36,28 @@ test("callback teardown suppresses retained movement and click handlers", async 
   expect(onClick).not.toHaveBeenCalled();
 });
 
+test("a retained filtered click skips the query after unmount", async () => {
+  const query = vi.fn<MapRef["queryRenderedFeatures"]>().mockResolvedValue([]);
+  const onClick = vi.fn();
+  const onError = vi.fn();
+  // The hook only reads queryRenderedFeatures from the attached map.
+  const map = { queryRenderedFeatures: query } as unknown as MapRef;
+  const mounted = renderHook(() =>
+    useMapInteractions(
+      { ...props, onClick, onError, interactiveLayerIds: ["route-line"] },
+      { current: map }
+    )
+  );
+  const { click } = mounted.result.current;
+  mounted.unmount();
+
+  await act(async () => click(event));
+
+  expect(query).not.toHaveBeenCalled();
+  expect(onClick).not.toHaveBeenCalled();
+  expect(onError).not.toHaveBeenCalled();
+});
+
 test("custom forwarding proxies retain common queries", async () => {
   const query = vi.fn<MapRef["queryRenderedFeatures"]>().mockResolvedValue([]);
   const unknownMethod = vi.fn();
