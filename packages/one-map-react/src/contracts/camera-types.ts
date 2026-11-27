@@ -174,7 +174,8 @@ export interface MapRef extends FeatureQueryMethods, FeatureStateMethods {
    * easing function, is rejected.
    * @returns A promise that adopts the wrapper call.
    * @throws When the camera or map ref is missing, MapLibre Native has not
-   * reported style load, or `options` asks for animation.
+   * reported style load, RNMapbox location follow owns the camera, or
+   * `options` asks for animation.
    */
   jumpTo: (options: CameraCommandOptions) => Promise<void>;
   /**
@@ -183,7 +184,8 @@ export interface MapRef extends FeatureQueryMethods, FeatureStateMethods {
    * @param options - Partial camera target and optional duration.
    * @returns A promise that adopts the wrapper call.
    * @throws When the camera or map ref is missing, MapLibre Native has not
-   * reported style load, or a native caller passes `easing`.
+   * reported style load, RNMapbox location follow owns the camera, or a
+   * native caller passes `easing`.
    */
   easeTo: (options: CameraCommandOptions) => Promise<void>;
   /**
@@ -194,7 +196,8 @@ export interface MapRef extends FeatureQueryMethods, FeatureStateMethods {
    * synchronous `setCamera` with `animationMode: "flyTo"`. MapLibre Native
    * awaits `setStop` after style load.
    * @throws When the camera or map ref is missing, MapLibre Native has not
-   * reported style load, or a native caller passes `easing`.
+   * reported style load, RNMapbox location follow owns the camera, or a
+   * native caller passes `easing`.
    */
   flyTo: (options: FlyToOptions) => Promise<void>;
   /**
@@ -204,8 +207,8 @@ export interface MapRef extends FeatureQueryMethods, FeatureStateMethods {
    * @param options - Padding, duration, bearing, pitch, easing, and max zoom.
    * @returns A promise that adopts the wrapper call.
    * @throws When the bounds are not two coordinate pairs, the camera or map
-   * ref is missing, MapLibre Native has not reported style load, or a native
-   * caller passes `easing`.
+   * ref is missing, MapLibre Native has not reported style load, RNMapbox
+   * location follow owns the camera, or a native caller passes `easing`.
    */
   fitBounds: (bounds: Bounds, options?: FitBoundsOptions) => Promise<void>;
   /**
@@ -215,7 +218,8 @@ export interface MapRef extends FeatureQueryMethods, FeatureStateMethods {
    * @param options - Duration and easing. Duration `0` is a jump.
    * @returns A promise that adopts the wrapper call.
    * @throws When the camera or map ref is missing, MapLibre Native has not
-   * reported style load, or a native caller passes `easing`.
+   * reported style load, RNMapbox location follow owns the camera, or a
+   * native caller passes `easing`.
    */
   zoomTo: (zoom: number, options?: ZoomToOptions) => Promise<void>;
   /** Rejects because the native wrappers have no camera-cancel method. */

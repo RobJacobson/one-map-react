@@ -9,7 +9,10 @@ import { reactCompiler } from "../scripts/react-compiler.mjs";
 
 // Check the actual component, since another compiled hook in its file proves nothing.
 for (const [relative, names] of [
-  ["adapters/mapbox-native/map.tsx", ["MapboxNativeMapImplementation"]],
+  [
+    "adapters/mapbox-native/MapboxNativeMap.tsx",
+    ["MapboxNativeMapImplementation"],
+  ],
   ["adapters/maplibre-native/map.tsx", ["MaplibreNativeMapImplementation"]],
   ["facade/map.tsx", ["MountedMap", "useMapAttachment"]],
   ["facade/user-location.tsx", ["UserLocation"]],

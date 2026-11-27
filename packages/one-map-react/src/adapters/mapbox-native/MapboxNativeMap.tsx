@@ -3,6 +3,7 @@ import {
   type ComponentProps,
   type ComponentRef,
   forwardRef,
+  useCallback,
   useRef,
   useState,
 } from "react";
@@ -38,8 +39,12 @@ import {
   GeoJsonSourceContext,
   createGeoJsonSourceRegistry,
 } from "./geojson-source-registry.js";
-import { useRnmapboxGestures } from "./gesture-settings.js";
-import { createMapboxMapRef, type NativeAdvancedMapRef } from "./map-ref.js";
+import {
+  createMapboxMapRef,
+  type NativeAdvancedMapRef,
+  type RnmapboxCameraAttachment,
+} from "./map-ref.js";
+import { useRnmapboxGestures } from "./MapboxGestureSettings.js";
 import { toRnmapboxStyleProps } from "./style-props.js";
 import { useMapboxScalePosition } from "./use-mapbox-scale-position.js";
 
@@ -54,7 +59,10 @@ const MapboxNativeMapImplementation = forwardRef<
 >((props, ref) => {
   const session = useNativeMapPresentation();
   const { viewState } = props;
-  if (viewState && props.locationOptions?.followUserLocation)
+  const { followUserLocation, ...locationSettings } =
+    props.locationOptions ?? {};
+  const isFollowing = Boolean(followUserLocation);
+  if (viewState && isFollowing)
     throw new Error("Selected location follow conflicts with viewState.");
   const scaleBarPosition = props.options?.scaleBarPosition;
   const refreshScalePosition = useMapboxScalePosition(
@@ -81,10 +89,17 @@ const MapboxNativeMapImplementation = forwardRef<
     onError,
     children,
   } = props;
-  const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
+  const cameraRef = useRef<RnmapboxCameraAttachment>(null);
+  const attachCamera = useCallback(
+    (camera: ComponentRef<typeof Camera> | null) => {
+      cameraRef.current = camera ? { camera, isFollowing } : null;
+    },
+    [isFollowing]
+  );
   const mapViewRef = useRef<ComponentRef<typeof MapView>>(null);
   const sawMove = useRef(false);
   const [geoJsonSources] = useState(createGeoJsonSourceRegistry);
+  const { zoomEnabled: _zoomEnabled, ...mapOptions } = props.options ?? {};
   const gestures = useRnmapboxGestures(props, props.options);
   // RNMapbox class event handlers read this.props, including props from a suspended render.
   const report = useActiveCallbacks({
@@ -124,7 +139,7 @@ const MapboxNativeMapImplementation = forwardRef<
     <NativeMapHost style={style} hostProps={props.hostProps}>
       <GeoJsonSourceContext.Provider value={geoJsonSources}>
         <MapView
-          {...props.options}
+          {...mapOptions}
           projection={props.projection ?? props.options?.projection}
           scaleBarPosition={scaleBarPosition}
           {...(refreshScalePosition ? { scaleBarEnabled: false } : {})}
@@ -161,7 +176,7 @@ const MapboxNativeMapImplementation = forwardRef<
           }
         >
           <Camera
-            ref={cameraRef}
+            ref={attachCamera}
             defaultSettings={toRnmapboxDefaultSettings(initialViewState)}
             minZoomLevel={minZoom}
             maxZoomLevel={maxZoom}
@@ -173,7 +188,8 @@ const MapboxNativeMapImplementation = forwardRef<
             padding={
               padding === undefined ? undefined : toRnmapboxPadding(padding)
             }
-            {...props.locationOptions}
+            {...locationSettings}
+            followUserLocation={followUserLocation}
             {...(controlled ?? {})}
           />
           {children}

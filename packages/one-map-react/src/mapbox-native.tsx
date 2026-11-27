@@ -9,7 +9,7 @@ import {
   nativeComponents,
   MapboxNativeMap,
 } from "./adapters/mapbox-native/index.js";
-import type { NativeAdvancedMapRef } from "./adapters/mapbox-native/map-ref.js";
+import type { NativeAdvancedMapRef } from "./adapters/mapbox-native/index.js";
 import type { LayerProps } from "./contracts/layer-types.js";
 import type { NativeMapInputs } from "./contracts/native-types.js";
 export type {
@@ -37,7 +37,7 @@ export type { GestureSettings } from "./adapters/mapbox-native/index.js";
 export type {
   NativeAdvancedMapRef,
   NativeAdvancedMapRef as MapRef,
-} from "./adapters/mapbox-native/map-ref.js";
+} from "./adapters/mapbox-native/index.js";
 export {
   CameraGestureObserver,
   MapboxGestureSettings,
@@ -58,7 +58,10 @@ export type NativeLocationOptions = Pick<
 export interface NativeMapProps extends Omit<NativeMapInputs, "mapStyle"> {
   /** Complete selected style document. */
   readonly mapStyle: NativeMapInputs["mapStyle"] | NativeStyleDocument;
-  /** SDK follow facilities; conflicts with an explicit viewState target. */
+  /**
+   * SDK location follow. When enabled, a `viewState` target and portable
+   * imperative camera commands are unavailable.
+   */
   readonly locationOptions?: NativeLocationOptions;
   /** Attributes on the containing native View. */
   readonly hostProps?: ViewProps;

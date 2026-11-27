@@ -114,6 +114,8 @@ Inside a map, read `useMap().current`. A sibling reads `useMap().harbor` for a m
 
 Native selected maps accept partial initial camera settings, desktop camera commands, and click fields such as `event.lngLat.lng` and `event.point.x`. Await native reads including `getCenter()`, `project()`, and `getBounds()`. Use `map.getSource(id)` to access a mounted GeoJSON source's cluster methods. Both promise and error-first callback calls are supported on native. [Library boundary](https://github.com/RobJacobson/one-map-react/blob/main/docs/architecture.md).
 
+On RNMapbox, `jumpTo`, `easeTo`, `flyTo`, `fitBounds`, and `zoomTo` reject while `locationOptions.followUserLocation` is true. To move the camera elsewhere, clear the follow option. You can supply a new `viewState` in that same render or issue a camera command after the change commits.
+
 The MapLibre native `Layer` also accepts SDK-specific props, including `afterId`, `layerIndex`, and `style`.
 
 ## Advanced native APIs
