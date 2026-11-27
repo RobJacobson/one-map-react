@@ -2369,6 +2369,9 @@ describe("mapbox-native entry binding", () => {
         layers
       ),
     () =>
+      mockQueryRenderedFeaturesAtPoint.mock.calls.length +
+      mockQueryRenderedFeaturesInRect.mock.calls.length,
+    () =>
       expect(LineLayerMock.mock.lastCall?.[0]).toMatchObject({
         sourceID: "routes",
         style: { lineWidth: 3 },

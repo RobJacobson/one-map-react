@@ -62,6 +62,7 @@ type WrapperEvents = {
  * @param beginPressQuery - Fakes a pending rendered-feature query and returns a function to resolve it or reject it with an error.
  * @param clusterZoom - Mock cluster call exposed by mounted source refs.
  * @param checkRenderedQuery - Verifies the wrapper receives the selected layer ids.
+ * @param renderedQueryCount - Counts rendered queries dispatched to the wrapper.
  * @param checkLayer - Verifies style conversion and source injection on the wrapper layer.
  */
 export const testNativeEntryBinding = <Handle extends SelectedHandle>(
@@ -71,6 +72,7 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
   beginPressQuery: () => (error?: Error) => void,
   clusterZoom: jest.Mock<(...args: never[]) => Promise<number>>,
   checkRenderedQuery: (layers: readonly string[]) => void,
+  renderedQueryCount: () => number,
   checkLayer: () => void
 ): void => {
   const { Map: NativeMap, MapProvider, Source, Layer, Marker, useMap } = entry;
@@ -514,6 +516,35 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     checkRenderedQuery(layers);
     expect(layerReads).toBe(1);
   });
+
+  test.each([
+    {
+      name: "point missing x",
+      target: { y: 20 },
+      message: "A map point must contain x and y.",
+    },
+    {
+      name: "function",
+      target: () => {},
+      message:
+        "A rendered query target must be a point, rectangle, or options object.",
+    },
+  ])(
+    "rejects a malformed rendered query before dispatch ($name)",
+    async ({ target, message }) => {
+      const ref = createRef<Handle>();
+      await render(<NativeMap ref={ref} mapStyle={emptyStyle} />);
+      const map = ref.current;
+      if (!map) throw new Error("Map is detached.");
+
+      const calls = renderedQueryCount();
+      await expect(
+        // @ts-expect-error Exercise a raw JavaScript query target.
+        map.queryRenderedFeatures(target, { layers: ["roads"] })
+      ).rejects.toThrow(message);
+      expect(renderedQueryCount()).toBe(calls);
+    }
+  );
 
   test("an explicit empty layer list matches no layers on an attached map", async () => {
     const ref = createRef<Handle>();
