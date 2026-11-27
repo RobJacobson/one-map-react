@@ -19,6 +19,7 @@ const regressions = [
   ["node", "tests/peers/location-observer.test.mjs"],
   ["node", "tests/peers/offline-status.test.mjs"],
   ["node", "tests/peers/light-color.test.mjs"],
+  ["node", "tests/peers/kotlin-regression.test.ts"],
   ["node", "tests/peers/source-lifetime.test.mjs"],
   ["bun", "tests/example/camera-observer.test.mjs"],
   ["node", "tests/peers/camera-bounds-reset.test.mjs"],

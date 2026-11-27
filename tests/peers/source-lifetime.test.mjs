@@ -1,14 +1,9 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
-import {
-  globSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
+
+import { getKotlinRunner } from "./kotlin-regression.ts";
 
 const mapboxRoot = process.argv[3] ?? "node_modules/@rnmapbox/maps";
 const maplibreRoot =
@@ -80,26 +75,9 @@ console.log(
   "PASS native explicit-state error/family and absent-Fabric-view source boundaries"
 );
 
-const cache = join(
-  process.env.GRADLE_USER_HOME ?? join(homedir(), ".gradle"),
-  "caches/modules-2/files-2.1"
-);
-const jars = [
-  "org.jetbrains.kotlin/kotlin-compiler-embeddable/2.2.0",
-  "org.jetbrains.kotlin/kotlin-stdlib/2.2.0",
-  "org.jetbrains.kotlin/kotlin-script-runtime/2.2.0",
-  "org.jetbrains.kotlin/kotlin-reflect/*",
-  "org.jetbrains.kotlin/kotlin-daemon-embeddable/2.2.0",
-  "org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.8.0",
-  "org.jetbrains.intellij.deps/trove4j/*",
-  "org.jetbrains/annotations/13.0",
-].flatMap((path) => globSync(`${cache}/${path}/*/*.jar`));
-if (!jars.some((path) => path.includes("kotlin-compiler-embeddable"))) {
-  console.log(
-    "SKIP native source-lifetime regression: cached Kotlin compiler required."
-  );
-  process.exit(0);
-}
+const runKotlin = getKotlinRunner();
+if (!runKotlin) process.exit(0);
+
 const section = (file, start, end) => {
   const source = readFileSync(file, "utf8");
   const first = source.indexOf(start);
@@ -113,12 +91,6 @@ const resolver = readFileSync(
   "utf8"
 ).replace(/^(?:package|import) .*\n/gm, "");
 const temporary = mkdtempSync(join(tmpdir(), "one-map-source-lifetime-"));
-const run = (command, args) => {
-  const result = spawnSync(command, args, { encoding: "utf8", timeout: 60000 });
-  if (result.error) throw result.error;
-  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
-  return result.stdout;
-};
 try {
   const bindgen = join(temporary, "Bindgen.kt");
   writeFileSync(
@@ -208,27 +180,10 @@ fun main(args: Array<String>) {
 }
 `
   );
-  const classes = join(temporary, "classes");
-  run("java", [
-    "-cp",
-    jars.join(":"),
-    "org.jetbrains.kotlin.cli.jvm.K2JVMCompiler",
-    "-no-stdlib",
-    "-no-reflect",
-    "-classpath",
-    jars.join(":"),
-    bindgen,
-    kotlin,
-    "-d",
-    classes,
-  ]);
-  console.log(
-    run("java", [
-      "-cp",
-      [classes, ...jars].join(":"),
-      "LifetimeKt",
-      ...process.argv.slice(2, 3),
-    ]).trim()
+  runKotlin(
+    [bindgen, kotlin],
+    join(temporary, "lifetime.jar"),
+    process.argv.slice(2, 3)
   );
 } finally {
   rmSync(temporary, { recursive: true, force: true });
