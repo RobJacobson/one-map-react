@@ -1,7 +1,9 @@
 import type {
   CameraAnimationOptions,
+  CameraBoundsOptions,
   CameraCenterOptions,
   CameraOptions,
+  InitialViewState,
 } from "@maplibre/maplibre-react-native";
 
 import type {
@@ -30,12 +32,14 @@ import {
  * @param viewState - Camera supplied by React.
  * @returns MapLibre center, zoom, bearing, and pitch.
  */
-export const toMaplibreViewState = (viewState: NativeCameraTarget) => {
+export const toMaplibreViewState = (
+  viewState: NativeCameraTarget
+): Exclude<InitialViewState, CameraBoundsOptions> => {
   const center = nativeCameraCenter(viewState);
   return {
     ...(center ? { center } : {}),
     zoom: viewState.zoom,
-    bearing: viewState.bearing,
+    bearing: toMaplibreDeclarativeBearing(viewState.bearing),
     pitch: viewState.pitch,
     ...(viewState.padding === undefined
       ? {}
@@ -43,14 +47,25 @@ export const toMaplibreViewState = (viewState: NativeCameraTarget) => {
   };
 };
 
+/**
+ * Converts the initial camera into a bounds fit or a centered view.
+ *
+ * @param viewState - Initial camera supplied by React.
+ * @returns MapLibre initial camera props.
+ * @throws When the coordinates are invalid or the fit options are unsupported.
+ */
 export const toMaplibreInitialViewState = (
   viewState: NativeInitialViewState = {}
-) => {
+): InitialViewState => {
   if (viewState.bounds !== undefined) {
-    const fit = toMaplibreFitBoundsOptions(nativeInitialFit(viewState));
+    const fit = nativeInitialFit(viewState);
+    const options = toMaplibreFitBoundsOptions({
+      ...fit,
+      bearing: toMaplibreDeclarativeBearing(fit.bearing),
+    });
     return {
       bounds: toFlatBounds(nativeBoundsInput(viewState.bounds)),
-      ...fit,
+      ...options,
     };
   }
   return toMaplibreViewState(nativeInitialCamera(viewState));
@@ -106,6 +121,10 @@ type MaplibreMovementOptions = Pick<
   CameraOptions & CameraAnimationOptions,
   "bearing" | "pitch" | "padding" | "duration"
 >;
+
+// The pinned iOS component treats -1 as omitted in initialViewState and stop.
+const toMaplibreDeclarativeBearing = (bearing: number | undefined) =>
+  bearing === -1 ? 359 : bearing;
 
 const toMaplibreMovementOptions = (
   options: Pick<

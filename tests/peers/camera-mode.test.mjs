@@ -100,6 +100,9 @@ int main(int argc, char **argv) { @autoreleasepool {
   Camera *other = [Camera new];
   update(other, nullptr, released);
   assert(other.releases == 0 && [other.stop isEqual:target]);
+  Props noTarget{nil, nil};
+  update(other, &released, noTarget);
+  assert(other.stop == nil && "A released target must be cleared before the first layout");
 } }
 `
   );

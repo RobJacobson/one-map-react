@@ -14,8 +14,13 @@ import {
   toMaplibreInitialViewState,
   toMaplibreViewState,
 } from "../src/adapters/maplibre-native/convert-camera.js";
+import { snapshotNativeInitialCamera } from "../src/adapters/shared/native-camera-inputs.js";
 import { nativeBoundsInput } from "../src/adapters/shared/native-values.js";
 import type { FlyToOptions, ViewState } from "../src/contracts/camera-types.js";
+import type {
+  NativeBoundsLike,
+  NativeInitialViewState,
+} from "../src/contracts/native-types.js";
 
 const fitBounds = nativeBoundsInput([
   [1, 2],
@@ -124,6 +129,137 @@ describe("camera conversion", () => {
       pitch: 45,
       padding: { top: 12, bottom: 12, left: 12, right: 12 },
     });
+  });
+
+  test("initial camera retains its bounds and fit padding after callers edit them", () => {
+    const corners: [[number, number], { lng: number; lat: number }] = [
+      [170, -10],
+      { lng: -170, lat: 10 },
+    ];
+    const flat: [number, number, number, number] = [170, -10, -170, 10];
+    const geographic = {
+      coordinates: flat,
+      getWest() {
+        return this.coordinates[0];
+      },
+      getSouth() {
+        return this.coordinates[1];
+      },
+      getEast() {
+        return this.coordinates[2];
+      },
+      getNorth() {
+        return this.coordinates[3];
+      },
+    };
+    const boundsInputs: NativeBoundsLike[] = [corners, flat, geographic];
+    const padding = { top: 0, left: 12 };
+    const fitBoundsOptions = { padding };
+    const initial = { padding: { top: 8 }, fitBoundsOptions };
+    const captureInitialCamera = (bounds: NativeBoundsLike) =>
+      snapshotNativeInitialCamera({ ...initial, bounds });
+    const snapshots = boundsInputs.map(captureInitialCamera);
+
+    corners[0][0] = 25;
+    corners[1].lat = 20;
+    flat[0] = 25;
+    padding.left = 40;
+    fitBoundsOptions.padding = { top: 40, left: 40 };
+
+    for (const snapshot of snapshots) {
+      expect(toRnmapboxDefaultSettings(snapshot)).toMatchObject({
+        bounds: { sw: [170, -10], ne: [-170, 10] },
+        padding: {
+          paddingTop: 0,
+          paddingRight: 0,
+          paddingBottom: 0,
+          paddingLeft: 12,
+        },
+      });
+      expect(toMaplibreInitialViewState(snapshot)).toMatchObject({
+        bounds: [170, -10, -170, 10],
+        padding: { top: 0, right: 0, bottom: 0, left: 12 },
+      });
+    }
+  });
+
+  test("initial fit constraints supplied as getters are captured once", () => {
+    const bounds = [1, 2, 3, 4] as const;
+    let maxZoom: number | undefined = 0;
+    const snapshot = snapshotNativeInitialCamera({
+      bounds,
+      fitBoundsOptions: {
+        get maxZoom() {
+          return maxZoom;
+        },
+      },
+    });
+    maxZoom = undefined;
+    expect(() => toRnmapboxDefaultSettings(snapshot)).toThrow(/maxZoom/);
+    expect(() => toMaplibreInitialViewState(snapshot)).toThrow(/maxZoom/);
+  });
+
+  test("initial fits distinguish zero fit padding from omitted fit padding", () => {
+    const initial = { bounds: fitBounds, padding: { left: 8 } };
+    const withFitPadding = snapshotNativeInitialCamera({
+      ...initial,
+      fitBoundsOptions: { padding: 0 },
+    });
+    const withoutFitPadding = snapshotNativeInitialCamera(initial);
+
+    expect(toRnmapboxDefaultSettings(withFitPadding)).toMatchObject({
+      padding: { paddingLeft: 0 },
+    });
+    expect(toRnmapboxDefaultSettings(withoutFitPadding)).toMatchObject({
+      padding: { paddingLeft: 8 },
+    });
+    expect(toMaplibreInitialViewState(withFitPadding)).toMatchObject({
+      padding: { left: 0 },
+    });
+    expect(toMaplibreInitialViewState(withoutFitPadding)).toMatchObject({
+      padding: { left: 8 },
+    });
+  });
+
+  test("initial fit offset still rejects if the caller later removes it", () => {
+    const fitBoundsOptions: { offset?: [number, number] } = { offset: [0, 0] };
+    const initial: NativeInitialViewState = {
+      bounds: fitBounds,
+      fitBoundsOptions,
+    };
+    expect(() => {
+      const snapshot = snapshotNativeInitialCamera(initial);
+      delete fitBoundsOptions.offset;
+      toMaplibreInitialViewState(snapshot);
+    }).toThrow(/initialViewState\.fitBoundsOptions\.offset/);
+  });
+
+  test("MapLibre declarative bearing avoids the iOS omission sentinel", () => {
+    const target = { ...viewState, bearing: -1 };
+    expect(toMaplibreViewState(target)).toEqual({
+      center: [-122.34, 47.61],
+      zoom: 11,
+      bearing: 359,
+      pitch: 0,
+    });
+    expect(toMaplibreInitialViewState(target)).toMatchObject({ bearing: 359 });
+    expect(
+      toMaplibreInitialViewState({ ...target, bounds: fitBounds })
+    ).toMatchObject({
+      bounds: [1, 2, 3, 4],
+      bearing: 359,
+      pitch: 0,
+    });
+    expect(toMaplibreViewState({})).toHaveProperty("bearing", undefined);
+    expect(
+      toMaplibreInitialViewState({ bounds: fitBounds })
+    ).not.toHaveProperty("bearing");
+    expect(toMaplibreCommand({ bearing: -1 })).toStrictEqual({ bearing: -1 });
+    expect(toMaplibreFitBoundsOptions({ bearing: -1 })).toStrictEqual({
+      bearing: -1,
+    });
+    expect(toRnmapboxDefaultSettings(target)).toMatchObject({ heading: -1 });
+    expect(toRnmapboxControlledCamera(target)).toMatchObject({ heading: -1 });
   });
 
   test("reports initial fit constraints the native wrappers cannot apply", () => {
