@@ -1,6 +1,15 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { createRef, type ComponentRef, type ReactNode, type Ref } from "react";
+import {
+  createRef,
+  startTransition,
+  Suspense,
+  type ComponentRef,
+  type ReactNode,
+  type Ref,
+  useLayoutEffect,
+  useState,
+} from "react";
 import { Platform } from "react-native";
 
 import {
@@ -199,10 +208,19 @@ jest.mock("@rnmapbox/maps", () => {
       }
     ),
     Camera: React.forwardRef(
-      (props: object, ref: React.Ref<{ setCamera: typeof mockSetCamera }>) => {
-        React.useImperativeHandle(ref, () => ({
-          setCamera: mockSetCamera,
-        }));
+      (
+        props: { readonly followUserLocation?: boolean },
+        ref: React.Ref<{ setCamera: (stop: unknown) => void }>
+      ) => {
+        React.useImperativeHandle(
+          ref,
+          () => ({
+            setCamera: (stop: unknown) => {
+              if (!props.followUserLocation) mockSetCamera(stop);
+            },
+          }),
+          [props.followUserLocation]
+        );
 
         return React.createElement("Camera", {
           ...props,
@@ -295,6 +313,197 @@ const lastMapProps = <Props,>(): Props => {
 
   return lastCall[0] as Props;
 };
+
+type ZoomGestureProps = {
+  readonly zoomEnabled?: boolean;
+  readonly gestureSettings?: {
+    readonly pinchZoomEnabled?: boolean;
+    readonly quickZoomEnabled?: boolean;
+    readonly doubleTapToZoomInEnabled?: boolean;
+    readonly doubleTouchToZoomOutEnabled?: boolean;
+  };
+};
+
+const enabledZoomGestures = {
+  pinchZoomEnabled: true,
+  quickZoomEnabled: true,
+  doubleTapToZoomInEnabled: true,
+  doubleTouchToZoomOutEnabled: true,
+};
+
+const disabledZoomGestures = {
+  pinchZoomEnabled: false,
+  quickZoomEnabled: false,
+  doubleTapToZoomInEnabled: false,
+  doubleTouchToZoomOutEnabled: false,
+};
+
+/** Applies the pinned wrapper's zoom setters only when their props change. */
+const zoomGestureState = (os: "ios" | "android") => {
+  let previous: ZoomGestureProps = {};
+  let gestures = { ...enabledZoomGestures };
+  return () => {
+    const props = lastMapProps<ZoomGestureProps>();
+    const { zoomEnabled, gestureSettings } = props;
+    if (zoomEnabled !== undefined && zoomEnabled !== previous.zoomEnabled) {
+      gestures.pinchZoomEnabled = zoomEnabled;
+      gestures.doubleTapToZoomInEnabled = zoomEnabled;
+      if (os === "ios") {
+        gestures.quickZoomEnabled = zoomEnabled;
+      } else {
+        gestures.doubleTouchToZoomOutEnabled = zoomEnabled;
+      }
+    }
+    if (
+      JSON.stringify(gestureSettings) !==
+      JSON.stringify(previous.gestureSettings)
+    ) {
+      gestures = { ...gestures, ...gestureSettings };
+    }
+    previous = props;
+    return gestures;
+  };
+};
+
+describe.each(["ios", "android"] as const)("%s pinch zoom ownership", (os) => {
+  const scene = (props: Partial<MapProps> = {}) => (
+    <NativeMap
+      initialViewState={initialViewState}
+      mapStyle={emptyStyle}
+      {...props}
+    />
+  );
+  test.each<Partial<MapProps>>([
+    { touchZoom: false },
+    { touchZoomRotate: false },
+    { options: { zoomEnabled: false } },
+    { options: { gestureSettings: { pinchZoomEnabled: false } } },
+  ])("restores pinch zoom after retiring %j", async (props) => {
+    const platform = jest.replaceProperty(Platform, "OS", os);
+    try {
+      const readGestures = zoomGestureState(os);
+      const view = await render(scene(props));
+      expect(readGestures().pinchZoomEnabled).toBe(false);
+      const mapId = view.getByTestId("wrapper-map").props.mapId;
+      await view.rerender(scene());
+      expect(readGestures().pinchZoomEnabled).toBe(true);
+      expect(view.getByTestId("wrapper-map").props.mapId).toBe(mapId);
+    } finally {
+      platform.restore();
+    }
+  });
+
+  test("restores the default zoom gestures when the interaction lock ends", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", os);
+    try {
+      const readGestures = zoomGestureState(os);
+      const view = await render(scene({ interactive: false }));
+      expect(readGestures()).toEqual(disabledZoomGestures);
+      await view.rerender(scene());
+      expect(readGestures()).toEqual(enabledZoomGestures);
+    } finally {
+      platform.restore();
+    }
+  });
+
+  test("applies portable pinch zoom ahead of selected settings and keeps tap gestures independent", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", os);
+    const selected = (touchZoom?: boolean) =>
+      scene({
+        touchZoom,
+        options: {
+          zoomEnabled: false,
+          gestureSettings: {
+            pinchZoomEnabled: false,
+            quickZoomEnabled: false,
+            doubleTapToZoomInEnabled: true,
+            doubleTouchToZoomOutEnabled: true,
+          },
+        },
+      });
+    try {
+      const readGestures = zoomGestureState(os);
+      const view = await render(selected(false));
+      const expected = {
+        ...enabledZoomGestures,
+        pinchZoomEnabled: false,
+        quickZoomEnabled: false,
+      };
+      expect(readGestures()).toEqual(expected);
+      await view.rerender(selected(true));
+      expect(readGestures()).toEqual({ ...expected, pinchZoomEnabled: true });
+      await view.rerender(selected());
+      expect(readGestures()).toEqual(expected);
+    } finally {
+      platform.restore();
+    }
+  });
+
+  test("keeps selected zoom recognizers while changing the raw zoom scalar and restores their defaults when removed", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", os);
+    const gestureSettings = {
+      pinchZoomEnabled: false,
+      quickZoomEnabled: false,
+      doubleTapToZoomInEnabled: true,
+      doubleTouchToZoomOutEnabled: false,
+    };
+    const selected = (zoomEnabled: boolean) =>
+      scene({
+        options: { zoomEnabled, gestureSettings },
+      });
+    try {
+      const readGestures = zoomGestureState(os);
+      const view = await render(scene());
+      expect(lastMapProps<ZoomGestureProps>().zoomEnabled).toBeUndefined();
+      expect(readGestures()).toEqual(enabledZoomGestures);
+      await view.rerender(selected(false));
+      expect(readGestures()).toEqual(gestureSettings);
+      await view.rerender(selected(true));
+      expect(readGestures()).toEqual(gestureSettings);
+      await view.rerender(scene());
+      expect(readGestures()).toEqual(enabledZoomGestures);
+    } finally {
+      platform.restore();
+    }
+  });
+
+  test("locks selected zoom recognizers and restores the latest settings", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", os);
+    const selected = (interactive: boolean, pinchZoomEnabled: boolean) => (
+      <MapboxGestureSettings
+        settings={{ pinchZoomEnabled, quickZoomEnabled: pinchZoomEnabled }}
+      >
+        {scene({
+          interactive,
+          options: {
+            zoomEnabled: false,
+            gestureSettings: {
+              ...enabledZoomGestures,
+              pinchZoomEnabled: !pinchZoomEnabled,
+            },
+          },
+        })}
+      </MapboxGestureSettings>
+    );
+    try {
+      const readGestures = zoomGestureState(os);
+      const view = await render(selected(false, true));
+      expect(readGestures()).toEqual(disabledZoomGestures);
+      await view.rerender(selected(true, true));
+      expect(readGestures()).toEqual(enabledZoomGestures);
+      await view.rerender(selected(false, false));
+      expect(readGestures()).toEqual(disabledZoomGestures);
+      await view.rerender(selected(true, false));
+      expect(readGestures()).toEqual({
+        ...enabledZoomGestures,
+        pinchZoomEnabled: false,
+        quickZoomEnabled: false,
+      });
+    } finally {
+      platform.restore();
+    }
+  });
+});
 
 test.each(["document", "url"] as const)(
   "common %s styles clear conflicting selected style fields through replacement",
@@ -451,7 +660,7 @@ describe("mapbox-native adapter", () => {
     }
   );
 
-  test("Android locks and restores gestures through scalar native props", async () => {
+  test("Android locks and restores scroll, rotate, and pitch through scalar native props", async () => {
     const platform = jest.replaceProperty(Platform, "OS", "android");
     const scene = (interactive: boolean) => (
       <NativeMap
@@ -464,25 +673,19 @@ describe("mapbox-native adapter", () => {
       const view = await render(scene(false));
       const locked = lastMapProps<{
         scrollEnabled: boolean;
-        zoomEnabled: boolean;
         rotateEnabled: boolean;
         pitchEnabled: boolean;
-        gestureSettings?: object;
       }>();
       expect(locked).toMatchObject({
         scrollEnabled: false,
-        zoomEnabled: false,
         rotateEnabled: false,
         pitchEnabled: false,
       });
-      expect(locked.gestureSettings).toBeUndefined();
       await view.rerender(scene(true));
       const restored = lastMapProps<typeof locked>();
       expect(restored.scrollEnabled).toBeUndefined();
-      expect(restored.zoomEnabled).toBe(true);
       expect(restored.rotateEnabled).toBeUndefined();
       expect(restored.pitchEnabled).toBeUndefined();
-      expect(restored.gestureSettings).toBeUndefined();
       await view.unmount();
     } finally {
       platform.restore();
@@ -502,59 +705,17 @@ describe("mapbox-native adapter", () => {
         />
       );
       try {
+        const readGestures = zoomGestureState("android");
         const view = await render(scene(false));
-        expect(lastMapProps<{ zoomEnabled: boolean }>().zoomEnabled).toBe(
-          false
-        );
+        expect(readGestures().pinchZoomEnabled).toBe(false);
         await view.rerender(scene(true));
-        expect(lastMapProps<{ zoomEnabled: boolean }>().zoomEnabled).toBe(
-          zoomEnabled
-        );
+        expect(readGestures().pinchZoomEnabled).toBe(zoomEnabled);
         await view.unmount();
       } finally {
         platform.restore();
       }
     }
   );
-
-  test("Android double-tap options cannot override a temporary gesture lock", async () => {
-    const platform = jest.replaceProperty(Platform, "OS", "android");
-    const scene = (interactive: boolean) => (
-      <NativeMap
-        mapStyle={emptyStyle}
-        initialViewState={initialViewState}
-        interactive={interactive}
-        options={{
-          gestureSettings: {
-            doubleTapToZoomInEnabled: true,
-            doubleTouchToZoomOutEnabled: true,
-            quickZoomEnabled: false,
-          },
-        }}
-      />
-    );
-    try {
-      const view = await render(scene(false));
-      expect(
-        lastMapProps<{ gestureSettings: object }>().gestureSettings
-      ).toEqual({
-        doubleTapToZoomInEnabled: false,
-        doubleTouchToZoomOutEnabled: false,
-        quickZoomEnabled: false,
-      });
-      await view.rerender(scene(true));
-      expect(
-        lastMapProps<{ gestureSettings: object }>().gestureSettings
-      ).toEqual({
-        doubleTapToZoomInEnabled: true,
-        doubleTouchToZoomOutEnabled: true,
-        quickZoomEnabled: false,
-      });
-      await view.unmount();
-    } finally {
-      platform.restore();
-    }
-  });
 
   test.each([false, true])(
     "Android retains an explicit doubleTapZoom=%s map across a gesture lock",
@@ -573,13 +734,13 @@ describe("mapbox-native adapter", () => {
         expect(
           lastMapProps<{ gestureSettings: object }>().gestureSettings
         ).toEqual({
-          doubleTapToZoomInEnabled: false,
-          doubleTouchToZoomOutEnabled: false,
+          ...disabledZoomGestures,
         });
         await view.rerender(scene(true));
         expect(
           lastMapProps<{ gestureSettings: object }>().gestureSettings
         ).toEqual({
+          ...enabledZoomGestures,
           doubleTapToZoomInEnabled: doubleTapZoom,
           doubleTouchToZoomOutEnabled: doubleTapZoom,
         });
@@ -676,14 +837,15 @@ describe("mapbox-native adapter", () => {
       try {
         const view = await render(scene(false));
         expect(forwardedSettings()).toEqual({
+          pinchZoomEnabled: false,
           doubleTapToZoomInEnabled: false,
           doubleTouchToZoomOutEnabled: false,
           quickZoomEnabled: false,
         });
         await view.rerender(scene(true));
         expect(lastMapProps<object>()).toMatchObject({
-          zoomEnabled: false,
           gestureSettings: {
+            pinchZoomEnabled: false,
             doubleTapToZoomInEnabled: false,
             doubleTouchToZoomOutEnabled: os === "ios",
             quickZoomEnabled: false,
@@ -694,32 +856,6 @@ describe("mapbox-native adapter", () => {
         platform.restore();
       }
     });
-  });
-
-  test("iOS restores both double-tap gestures after an interaction lock without selected settings", async () => {
-    const platform = jest.replaceProperty(Platform, "OS", "ios");
-    const scene = (interactive: boolean) =>
-      example(undefined, undefined, { interactive });
-    try {
-      const view = await render(scene(false));
-      expect(lastMapProps<object>()).toMatchObject({
-        zoomEnabled: false,
-        gestureSettings: {
-          doubleTapToZoomInEnabled: false,
-          doubleTouchToZoomOutEnabled: false,
-        },
-      });
-      await view.rerender(scene(true));
-      expect(lastMapProps<object>()).toMatchObject({
-        gestureSettings: {
-          doubleTapToZoomInEnabled: true,
-          doubleTouchToZoomOutEnabled: true,
-        },
-      });
-      await view.unmount();
-    } finally {
-      platform.restore();
-    }
   });
 
   test.each<["ios" | "android", boolean]>([
@@ -1151,17 +1287,15 @@ describe("mapbox-native adapter", () => {
       })
     );
 
-    expect(lastMapProps<object>()).toEqual(
-      expect.objectContaining({
-        scrollEnabled: false,
-        zoomEnabled: false,
-        rotateEnabled: true,
-        gestureSettings: {
-          doubleTapToZoomInEnabled: true,
-          doubleTouchToZoomOutEnabled: true,
-        },
-      })
-    );
+    expect(lastMapProps<object>()).toMatchObject({
+      scrollEnabled: false,
+      rotateEnabled: true,
+      gestureSettings: {
+        pinchZoomEnabled: false,
+        doubleTapToZoomInEnabled: true,
+        doubleTouchToZoomOutEnabled: true,
+      },
+    });
   });
 
   test("Mapbox camera props apply without animation and preserve initial defaults", async () => {
@@ -2450,6 +2584,15 @@ test("a layer filter snapshot preserves literal keys and array positions", async
   await view.unmount();
 });
 
+const followLocation = {
+  followUserLocation: true,
+  followHeading: undefined,
+  followPitch: undefined,
+  followUserMode: undefined,
+  followZoomLevel: undefined,
+  onUserTrackingModeChange: undefined,
+};
+
 test("selected native location follow rejects a simultaneous viewState target", async () => {
   await expect(
     render(
@@ -2457,17 +2600,127 @@ test("selected native location follow rejects a simultaneous viewState target", 
         mapStyle={emptyStyle}
         initialViewState={initialViewState}
         viewState={initialViewState}
-        locationOptions={{
-          followUserLocation: true,
-          followHeading: undefined,
-          followPitch: undefined,
-          followUserMode: undefined,
-          followZoomLevel: undefined,
-          onUserTrackingModeChange: undefined,
-        }}
+        locationOptions={followLocation}
       />
     )
   ).rejects.toThrow("Selected location follow conflicts with viewState.");
+});
+
+test("all portable camera commands reject while the mounted RNMapbox camera follows", async () => {
+  const ref = createRef<MapRef>();
+  const scene = (follow: boolean, zoom?: number) => (
+    <NativeMap
+      ref={ref}
+      mapStyle={emptyStyle}
+      initialViewState={initialViewState}
+      locationOptions={follow ? followLocation : undefined}
+      viewState={zoom === undefined ? undefined : { zoom }}
+    />
+  );
+  mockSetCamera.mockClear();
+  const view = await render(scene(true));
+  const map = ref.current;
+  if (!map) throw new Error("Map did not attach.");
+
+  await expect(map.jumpTo({ zoom: 10 })).rejects.toThrow("followUserLocation");
+  await expect(map.easeTo({ zoom: 10 })).rejects.toThrow("followUserLocation");
+  await expect(map.flyTo({ center: [0, 0] })).rejects.toThrow(
+    "followUserLocation"
+  );
+  await expect(
+    map.fitBounds([
+      [0, 0],
+      [1, 1],
+    ])
+  ).rejects.toThrow("followUserLocation");
+  await expect(map.zoomTo(10)).rejects.toThrow("followUserLocation");
+  expect(mockSetCamera).not.toHaveBeenCalled();
+  await expect(map.getZoom()).resolves.toBe(11);
+  await view.rerender(scene(false, 12));
+  expect(view.getByTestId("wrapper-camera").props).toMatchObject({
+    zoomLevel: 12,
+    animationMode: "none",
+  });
+  expect(
+    view.getByTestId("wrapper-camera").props.followUserLocation
+  ).toBeUndefined();
+  expect(ref.current).toBe(map);
+  await expect(map.zoomTo(10)).resolves.toBeUndefined();
+  expect(mockSetCamera).toHaveBeenCalledTimes(1);
+  await view.unmount();
+  await expect(map.zoomTo(10)).rejects.toThrow("Map camera is not attached.");
+});
+
+test("retained map handles read the committed owner in descendant layout effects and across a suspended transition", async () => {
+  const first = createRef<MapRef>();
+  const second = createRef<MapRef>();
+  const pending = new Promise<never>(() => {});
+  const renderedPending = jest.fn();
+  const results: Promise<unknown>[] = [];
+  let updateFollow = (_follow: boolean, _suspend?: boolean) => {};
+  const Probe = ({
+    follow,
+    suspended,
+  }: {
+    follow: boolean;
+    suspended: boolean;
+  }) => {
+    useLayoutEffect(() => {
+      const map = first.current;
+      if (map) results.push(map.zoomTo(10).catch((error: unknown) => error));
+    }, [follow]);
+    if (suspended) {
+      renderedPending();
+      throw pending;
+    }
+    return null;
+  };
+  const Scene = () => {
+    const [state, setState] = useState({ follow: false, suspended: false });
+    useLayoutEffect(() => {
+      updateFollow = (follow, suspended = false) =>
+        setState({ follow, suspended });
+    }, []);
+    return (
+      <Suspense fallback={null}>
+        <NativeMap
+          ref={first}
+          mapStyle={emptyStyle}
+          locationOptions={state.follow ? followLocation : undefined}
+        >
+          <Probe {...state} />
+        </NativeMap>
+        <NativeMap ref={second} mapStyle={emptyStyle} />
+      </Suspense>
+    );
+  };
+  mockSetCamera.mockClear();
+  const view = await render(<Scene />);
+  const firstMap = first.current;
+  const secondMap = second.current;
+  if (!firstMap || !secondMap) throw new Error("Maps did not attach.");
+
+  await act(async () => startTransition(() => updateFollow(true, true)));
+  expect(renderedPending).toHaveBeenCalled();
+  await expect(firstMap.zoomTo(10)).resolves.toBeUndefined();
+
+  await act(async () => updateFollow(true));
+  expect(results).toHaveLength(1);
+  await expect(results[0]).resolves.toEqual(
+    expect.objectContaining({
+      message: expect.stringContaining("followUserLocation"),
+    })
+  );
+  await expect(secondMap.zoomTo(10)).resolves.toBeUndefined();
+  await act(async () => startTransition(() => updateFollow(false, true)));
+  await expect(firstMap.zoomTo(10)).rejects.toThrow("followUserLocation");
+
+  await act(async () => updateFollow(false));
+  expect(results).toHaveLength(2);
+  await expect(results[1]).resolves.toBeUndefined();
+  expect(first.current).toBe(firstMap);
+  expect(mockSetCamera).toHaveBeenCalledTimes(3);
+  await view.unmount();
 });
 
 describe("mapbox-native entry binding", () => {

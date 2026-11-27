@@ -507,6 +507,23 @@ index e69ab60..248be77 100644
      }
  }
  
+diff --git a/ios/RNMBX/RNMBXCameraComponentView.mm b/ios/RNMBX/RNMBXCameraComponentView.mm
+index 4794097..899379d 100644
+--- a/ios/RNMBX/RNMBXCameraComponentView.mm
++++ b/ios/RNMBX/RNMBXCameraComponentView.mm
+@@ -91,7 +91,11 @@ using namespace facebook::react;
+         _view.defaultStop = defaultStop;
+     }
+     id followUserLocationDynamic = RNMBXConvertFollyDynamicToId(newViewProps.followUserLocation);
+-    if (followUserLocationDynamic != nil) {
++    id previousFollowUserLocation = oldProps
++        ? RNMBXConvertFollyDynamicToId(oldViewProps.followUserLocation)
++        : nil;
++    // Release an omitted follow before applying the next camera stop.
++    if (followUserLocationDynamic != nil || [previousFollowUserLocation boolValue]) {
+         _view.followUserLocation = [followUserLocationDynamic boolValue];
+     }
+     id followUserMode = RNMBXConvertFollyDynamicToId(newViewProps.followUserMode);
 diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.m b/ios/RNMBX/Offline/RNMBXOfflineModule.m
 index 1808393..95b1081 100644
 --- a/ios/RNMBX/Offline/RNMBXOfflineModule.m

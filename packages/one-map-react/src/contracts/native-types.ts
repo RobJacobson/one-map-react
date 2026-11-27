@@ -192,9 +192,13 @@ export interface NativeMapRef extends MapRef {
   getBounds(): Promise<NativeBounds>;
   project(lngLat: NativeLngLatLike): Promise<NativePoint>;
   unproject(point: NativePointLike): Promise<NativeLngLat>;
+  /** {@inheritDoc MapRef.jumpTo} */
   jumpTo(options: NativeCameraCommand): Promise<void>;
+  /** {@inheritDoc MapRef.easeTo} */
   easeTo(options: NativeCameraCommand): Promise<void>;
+  /** {@inheritDoc MapRef.flyTo} */
   flyTo(options: NativeCameraCommand): Promise<void>;
+  /** {@inheritDoc MapRef.fitBounds} */
   fitBounds(
     bounds: NativeBoundsLike,
     options?: NativeFitBoundsOptions

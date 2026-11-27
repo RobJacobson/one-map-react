@@ -115,15 +115,18 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
       <NativeMap mapStyle={emptyStyle} touchZoomRotate={false} />
     );
     const gestureProps = () => view.getByTestId("wrapper-map").props;
-    const zoom = backend === "mapbox-native" ? "zoomEnabled" : "touchZoom";
+    const pinchZoomEnabled = () =>
+      backend === "mapbox-native"
+        ? gestureProps().gestureSettings?.pinchZoomEnabled
+        : gestureProps().touchZoom;
     const rotate =
       backend === "mapbox-native" ? "rotateEnabled" : "touchRotate";
-    expect(gestureProps()[zoom]).toBe(false);
+    expect(pinchZoomEnabled()).toBe(false);
     expect(gestureProps()[rotate]).toBe(false);
     await view.rerender(
       <NativeMap mapStyle={emptyStyle} touchZoomRotate touchRotate={false} />
     );
-    expect(gestureProps()[zoom]).toBe(true);
+    expect(pinchZoomEnabled()).toBe(true);
     expect(gestureProps()[rotate]).toBe(false);
   });
 

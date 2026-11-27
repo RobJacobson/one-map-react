@@ -1,23 +1,20 @@
 import { describe, expect, test } from "vite-plus/test";
 
-import { toRnmapboxGestures } from "../src/adapters/mapbox-native/convert-gestures.js";
+import { normalizeNativeGestures } from "../src/adapters/index.js";
 import { toMaplibreGestures } from "../src/adapters/maplibre-native/convert-gestures.js";
 
 describe("gesture conversion", () => {
-  test("RNMapbox renames pan and records both double-tap flags", () => {
+  test("pan and pinch can be disabled independently of double tap", () => {
     expect(
-      toRnmapboxGestures({
+      normalizeNativeGestures({
         dragPan: false,
         touchZoom: false,
         doubleTapZoom: true,
       })
-    ).toEqual({
-      scrollEnabled: false,
-      zoomEnabled: false,
-      gestureSettings: {
-        doubleTapToZoomInEnabled: true,
-        doubleTouchToZoomOutEnabled: true,
-      },
+    ).toMatchObject({
+      dragPan: false,
+      touchZoom: false,
+      doubleTapZoom: true,
     });
   });
 
@@ -31,16 +28,6 @@ describe("gesture conversion", () => {
       doubleTapZoom: true,
     };
 
-    expect(toRnmapboxGestures(selection)).toEqual({
-      scrollEnabled: false,
-      zoomEnabled: false,
-      rotateEnabled: false,
-      pitchEnabled: false,
-      gestureSettings: {
-        doubleTapToZoomInEnabled: false,
-        doubleTouchToZoomOutEnabled: false,
-      },
-    });
     expect(toMaplibreGestures(selection)).toEqual({
       dragPan: false,
       touchZoom: false,
@@ -55,12 +42,12 @@ describe("gesture conversion", () => {
     "specific gestures take precedence over touchZoomRotate=%s",
     (combined) => {
       expect(
-        toRnmapboxGestures({
+        normalizeNativeGestures({
           touchZoomRotate: combined,
           touchZoom: !combined,
           touchRotate: undefined,
         })
-      ).toEqual({ zoomEnabled: !combined, rotateEnabled: combined });
+      ).toMatchObject({ touchZoom: !combined, touchRotate: combined });
       expect(
         toMaplibreGestures({
           touchZoomRotate: combined,
@@ -71,7 +58,6 @@ describe("gesture conversion", () => {
   );
 
   test("omitted portable flags leave wrapper fields unset", () => {
-    expect(toRnmapboxGestures({})).toStrictEqual({});
     expect(toMaplibreGestures({})).toStrictEqual({});
   });
 

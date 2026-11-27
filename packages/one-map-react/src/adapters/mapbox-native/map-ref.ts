@@ -1,4 +1,4 @@
-import type { Camera, MapView } from "@rnmapbox/maps";
+import type { Camera, CameraStop, MapView } from "@rnmapbox/maps";
 import type { ComponentRef } from "react";
 
 import type { NativeMapRefWithWrapper } from "../../contracts/native-types.js";
@@ -47,16 +47,24 @@ export type NativeAdvancedMapRef = NativeMapRefWithWrapper<
   ComponentRef<typeof MapView>
 >;
 
+/** The mounted RNMapbox camera and the follow setting it committed with. */
+export interface RnmapboxCameraAttachment {
+  /** Imperative wrapper camera handle. */
+  readonly camera: ComponentRef<typeof Camera>;
+  /** Whether the wrapper suppresses commands in favor of location follow. */
+  readonly isFollowing: boolean;
+}
+
 /**
  * Builds the imperative map handle over RNMapbox camera and map refs.
  *
- * @param cameraRef - Ref to the RNMapbox `Camera` child.
+ * @param cameraRef - Committed RNMapbox camera attachment.
  * @param mapViewRef - Ref to the RNMapbox `MapView`.
  * @param geoJsonSources - Registry of mounted GeoJSON source refs.
  * @returns The selected native map ref.
  */
 export const createMapboxMapRef = (
-  cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
+  cameraRef: { readonly current: RnmapboxCameraAttachment | null },
   mapViewRef: { readonly current: ComponentRef<typeof MapView> | null },
   geoJsonSources: GeoJsonSourceRegistry
 ): NativeAdvancedMapRef => {
@@ -89,29 +97,30 @@ export const createMapboxMapRef = (
       rejectJumpTiming(options);
       const camera = requireCamera(cameraRef.current);
 
-      await camera.setCamera(toRnmapboxStop(options, "none"));
+      await dispatchCameraStop(camera, toRnmapboxStop(options, "none"));
     },
     easeTo: async (options) => {
       const camera = requireCamera(cameraRef.current);
 
-      await camera.setCamera(toRnmapboxStop(options, "easeTo"));
+      await dispatchCameraStop(camera, toRnmapboxStop(options, "easeTo"));
     },
     flyTo: async (options) => {
       const camera = requireCamera(cameraRef.current);
 
-      await camera.setCamera(toRnmapboxStop(options, "flyTo"));
+      await dispatchCameraStop(camera, toRnmapboxStop(options, "flyTo"));
     },
     fitBounds: async (bounds, options) => {
       const camera = requireCamera(cameraRef.current);
 
-      await camera.setCamera(
+      await dispatchCameraStop(
+        camera,
         toRnmapboxFitBoundsStop(nativeBoundsInput(bounds), options)
       );
     },
     zoomTo: async (zoom, options) => {
       const camera = requireCamera(cameraRef.current);
 
-      await camera.setCamera(toRnmapboxZoomStop(zoom, options));
+      await dispatchCameraStop(camera, toRnmapboxZoomStop(zoom, options));
     },
     stop: rejectNativeStop,
     getCenter: async () =>
@@ -180,11 +189,24 @@ export const createMapboxMapRef = (
 };
 
 const requireCamera = (
-  camera: ComponentRef<typeof Camera> | null
-): NonNullable<ComponentRef<typeof Camera>> => {
+  camera: RnmapboxCameraAttachment | null
+): RnmapboxCameraAttachment => {
   if (!camera) {
     throw missingCameraError();
   }
 
   return camera;
+};
+
+const dispatchCameraStop = (
+  { camera, isFollowing }: RnmapboxCameraAttachment,
+  stop: CameraStop
+) => {
+  if (isFollowing) {
+    throw new Error(
+      "Camera commands are unavailable while followUserLocation is enabled."
+    );
+  }
+
+  return camera.setCamera(stop);
 };
