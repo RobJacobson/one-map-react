@@ -22,6 +22,7 @@ one-map/                         # Repository root (0)
 │   ├── fixtures/                # Shared map fixture notes (2)
 │   ├── package/                 # Packed archive and consumer checks (2)
 │   └── peers/                   # Installed native wrapper regressions (2)
+│       └── kotlin-regression.ts # Compiler runner for extracted peer methods (3)
 ├── docs/                        # Library boundary and testing policy (1)
 └── scripts/                     # Build plugins and the documentation check (1)
 ```

@@ -1,14 +1,10 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import {
-  globSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+
+import { getKotlinRunner } from "./kotlin-regression.ts";
 
 const mapbox = resolve(process.argv[2] ?? "node_modules/@rnmapbox/maps");
 const maplibre = resolve(
@@ -19,6 +15,8 @@ if (process.platform !== "darwin") {
   console.log("SKIP native bounds method regression: requires Xcode.");
   process.exit(0);
 }
+
+const runKotlin = getKotlinRunner();
 
 /** Extracts actual peer methods for execution against small SDK boundary stubs. */
 const section = (root, file, start, end) => {
@@ -248,44 +246,13 @@ fun main() {
 }
 `
   );
-  const cache = join(
-    process.env.GRADLE_USER_HOME ?? join(homedir(), ".gradle"),
-    "caches/modules-2/files-2.1"
-  );
-  const jars = [
-    "org.jetbrains.kotlin/kotlin-compiler-embeddable/2.2.0",
-    "org.jetbrains.kotlin/kotlin-stdlib/2.2.0",
-    "org.jetbrains.kotlin/kotlin-script-runtime/2.2.0",
-    "org.jetbrains.kotlin/kotlin-reflect/*",
-    "org.jetbrains.kotlin/kotlin-daemon-embeddable/2.2.0",
-    "org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.8.0",
-    "org.jetbrains.intellij.deps/trove4j/*",
-    "org.jetbrains/annotations/13.0",
-  ].flatMap((path) => globSync(`${cache}/${path}/*/*.jar`));
   console.log(
     "PASS actual Swift and Objective-C++ camera methods: set, replace, clear and reapply; unrelated limits preserved."
   );
-  if (jars.some((file) => file.includes("kotlin-compiler-embeddable"))) {
-    const classes = join(temporary, "classes");
-    run("java", [
-      "-cp",
-      jars.join(":"),
-      "org.jetbrains.kotlin.cli.jvm.K2JVMCompiler",
-      "-no-stdlib",
-      "-no-reflect",
-      "-classpath",
-      jars.join(":"),
-      kotlinFile,
-      "-d",
-      classes,
-    ]);
-    run("java", ["-cp", [classes, ...jars].join(":"), "BoundsKt"]);
+  if (runKotlin) {
+    runKotlin([kotlinFile], join(temporary, "bounds.jar"));
     console.log(
       "PASS actual Kotlin camera bounds methods at both SDK boundaries."
-    );
-  } else {
-    console.log(
-      "SKIP Kotlin method regression: cached Kotlin 2.2.0 compiler required."
     );
   }
   console.log(
