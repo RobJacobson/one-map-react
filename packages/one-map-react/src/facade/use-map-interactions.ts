@@ -43,6 +43,8 @@ export const useMapInteractions = <Event extends ClickEvent>(
   };
 
   const click = async (event: Event): Promise<void> => {
+    if (!active.current) return;
+
     const currentGeneration = generation.current;
     const map = mapRef.current;
     const isCurrent = (): boolean =>
