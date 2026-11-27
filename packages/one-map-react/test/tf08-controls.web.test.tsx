@@ -104,15 +104,17 @@ test.each([
 );
 
 test.each([
-  { latitude: 8, radius: 30 },
+  { longitude: 7, latitude: 8, radius: 30 },
   // The geodesic calculation can round past either end of the asin domain.
-  { latitude: -88, radius: 19792724.281568855 },
-  { latitude: 88, radius: 19792724.281568855 },
-  { latitude: -90, radius: 30 },
-  { latitude: 90, radius: 30 },
+  { longitude: 7, latitude: -88, radius: 19792724.281568855 },
+  { longitude: 7, latitude: 88, radius: 19792724.281568855 },
+  { longitude: 7, latitude: -90, radius: 30 },
+  { longitude: 7, latitude: 90, radius: 30 },
+  { longitude: Number.MAX_VALUE, latitude: 8, radius: 30 },
+  { longitude: -Number.MAX_VALUE, latitude: 8, radius: 30 },
 ])(
-  "draws a finite, closed accuracy ring at latitude $latitude",
-  ({ latitude, radius }) => {
+  "draws a finite, closed accuracy ring at $longitude, $latitude",
+  ({ longitude, latitude, radius }) => {
     const { NativeMap, source } = fixture();
     const scene = (position?: UserLocationProps["position"]) => (
       <NativeMap mapStyle={{ version: 8, sources: {}, layers: [] }}>
@@ -125,7 +127,7 @@ test.each([
     const accuracy = vi.fn(() => NaN).mockReturnValueOnce(radius);
     mounted.rerender(
       scene({
-        lngLat: [7, latitude],
+        lngLat: [longitude, latitude],
         get accuracy() {
           return accuracy();
         },

@@ -61,7 +61,7 @@ const locationGeometry = (
   };
   if (!accuracy || radius === undefined || radius === 0)
     return { type: "FeatureCollection", features: [dot] };
-  const longitude = (lngLat[0] * Math.PI) / 180;
+  const longitude = lngLat[0] * (Math.PI / 180);
   const latitude = (lngLat[1] * Math.PI) / 180;
   const distance = Math.min(radius / 6371008.8, Math.PI);
   const ringCoordinate = (_value: unknown, index: number) => {
@@ -77,7 +77,7 @@ const locationGeometry = (
         Math.sin(bearing) * Math.sin(distance) * Math.cos(latitude),
         Math.cos(distance) - Math.sin(latitude) * Math.sin(nextLatitude)
       );
-    return [(nextLongitude * 180) / Math.PI, (nextLatitude * 180) / Math.PI];
+    return [nextLongitude * (180 / Math.PI), (nextLatitude * 180) / Math.PI];
   };
   const ring = Array.from({ length: 65 }, ringCoordinate);
   return {
