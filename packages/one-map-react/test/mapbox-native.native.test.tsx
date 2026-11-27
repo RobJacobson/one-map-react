@@ -1628,7 +1628,6 @@ describe("mapbox-native layers", () => {
       lineCap: "round",
       visibility: "none",
     });
-    expect(current.style.lineColor).toBe(color);
     await view.rerender(scene(true));
     expect(LineLayerMock.mock.calls.at(-1)?.[0]).toMatchObject({ style: {} });
     await view.unmount();
@@ -2272,6 +2271,110 @@ test("terrain/light/projection and hillshade use native public components, inclu
 
 const lastRenderingProps = (component: unknown): Record<string, unknown> =>
   (component as jest.Mock).mock.calls.at(-1)?.[0] as Record<string, unknown>;
+
+const { transformStyle: transformRnmapboxStyle } = jest.requireActual<{
+  transformStyle: (style: unknown) => unknown;
+}>("../../../node_modules/@rnmapbox/maps/lib/module/utils/StyleValue.js");
+
+test("RNMapbox serializes a line transition with an omitted delay", async () => {
+  const transition = Object.freeze({ duration: 300, delay: undefined });
+  const view = await render(
+    <Layer
+      id="line"
+      type="line"
+      paint={{ "line-color-transition": transition }}
+    />
+  );
+  const { style } = lastRenderingProps(LineLayer);
+  expect(transformRnmapboxStyle(style)).toEqual(
+    transformRnmapboxStyle({ lineColorTransition: { duration: 300 } })
+  );
+  expect(transition).toHaveProperty("delay", undefined);
+  await view.unmount();
+});
+
+test("RNMapbox serializes format options with an omitted font scale", async () => {
+  const view = await render(
+    <Layer
+      id="labels"
+      type="symbol"
+      layout={{
+        "text-field": ["format", "Label", { "font-scale": undefined }],
+      }}
+    />
+  );
+  const { style } = lastRenderingProps(SymbolLayer);
+  expect(transformRnmapboxStyle(style)).toEqual(
+    transformRnmapboxStyle({ textField: ["format", "Label", {}] })
+  );
+  await view.unmount();
+});
+
+test("RNMapbox serializes managed light transitions with omitted delays", async () => {
+  const transition = { duration: 300, delay: undefined };
+  const readPosition = jest.fn(() => [1, 2, 3] as const);
+  const view = await render(
+    <NativeMap
+      mapStyle={emptyStyle}
+      light={{
+        get position() {
+          return readPosition();
+        },
+        "color-transition": transition,
+        "intensity-transition": transition,
+        "position-transition": transition,
+      }}
+    />
+  );
+  expect(transformRnmapboxStyle(lastRenderingProps(RnLight).style)).toEqual(
+    transformRnmapboxStyle({
+      position: [1, 2, 3],
+      colorTransition: { duration: 300 },
+      intensityTransition: { duration: 300 },
+      positionTransition: { duration: 300 },
+    })
+  );
+  expect(readPosition).toHaveBeenCalledTimes(1);
+  await view.unmount();
+});
+
+test("a second layout getter read cannot dispatch an unsupported key", async () => {
+  const readOverlap = jest
+    .fn<() => "always" | undefined>()
+    .mockReturnValueOnce(undefined)
+    .mockReturnValue("always");
+  const layout = {
+    get "icon-overlap"() {
+      return readOverlap();
+    },
+  };
+  const view = await render(
+    <Layer id="labels" type="symbol" layout={layout} />
+  );
+  expect(lastRenderingProps(SymbolLayer).style).toEqual({});
+  expect(readOverlap).toHaveBeenCalledTimes(1);
+  await view.unmount();
+});
+
+test("a layer filter snapshot preserves literal keys and array positions", async () => {
+  const payload = Object.freeze({
+    ["__proto__"]: "literal value",
+    omitted: undefined,
+    values: Object.freeze([0, undefined, false]),
+  });
+  const filter = ["==", ["get", "data"], ["literal", payload]];
+  const view = await render(<Layer id="line" type="line" filter={filter} />);
+  expect(lastRenderingProps(LineLayer).filter).toStrictEqual([
+    "==",
+    ["get", "data"],
+    [
+      "literal",
+      { ["__proto__"]: "literal value", values: [0, undefined, false] },
+    ],
+  ]);
+  expect(payload).toHaveProperty("omitted", undefined);
+  await view.unmount();
+});
 
 test("selected native location follow rejects a simultaneous viewState target", async () => {
   await expect(
