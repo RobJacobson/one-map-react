@@ -25,6 +25,7 @@ const regressions = [
   ["node", "tests/peers/source-lifetime.test.mjs"],
   ["bun", "tests/example/camera-observer.test.mjs"],
   ["node", "tests/peers/camera-bounds-reset.test.mjs"],
+  ["node", "tests/peers/camera-intent.test.ts"],
   ["bun", "tests/peers/camera-mode.test.mjs"],
 ];
 

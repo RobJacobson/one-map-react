@@ -13,7 +13,7 @@ export const nativeComponents = {
   Images: MaplibreNativeImages,
 } satisfies NativeComponents;
 
-export { MaplibreNativeMap } from "./map.js";
+export { MaplibreNativeMap } from "./MaplibreNativeMap.js";
 export {
   MaplibreNativeLayer,
   type NativeLayerProps,

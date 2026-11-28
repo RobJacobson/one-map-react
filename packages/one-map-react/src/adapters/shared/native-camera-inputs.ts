@@ -5,6 +5,7 @@ import type {
   NativeInitialViewState,
   NativeMapInputs,
 } from "../../contracts/native-types.js";
+import { nativeBoundsInput } from "./native-values.js";
 import { finiteNumber, normalizePadding } from "./wrapper-values.js";
 
 /**
@@ -42,16 +43,21 @@ export const nativeCameraTarget = ({
  *
  * @param initial - Explicit initial settings or the first camera target.
  * @returns The captured settings, if supplied.
+ * @throws When bounds are invalid or the initial fit uses an unsupported offset or minimum zoom.
  */
 export const snapshotNativeInitialCamera = (
   initial: NativeInitialViewState | undefined
 ): NativeInitialViewState | undefined => {
   if (initial === undefined) return undefined;
 
+  const target = snapshotCameraTarget(initial);
+  const bounds = initial.bounds;
+  if (bounds === undefined) return target;
+
   return {
-    ...snapshotCameraTarget(initial),
-    bounds: initial.bounds,
-    fitBoundsOptions: initial.fitBoundsOptions,
+    ...target,
+    bounds: nativeBoundsInput(bounds),
+    fitBoundsOptions: snapshotInitialFitOptions(initial.fitBoundsOptions),
   };
 };
 
@@ -95,19 +101,19 @@ export const nativeInitialCamera = (
   padding: initial.padding,
 });
 
-/** Bounds replace the initial center and zoom. Fit padding overrides view padding. */
+/**
+ * Resolves an initial bounds fit. Bounds replace the center and zoom.
+ *
+ * @param initial - Requested initial camera fields and fit options.
+ * @returns Fit options with fit padding taking precedence over view padding.
+ * @throws When coordinates are invalid or the fit uses an unsupported offset or minimum zoom.
+ */
 export const nativeInitialFit = (
   initial: NativeInitialViewState
 ): NativeFitBoundsOptions => {
   nativeCameraCenter(initial);
   const options = initial.fitBoundsOptions;
-  for (const key of ["minZoom", "offset"] as const) {
-    if (options?.[key] !== undefined) {
-      throw new Error(
-        `initialViewState.fitBoundsOptions.${key} is unavailable through the pinned native camera wrapper.`
-      );
-    }
-  }
+  rejectUnsupportedInitialFitOptions(options);
   return {
     padding: options?.padding ?? initial.padding,
     maxZoom: options?.maxZoom,
@@ -129,6 +135,31 @@ export const rejectNativeFitBoundsMaxZoom = (
     throw new Error(
       "fitBounds.maxZoom is unavailable through the pinned native camera wrapper."
     );
+  }
+};
+
+const snapshotInitialFitOptions = (
+  options: NativeInitialViewState["fitBoundsOptions"]
+): NativeInitialViewState["fitBoundsOptions"] => {
+  if (options == null) return undefined;
+
+  rejectUnsupportedInitialFitOptions(options);
+  const { maxZoom, padding } = options;
+  return {
+    maxZoom,
+    padding: padding == null ? undefined : normalizePadding(padding),
+  };
+};
+
+const rejectUnsupportedInitialFitOptions = (
+  options: NativeInitialViewState["fitBoundsOptions"]
+): void => {
+  for (const key of ["minZoom", "offset"] as const) {
+    if (options?.[key] !== undefined) {
+      throw new Error(
+        `initialViewState.fitBoundsOptions.${key} is unavailable through the pinned native camera wrapper.`
+      );
+    }
   }
 };
 

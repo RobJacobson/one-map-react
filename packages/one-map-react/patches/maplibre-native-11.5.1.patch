@@ -1,8 +1,225 @@
+diff --git a/android/src/main/java/org/maplibre/reactnative/components/camera/CameraStop.kt b/android/src/main/java/org/maplibre/reactnative/components/camera/CameraStop.kt
+index 321734a..fe7e336 100644
+--- a/android/src/main/java/org/maplibre/reactnative/components/camera/CameraStop.kt
++++ b/android/src/main/java/org/maplibre/reactnative/components/camera/CameraStop.kt
+@@ -17,10 +17,7 @@ class CameraStop {
+ 
+     var bounds: LatLngBounds? = null
+ 
+-    var paddingTop = 0
+-    var paddingRight = 0
+-    var paddingBottom = 0
+-    var paddingLeft = 0
++    private var padding: IntArray? = null
+ 
+     var zoom: Double? = null
+     var bearing: Double? = null
+@@ -37,39 +34,32 @@ class CameraStop {
+         paddingTop: Int,
+         paddingBottom: Int,
+     ) {
+-        this.paddingLeft = paddingLeft
+-        this.paddingRight = paddingRight
+-        this.paddingTop = paddingTop
+-        this.paddingBottom = paddingBottom
++        padding = intArrayOf(paddingLeft, paddingTop, paddingRight, paddingBottom)
+     }
+ 
++    fun hasCameraOptions(): Boolean =
++        center != null || bounds != null || padding != null || zoom != null || bearing != null || pitch != null
++
+     fun toCameraUpdate(mapView: MLRNMapView): CameraUpdateItem {
+         val map = mapView.mapLibreMap
+         val currentCamera = map!!.cameraPosition
+         val builder = CameraPosition.Builder(currentCamera)
+ 
+-        // Adding map padding to the camera padding to mimic MLN iOS behavior
+-        val contentInset = mapView.contentInset
+-
+-        val paddingLeft: Int = contentInset[0].toInt() + paddingLeft
+-        val paddingTop: Int = contentInset[1].toInt() + paddingTop
+-        val paddingRight: Int = contentInset[2].toInt() + paddingRight
+-        val paddingBottom: Int = contentInset[3].toInt() + paddingBottom
+-
+-        val cameraPadding = intArrayOf(paddingLeft, paddingTop, paddingRight, paddingBottom)
+-        val cameraPaddingClipped: IntArray = clippedPadding(cameraPadding, mapView)
++        val cameraPadding = padding?.let { requested ->
++            // Both arrays are in pixels. Keep the map's content inset when clearing camera padding.
++            val inset = mapView.contentInset
++            IntArray(4) { inset[it].toInt() + requested[it] }
++        }
+ 
+         var hasSetZoom = false
+ 
+         if (center != null) {
+             builder.target(center)
+-            builder.padding(
+-                cameraPaddingClipped[0].toDouble(),
+-                cameraPaddingClipped[1].toDouble(),
+-                cameraPaddingClipped[2].toDouble(),
+-                cameraPaddingClipped[3].toDouble(),
+-            )
+-        } else if (bounds != null) {
++        }
++
++        if (center == null && bounds != null) {
++            // Map padding includes any content inset waiting for the next camera update.
++            val cameraPaddingClipped = clippedPadding(cameraPadding ?: map.padding, mapView)
+             val tilt = (if (pitch != null) pitch else currentCamera.tilt)!!
+             val bearing = (if (bearing != null) bearing else currentCamera.bearing)!!
+ 
+@@ -92,6 +82,11 @@ class CameraStop {
+             }
+ 
+             hasSetZoom = true
++        } else {
++            // Let the SDK retain its padding or apply a pending content inset when omitted.
++            builder.padding(cameraPadding?.let {
++                clippedPadding(it, mapView).map { edge -> edge.toDouble() }.toDoubleArray()
++            })
+         }
+ 
+         if (zoom != null && !hasSetZoom) {
+@@ -123,43 +118,36 @@ class CameraStop {
+         ): CameraStop {
+             val stop = CameraStop()
+ 
+-            if (readableMap.hasKey("center")) {
++            if (readableMap.hasKey("center") && !readableMap.isNull("center")) {
+                 stop.center = GeoJSONUtils.toLatLng(readableMap.getArray("center"))
+-            } else if (readableMap.hasKey("bounds")) {
++            } else if (readableMap.hasKey("bounds") && !readableMap.isNull("bounds")) {
+                 stop.bounds = GeoJSONUtils.toLatLngBounds(readableMap.getArray("bounds"))
+             }
+ 
+-            var paddingTop: Int = getPaddingByKey(readableMap, "top")
+-            var paddingRight: Int = getPaddingByKey(readableMap, "right")
+-            var paddingBottom: Int = getPaddingByKey(readableMap, "bottom")
+-            var paddingLeft: Int = getPaddingByKey(readableMap, "left")
+-
+-            val density = context.resources.displayMetrics.density
+-            paddingTop = (paddingTop * density).toInt()
+-            paddingRight = (paddingRight * density).toInt()
+-            paddingBottom = (paddingBottom * density).toInt()
+-            paddingLeft = (paddingLeft * density).toInt()
+-
+-            stop.setPadding(
+-                paddingLeft,
+-                paddingRight,
+-                paddingTop,
+-                paddingBottom,
+-            )
+-
+-            if (readableMap.hasKey("zoom")) {
++            if (readableMap.hasKey("padding") && !readableMap.isNull("padding")) {
++                val padding = readableMap.getMap("padding")!!
++                val density = context.resources.displayMetrics.density
++                stop.setPadding(
++                    (getPaddingByKey(padding, "left") * density).toInt(),
++                    (getPaddingByKey(padding, "right") * density).toInt(),
++                    (getPaddingByKey(padding, "top") * density).toInt(),
++                    (getPaddingByKey(padding, "bottom") * density).toInt(),
++                )
++            }
++
++            if (readableMap.hasKey("zoom") && !readableMap.isNull("zoom")) {
+                 stop.zoom = readableMap.getDouble("zoom")
+             }
+ 
+-            if (readableMap.hasKey("bearing")) {
++            if (readableMap.hasKey("bearing") && !readableMap.isNull("bearing")) {
+                 stop.bearing = readableMap.getDouble("bearing")
+             }
+ 
+-            if (readableMap.hasKey("pitch")) {
++            if (readableMap.hasKey("pitch") && !readableMap.isNull("pitch")) {
+                 stop.pitch = readableMap.getDouble("pitch")
+             }
+ 
+-            if (readableMap.hasKey("duration")) {
++            if (readableMap.hasKey("duration") && !readableMap.isNull("duration")) {
+                 stop.duration = readableMap.getInt("duration")
+             }
+ 
+@@ -209,11 +197,10 @@ class CameraStop {
+         }
+ 
+         private fun getPaddingByKey(
+-            map: ReadableMap?,
++            paddingMap: ReadableMap,
+             key: String,
+         ): Int {
+-            val paddingMap = map?.getMap("padding")
+-            return if (paddingMap != null && paddingMap.hasKey(key)) {
++            return if (paddingMap.hasKey(key) && !paddingMap.isNull(key)) {
+                 paddingMap.getInt(key)
+             } else {
+                 0
 diff --git a/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCamera.kt b/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCamera.kt
-index a789f4d..44a3a89 100644
+index a789f4d..864a861 100644
 --- a/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCamera.kt
 +++ b/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCamera.kt
-@@ -173,7 +173,7 @@ class MLRNCamera(
+@@ -14,6 +14,7 @@ import com.facebook.react.uimanager.events.Event
+ import com.facebook.react.uimanager.events.EventDispatcher
+ import org.maplibre.android.camera.CameraPosition
+ import org.maplibre.android.camera.CameraUpdateFactory.newCameraPosition
++import org.maplibre.android.constants.MapLibreConstants
+ import org.maplibre.android.geometry.LatLngBounds
+ import org.maplibre.android.location.OnCameraTrackingChangedListener
+ import org.maplibre.android.location.permissions.PermissionsManager
+@@ -46,6 +47,8 @@ class MLRNCamera(
+     private val updateQueue = CameraUpdateQueue()
+ 
+     private var stop: CameraStop? = null
++    private var cameraStopChanged = false
++    private var zoomLimitsChanged = false
+ 
+     private var initialViewState: CameraStop? = null
+ 
+@@ -137,12 +140,17 @@ class MLRNCamera(
+     }
+ 
+     fun setStop(stop: ReadableMap?) {
+-        this.stop =
+-            CameraStop.fromReadableMap(context, stop ?: Arguments.createMap(), cameraCallback)
+-
+-        if (mapView != null) {
+-            updateCamera()
++        this.stop = stop?.let {
++            CameraStop.fromReadableMap(context, it, cameraCallback).takeIf { it.hasCameraOptions() }
+         }
++        cameraStopChanged = true
++    }
++
++    fun commitCameraProps() {
++        if (zoomLimitsChanged) updateMaxMinZoom()
++        if (cameraStopChanged && stop != null && mapView != null) updateCamera()
++        zoomLimitsChanged = false
++        cameraStopChanged = false
+     }
+ 
+     fun setInitialViewState(stop: CameraStop?) {
+@@ -159,13 +167,13 @@ class MLRNCamera(
+     private fun updateMaxMinZoom() {
+         val map = maplibreMap
+         if (map != null) {
+-            val minZoom = minZoom
+-            if (minZoom != null) {
++            val minZoom = minZoom ?: MapLibreConstants.MINIMUM_ZOOM.toDouble()
++            val maxZoom = maxZoom ?: MapLibreConstants.MAXIMUM_ZOOM.toDouble()
++            if (minZoom > map.maxZoomLevel) {
++                map.setMaxZoomPreference(maxZoom)
++                map.setMinZoomPreference(minZoom)
++            } else {
+                 map.setMinZoomPreference(minZoom)
+-            }
+-
+-            val maxZoom = maxZoom
+-            if (maxZoom != null) {
+                 map.setMaxZoomPreference(maxZoom)
+             }
+         }
+@@ -173,7 +181,7 @@ class MLRNCamera(
  
      private fun updateMaxBounds() {
          val map = maplibreMap
@@ -11,6 +228,51 @@ index a789f4d..44a3a89 100644
              map.setLatLngBoundsForCameraTarget(maxBounds)
          }
      }
+@@ -352,13 +360,13 @@ class MLRNCamera(
+     }
+ 
+     fun setMinZoomLevel(zoomLevel: Double) {
+-        minZoom = zoomLevel
+-        updateMaxMinZoom()
++        minZoom = zoomLevel.takeUnless { it == -1.0 }
++        zoomLimitsChanged = true
+     }
+ 
+     fun setMaxZoomLevel(zoomLevel: Double) {
+-        maxZoom = zoomLevel
+-        updateMaxMinZoom()
++        maxZoom = zoomLevel.takeUnless { it == -1.0 }
++        zoomLimitsChanged = true
+     }
+ 
+     fun setTrackUserLocation(trackUserLocationMode: Int) {
+diff --git a/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCameraManager.kt b/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCameraManager.kt
+index 372105d..9f98311 100644
+--- a/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCameraManager.kt
++++ b/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCameraManager.kt
+@@ -50,7 +50,12 @@ class MLRNCameraManager(
+         }
+     }
+ 
+-    @ReactProp(name = "minZoom")
++    override fun onAfterUpdateTransaction(camera: MLRNCamera) {
++        super.onAfterUpdateTransaction(camera)
++        camera.commitCameraProps()
++    }
++
++    @ReactProp(name = "minZoom", defaultDouble = -1.0)
+     override fun setMinZoom(
+         camera: MLRNCamera,
+         value: Double,
+@@ -58,7 +63,7 @@ class MLRNCameraManager(
+         camera.setMinZoomLevel(value)
+     }
+ 
+-    @ReactProp(name = "maxZoom")
++    @ReactProp(name = "maxZoom", defaultDouble = -1.0)
+     override fun setMaxZoom(
+         camera: MLRNCamera,
+         value: Double,
 diff --git a/android/src/main/java/org/maplibre/reactnative/components/images/MLRNImages.kt b/android/src/main/java/org/maplibre/reactnative/components/images/MLRNImages.kt
 index cedb8bf..d2f9257 100644
 --- a/android/src/main/java/org/maplibre/reactnative/components/images/MLRNImages.kt
@@ -250,10 +512,77 @@ index b257692..0cc52a7 100644
              }
          }
      }
+diff --git a/ios/components/camera/MLRNCamera.h b/ios/components/camera/MLRNCamera.h
+index 28d5e60..200d45e 100644
+--- a/ios/components/camera/MLRNCamera.h
++++ b/ios/components/camera/MLRNCamera.h
+@@ -12,14 +12,13 @@
+ 
+ @property (nonatomic, strong) NSDictionary<NSString *, id> *initialViewState;
+ 
+-@property (nonatomic, copy) NSNumber *minZoom;
+-@property (nonatomic, copy) NSNumber *maxZoom;
+ @property (nonatomic, copy) NSArray<NSNumber *> *maxBounds;
+ 
+ @property (nonatomic, copy) NSString *trackUserLocation;
+ 
+ @property (nonatomic, copy) RCTDirectEventBlock onTrackUserLocationChange;
+ 
++- (void)setZoomLimitsWithMinZoom:(NSNumber *)minZoom maxZoom:(NSNumber *)maxZoom;
+ - (void)handleImperativeStop:(NSDictionary<NSString *, id> *)stop;
+ - (void)updateCamera;
+ 
 diff --git a/ios/components/camera/MLRNCamera.m b/ios/components/camera/MLRNCamera.m
-index f5c8dec..db871b5 100644
+index f5c8dec..d5f1061 100644
 --- a/ios/components/camera/MLRNCamera.m
 +++ b/ios/components/camera/MLRNCamera.m
+@@ -11,6 +11,8 @@
+ @implementation MLRNCamera {
+   CameraUpdateQueue *cameraUpdateQueue;
+   MLRNCamera *followCamera;
++  NSNumber *_minZoom;
++  NSNumber *_maxZoom;
+ }
+ 
+ - (instancetype)init {
+@@ -43,15 +45,9 @@
+   _stop = stop;
+ }
+ 
+-- (void)setMinZoom:(NSNumber *)minZoom {
++- (void)setZoomLimitsWithMinZoom:(NSNumber *)minZoom maxZoom:(NSNumber *)maxZoom {
+   _minZoom = minZoom;
+-
+-  [self _updateMinMaxZoom];
+-}
+-
+-- (void)setMaxZoom:(NSNumber *)maxZoom {
+   _maxZoom = maxZoom;
+-
+   [self _updateMinMaxZoom];
+ }
+ 
+@@ -137,11 +133,15 @@
+ 
+ - (void)_updateMinMaxZoom {
+   if (_map != nil) {
+-    if (_maxZoom) {
+-      _map.maximumZoomLevel = [_maxZoom doubleValue];
+-    }
+-    if (_minZoom) {
+-      _map.minimumZoomLevel = [_minZoom doubleValue];
++    // MapLibre Native TransformState starts at 0 and DEFAULT_MAX_ZOOM (22) on iOS.
++    double minZoom = _minZoom ? _minZoom.doubleValue : 0;
++    double maxZoom = _maxZoom ? _maxZoom.doubleValue : 22;
++    if (minZoom > _map.maximumZoomLevel) {
++      _map.maximumZoomLevel = maxZoom;
++      _map.minimumZoomLevel = minZoom;
++    } else {
++      _map.minimumZoomLevel = minZoom;
++      _map.maximumZoomLevel = maxZoom;
+     }
+   }
+ }
 @@ -150,6 +150,9 @@
    if (_map != nil) {
      if (_maxBounds) {
@@ -264,6 +593,85 @@ index f5c8dec..db871b5 100644
      }
    }
  }
+diff --git a/ios/components/camera/MLRNCameraComponentView.mm b/ios/components/camera/MLRNCameraComponentView.mm
+index cd7c016..8e07460 100644
+--- a/ios/components/camera/MLRNCameraComponentView.mm
++++ b/ios/components/camera/MLRNCameraComponentView.mm
+@@ -71,12 +71,9 @@ using namespace facebook::react;
+   const auto &oldViewProps = *std::static_pointer_cast<MLRNCameraProps const>(_props);
+   const auto &newViewProps = *std::static_pointer_cast<MLRNCameraProps const>(props);
+ 
+-  if (oldViewProps.minZoom != newViewProps.minZoom) {
+-    [_view setMinZoom:@(newViewProps.minZoom)];
+-  }
+-
+-  if (oldViewProps.maxZoom != newViewProps.maxZoom) {
+-    [_view setMaxZoom:@(newViewProps.maxZoom)];
++  if (oldViewProps.minZoom != newViewProps.minZoom || oldViewProps.maxZoom != newViewProps.maxZoom) {
++    [_view setZoomLimitsWithMinZoom:newViewProps.minZoom == -1 ? nil : @(newViewProps.minZoom)
++                           maxZoom:newViewProps.maxZoom == -1 ? nil : @(newViewProps.maxZoom)];
+   }
+ 
+   if (oldViewProps.maxBounds != newViewProps.maxBounds) {
+@@ -129,13 +126,14 @@ using namespace facebook::react;
+ 
+   BOOL updateCamera = NO;
+ 
+-  if (oldViewProps.stop.center != newViewProps.stop.center ||
+-
+-      oldViewProps.stop.bounds != newViewProps.stop.bounds ||
++  const BOOL paddingChanged =
+       oldViewProps.stop.padding.top != newViewProps.stop.padding.top ||
+       oldViewProps.stop.padding.right != newViewProps.stop.padding.right ||
+       oldViewProps.stop.padding.bottom != newViewProps.stop.padding.bottom ||
+-      oldViewProps.stop.padding.left != newViewProps.stop.padding.left ||
++      oldViewProps.stop.padding.left != newViewProps.stop.padding.left;
++
++  if (oldViewProps.stop.center != newViewProps.stop.center ||
++      oldViewProps.stop.bounds != newViewProps.stop.bounds || paddingChanged ||
+ 
+       oldViewProps.stop.zoom != newViewProps.stop.zoom ||
+       oldViewProps.stop.bearing != newViewProps.stop.bearing ||
+@@ -154,13 +152,6 @@ using namespace facebook::react;
+       ];
+     }
+ 
+-    stop[@"padding"] = @{
+-      @"top" : @(newViewProps.stop.padding.top),
+-      @"right" : @(newViewProps.stop.padding.right),
+-      @"bottom" : @(newViewProps.stop.padding.bottom),
+-      @"left" : @(newViewProps.stop.padding.left)
+-    };
+-
+     if (newViewProps.stop.zoom != -1) {
+       stop[@"zoom"] = @(newViewProps.stop.zoom);
+     }
+@@ -174,10 +165,21 @@ using namespace facebook::react;
+     if (newViewProps.stop.duration != -1) {
+       stop[@"duration"] = @(newViewProps.stop.duration);
+     }
+-    stop[@"easing"] = @((NSInteger)newViewProps.stop.easing);
+-
+-    [_view setStop:stop];
+-    updateCamera = YES;
++    if (stop.count > 0 || paddingChanged) {
++      stop[@"padding"] = @{
++        @"top" : @(newViewProps.stop.padding.top),
++        @"right" : @(newViewProps.stop.padding.right),
++        @"bottom" : @(newViewProps.stop.padding.bottom),
++        @"left" : @(newViewProps.stop.padding.left)
++      };
++      stop[@"easing"] = @((NSInteger)newViewProps.stop.easing);
++      [_view setStop:stop];
++      updateCamera = YES;
++    } else {
++      // Fabric gives absent padding the same fields as zero padding.
++      // Clearing the pose with unchanged padding does not request a move.
++      [_view setStop:nil];
++    }
+   }
+ 
+   if (oldViewProps.trackUserLocation != newViewProps.trackUserLocation) {
 diff --git a/ios/components/images/MLRNImageLoader.h b/ios/components/images/MLRNImageLoader.h
 index 940d37d..07a6c05 100644
 --- a/ios/components/images/MLRNImageLoader.h
@@ -1052,7 +1460,7 @@ index ce2ed5a..cbf2413 100644
  - (void)setZoomBounds;
  
 diff --git a/ios/components/layer/MLRNLayer.m b/ios/components/layer/MLRNLayer.m
-index 052406f..66338d6 100644
+index 052406f..7e3a476 100644
 --- a/ios/components/layer/MLRNLayer.m
 +++ b/ios/components/layer/MLRNLayer.m
 @@ -7,87 +7,129 @@
@@ -1330,8 +1738,9 @@ index 052406f..66338d6 100644
 +  __weak MLRNLayer *owner = self;
 +  MLNStyleLayer *layer = _styleLayer;
 +  NSDictionary *reactStyle = _reactStyle;
-   BOOL (^isValid)(void) = ^{
+-  BOOL (^isValid)(void) = ^{
 -    return [self isAddedToMap];
++  BOOL (^isValid)(void) = ^BOOL{
 +    MLRNLayer *view = owner;
 +    return [view _hasInitialized] && view.styleLayer == layer && view.reactStyle == reactStyle;
    };
