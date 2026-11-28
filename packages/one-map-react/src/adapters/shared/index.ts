@@ -4,10 +4,7 @@ export {
   type NativeViewportBounds,
   reportSettledMove,
 } from "./move-event.js";
-export {
-  toNativeLayerStyleKey,
-  useNativeLayerKey,
-} from "./native-layer-updates.js";
+export { toNativeLayerStyleKey } from "./native-layer-style-key.js";
 export {
   omitUndefinedFields,
   snapshotNativeStyleValue,

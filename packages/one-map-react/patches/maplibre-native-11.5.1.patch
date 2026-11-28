@@ -640,3 +640,979 @@ index 19314dd..70c1358 100644
    }
  
    /**
+diff --git a/android/src/main/java/org/maplibre/reactnative/components/layer/MLRNLayer.kt b/android/src/main/java/org/maplibre/reactnative/components/layer/MLRNLayer.kt
+index 0c6baf8..0b55f50 100644
+--- a/android/src/main/java/org/maplibre/reactnative/components/layer/MLRNLayer.kt
++++ b/android/src/main/java/org/maplibre/reactnative/components/layer/MLRNLayer.kt
+@@ -18,6 +18,7 @@ import org.maplibre.android.style.layers.HillshadeLayer
+ import org.maplibre.android.style.layers.Layer
+ import org.maplibre.android.style.layers.LineLayer
+ import org.maplibre.android.style.layers.Property
++import org.maplibre.android.style.layers.PropertyValue
+ import org.maplibre.android.style.layers.PropertyFactory
+ import org.maplibre.android.style.layers.RasterLayer
+ import org.maplibre.android.style.layers.SymbolLayer
+@@ -27,6 +28,7 @@ import org.maplibre.reactnative.components.layer.style.MLRNStyleFactory
+ import org.maplibre.reactnative.components.mapview.MLRNMapView
+ import org.maplibre.reactnative.components.mapview.MLRNMapView.FoundLayerCallback
+ import org.maplibre.reactnative.utils.ExpressionParser.from
++import java.lang.ref.WeakReference
+ 
+ class MLRNLayer(
+     context: Context?,
+@@ -42,6 +44,10 @@ class MLRNLayer(
+     private var mReactStyle: ReadableMap? = null
+     private var mFilter: Expression? = null
+     private var mHadFilter: Boolean = false
++    private var mPlacement = Placement()
++    private var mPlacementRevision = 0
++
++    private data class Placement(val above: String? = null, val below: String? = null, val index: Int? = null)
+ 
+     private var mLayerType: String? = null
+     private var mSourceLayerID: String? = null
+@@ -49,6 +55,7 @@ class MLRNLayer(
+     private var mMap: MapLibreMap? = null
+     private var mLayer: Layer? = null
+     private var mMapView: MLRNMapView? = null
++    private var mStyle: Style? = null
+ 
+     var ID: String
+         get() = mID!!
+@@ -66,42 +73,21 @@ class MLRNLayer(
+ 
+     fun setSourceLayerID(sourceLayerID: String?) {
+         mSourceLayerID = sourceLayerID
+-        if (mLayer != null) {
++        if (style != null && mLayer != null) {
+             applySourceLayer()
+         }
+     }
+ 
+     fun setAboveLayerID(aboveLayerID: String?) {
+-        if (mAboveLayerID != null && mAboveLayerID == aboveLayerID) {
+-            return
+-        }
+         mAboveLayerID = aboveLayerID
+-        if (mLayer != null) {
+-            removeFromMap(mMapView!!)
+-            addAbove(mAboveLayerID!!)
+-        }
+     }
+ 
+     fun setBelowLayerID(belowLayerID: String?) {
+-        if (mBelowLayerID != null && mBelowLayerID == belowLayerID) {
+-            return
+-        }
+         mBelowLayerID = belowLayerID
+-        if (mLayer != null) {
+-            removeFromMap(mMapView!!)
+-            addBelow(mBelowLayerID!!)
+-        }
+     }
+ 
+     fun setLayerIndex(layerIndex: Int) {
+-        if (mLayerIndex != null && mLayerIndex == layerIndex) {
+-            return
+-        }
+-        mLayerIndex = layerIndex
+-        if (mLayer != null) {
+-            removeFromMap(mMapView!!)
+-            addAtIndex(mLayerIndex!!)
+-        }
++        mLayerIndex = layerIndex.takeIf { it >= 0 }
+     }
+ 
+     fun setVisible(visible: Boolean) {
+@@ -113,30 +99,58 @@ class MLRNLayer(
+     }
+ 
+     fun setMinZoomLevel(minZoomLevel: Double) {
+-        mMinZoomLevel = minZoomLevel
+-        if (mLayer != null) {
+-            mLayer!!.setMinZoom(minZoomLevel.toFloat())
++        mMinZoomLevel = minZoomLevel.takeUnless { it == -1.0 }
++        if (style != null) {
++            mLayer?.setMinZoom(mMinZoomLevel?.toFloat() ?: Float.NEGATIVE_INFINITY)
+         }
+     }
+ 
+     fun setMaxZoomLevel(maxZoomLevel: Double) {
+-        mMaxZoomLevel = maxZoomLevel
+-        if (mLayer != null) {
+-            mLayer!!.setMaxZoom(maxZoomLevel.toFloat())
++        mMaxZoomLevel = maxZoomLevel.takeUnless { it == -1.0 }
++        if (style != null) {
++            mLayer?.setMaxZoom(mMaxZoomLevel?.toFloat() ?: Float.POSITIVE_INFINITY)
+         }
+     }
+ 
+     fun setReactStyle(reactStyle: ReadableMap?) {
++        val layer = mLayer?.takeIf { style != null }
++        val previous = mReactStyle?.keySetIterator()
+         mReactStyle = reactStyle
+-        if (mLayer != null) {
+-            addStyles()
++        if (layer == null) return
++
++        while (previous != null && previous.hasNextKey()) {
++            val key = previous.nextKey()
++            if (reactStyle?.hasKey(key) == true) continue
++            val name = camelCase.replace(key) { "-${it.value.lowercase()}" }
++            // JNI reads null as an undefined property and an empty map as inherited transition options.
++            val value = if (name.endsWith("-transition")) emptyMap<String, Any>() else null
++            layer.setProperties(PropertyValue<Any?>(name, value))
+         }
++        addStyles()
+     }
+ 
++    fun commitLayerProps() {
++        val placement = requestedPlacement()
++        if (placement == mPlacement) return
++        mPlacement = placement
++
++        val style = this.style ?: return
++        val layer = mLayer ?: return
++        if (style.getLayer(layer.id) != null && !style.removeLayer(layer)) return
++        insertLayer()
++    }
++
++    private fun requestedPlacement(): Placement =
++        when {
++            mAboveLayerID != null -> Placement(above = mAboveLayerID)
++            mBelowLayerID != null -> Placement(below = mBelowLayerID)
++            else -> Placement(index = mLayerIndex)
++        }
++
+     fun setFilter(readableFilterArray: ReadableArray?) {
+         val filterExpression = from(readableFilterArray)
+         mFilter = filterExpression
+-        if (mLayer != null) {
++        if (style != null && mLayer != null) {
+             if (mFilter != null) {
+                 mHadFilter = true
+                 updateFilter(mFilter)
+@@ -213,7 +227,12 @@ class MLRNLayer(
+     private fun addStyles() {
+         val reactStyle = mReactStyle ?: return
+         val map = mMap ?: return
+-        val style = MLRNStyle(context, reactStyle, map)
++        val layer = mLayer ?: return
++        val owner = WeakReference(this)
++        val style = MLRNStyle(context, reactStyle, map) {
++            val view = owner.get()
++            view?.style != null && view.mLayer === layer && view.mReactStyle === reactStyle
++        }
+         when (mLayer) {
+             is BackgroundLayer -> MLRNStyleFactory.setBackgroundLayerStyle(mLayer as BackgroundLayer, style)
+             is CircleLayer -> MLRNStyleFactory.setCircleLayerStyle(mLayer as CircleLayer, style)
+@@ -272,47 +291,43 @@ class MLRNLayer(
+         mMapView!!.layerAdded(layer)
+     }
+ 
+-    private fun addAbove(aboveLayerID: String) {
+-        mMapView!!.waitForLayer(
+-            aboveLayerID,
++    private fun addRelative(anchor: String, above: Boolean) {
++        val owner = WeakReference(this)
++        val revision = mPlacementRevision
++        mMapView?.waitForLayer(
++            anchor,
+             object : FoundLayerCallback {
+                 override fun found(layer: Layer?) {
+-                    if (!hasInitialized()) return
+-                    val style = this@MLRNLayer.style ?: return
+-                    val l = mLayer ?: return
+-                    style.addLayerAbove(l, aboveLayerID)
+-                    mMapView!!.layerAdded(l)
++                    owner.get()?.insertRelative(anchor, above, revision)
+                 }
+             },
+         )
+     }
+ 
+-    private fun addBelow(belowLayerID: String) {
+-        mMapView!!.waitForLayer(
+-            belowLayerID,
+-            object : FoundLayerCallback {
+-                override fun found(layer: Layer?) {
+-                    if (!hasInitialized()) return
+-                    val style = this@MLRNLayer.style ?: return
+-                    val l = mLayer ?: return
+-                    style.addLayerBelow(l, belowLayerID)
+-                    mMapView!!.layerAdded(l)
+-                }
+-            },
+-        )
++    private fun insertRelative(anchor: String, above: Boolean, revision: Int) {
++        if (revision != mPlacementRevision) return
++        val style = this.style ?: return
++        val layer = mLayer ?: return
++        if (above) {
++            style.addLayerAbove(layer, anchor)
++        } else {
++            style.addLayerBelow(layer, anchor)
++        }
++        mMapView?.layerAdded(layer)
+     }
+ 
+     private fun addAtIndex(index: Int) {
+-        var idx = index
+-        if (!hasInitialized()) return
+         val style = this.style ?: return
+         val l = mLayer ?: return
+         val layerSize = style.getLayers().size
+-        if (idx >= layerSize) {
+-            FLog.e(LOG_TAG, "Layer index is greater than number of layers on map. Layer inserted at end of layer stack.")
+-            idx = layerSize - 1
++        if (index >= layerSize) {
++            if (index > layerSize) {
++                FLog.e(LOG_TAG, "Layer index is greater than number of layers on map. Layer inserted at end of layer stack.")
++            }
++            style.addLayer(l)
++        } else {
++            style.addLayerAt(l, index)
+         }
+-        style.addLayerAt(l, idx)
+         mMapView!!.layerAdded(l)
+     }
+ 
+@@ -321,17 +336,14 @@ class MLRNLayer(
+         val id = mID ?: return
+         if (style.getLayer(id) != null) return
+ 
+-        if (mAboveLayerID != null) {
+-            addAbove(mAboveLayerID!!)
+-        } else if (mBelowLayerID != null) {
+-            addBelow(mBelowLayerID!!)
+-        } else if (mLayerIndex != null) {
+-            addAtIndex(mLayerIndex!!)
+-        } else {
+-            add()
++        mPlacementRevision++
++        val (above, below, index) = mPlacement
++        when {
++            above != null -> addRelative(above, true)
++            below != null -> addRelative(below, false)
++            index != null -> addAtIndex(index)
++            else -> add()
+         }
+-
+-        setZoomBounds()
+     }
+ 
+     private fun setZoomBounds() {
+@@ -346,35 +358,49 @@ class MLRNLayer(
+     override fun addToMap(mapView: MLRNMapView) {
+         mMap = mapView.mapLibreMap
+         mMapView = mapView
++        mStyle = mMap?.style
+ 
+         val style = this.style ?: return
+-
++        mPlacementRevision++
++        mPlacement = requestedPlacement()
+         val existingLayer = style.getLayer(mID!!)
+-        if (existingLayer != null) {
+-            mLayer = existingLayer
+-        } else {
+-            mLayer = makeLayer()
+-            insertLayer()
++        mLayer = existingLayer ?: makeLayer()
++        if (mLayer == null) return
++        if (existingLayer == null) {
++            setZoomBounds()
+         }
+-
++        applyFilter()
+         addStyles()
+-        if (mFilter != null) {
+-            mHadFilter = true
+-            updateFilter(mFilter)
++        if (existingLayer == null) {
++            insertLayer()
+         }
+     }
+ 
++    private fun applyFilter() {
++        mHadFilter = mFilter != null
++        if (mHadFilter) updateFilter(mFilter)
++    }
++
+     override fun removeFromMap(mapView: MLRNMapView) {
+-        val layer = mLayer ?: return
+-        this.style?.removeLayer(layer)
++        val layer = mLayer
++        val style = this.style
++        if (layer != null && style?.getLayer(layer.id) != null) {
++            style.removeLayer(layer)
++        }
++        mPlacementRevision++
++        mLayer = null
++        mMap = null
++        mMapView = null
++        mStyle = null
+     }
+ 
+     private val style: Style?
+-        get() = mMap?.style
++        get() = mStyle?.takeIf { it === mMap?.style }
+ 
+     private fun hasInitialized(): Boolean = mMap != null && mLayer != null
+ 
+     companion object {
+         const val LOG_TAG: String = "MLRNLayer"
++        private val camelCase = Regex("[A-Z]")
+     }
+ }
+diff --git a/android/src/main/java/org/maplibre/reactnative/components/layer/MLRNLayerManager.kt b/android/src/main/java/org/maplibre/reactnative/components/layer/MLRNLayerManager.kt
+index 7888952..322bae2 100644
+--- a/android/src/main/java/org/maplibre/reactnative/components/layer/MLRNLayerManager.kt
++++ b/android/src/main/java/org/maplibre/reactnative/components/layer/MLRNLayerManager.kt
+@@ -59,7 +59,7 @@ class MLRNLayerManager : ViewGroupManager<MLRNLayer>() {
+         layer!!.setBelowLayerID(belowLayerID)
+     }
+ 
+-    @ReactProp(name = "layerIndex")
++    @ReactProp(name = "layerIndex", defaultInt = -1)
+     fun setLayerIndex(
+         layer: MLRNLayer?,
+         layerIndex: Int,
+@@ -67,7 +67,7 @@ class MLRNLayerManager : ViewGroupManager<MLRNLayer>() {
+         layer!!.setLayerIndex(layerIndex)
+     }
+ 
+-    @ReactProp(name = "minzoom")
++    @ReactProp(name = "minzoom", defaultDouble = -1.0)
+     fun setMinzoom(
+         layer: MLRNLayer?,
+         minZoomLevel: Double,
+@@ -75,7 +75,7 @@ class MLRNLayerManager : ViewGroupManager<MLRNLayer>() {
+         layer!!.setMinZoomLevel(minZoomLevel)
+     }
+ 
+-    @ReactProp(name = "maxzoom")
++    @ReactProp(name = "maxzoom", defaultDouble = -1.0)
+     fun setMaxzoom(
+         layer: MLRNLayer?,
+         maxZoomLevel: Double,
+@@ -99,6 +99,11 @@ class MLRNLayerManager : ViewGroupManager<MLRNLayer>() {
+         layer!!.setFilter(filterList)
+     }
+ 
++    override fun onAfterUpdateTransaction(layer: MLRNLayer) {
++        super.onAfterUpdateTransaction(layer)
++        layer.commitLayerProps()
++    }
++
+     companion object {
+         const val REACT_CLASS: String = "MLRNLayer"
+     }
+diff --git a/android/src/main/java/org/maplibre/reactnative/components/layer/style/MLRNStyle.kt b/android/src/main/java/org/maplibre/reactnative/components/layer/style/MLRNStyle.kt
+index 880cb79..6044e09 100644
+--- a/android/src/main/java/org/maplibre/reactnative/components/layer/style/MLRNStyle.kt
++++ b/android/src/main/java/org/maplibre/reactnative/components/layer/style/MLRNStyle.kt
+@@ -12,6 +12,7 @@ class MLRNStyle(
+     private val mContext: Context,
+     reactStyle: ReadableMap,
+     map: MapLibreMap,
++    private val isCurrent: () -> Boolean = { true },
+ ) {
+     private val mReactStyle: ReadableMap = reactStyle
+     private val mMap: MapLibreMap = map
+@@ -54,7 +55,7 @@ class MLRNStyle(
+             arrayOf(
+                 AbstractMap.SimpleEntry(uriStr, imageEntry(styleValue)),
+             )
+-        val task = DownloadMapImageTask(mContext, mMap, callback)
++        val task = DownloadMapImageTask(mContext, mMap, callback) { isCurrent() }
+         task.execute(*images)
+     }
+ }
+diff --git a/ios/components/layer/MLRNLayer.h b/ios/components/layer/MLRNLayer.h
+index ce2ed5a..cbf2413 100644
+--- a/ios/components/layer/MLRNLayer.h
++++ b/ios/components/layer/MLRNLayer.h
+@@ -23,6 +23,7 @@ typedef NS_ENUM(NSInteger, MLRNLayerType) {
+ @property (nonatomic, strong, nullable) MLNStyle *style;
+ @property (nonatomic, weak, nullable) MLRNMapView *map;
+ @property (nonatomic, strong, nullable) NSDictionary *reactStyle;
++@property (nonatomic, assign) BOOL oneMapResetAdoptedStyle;
+ @property (nonatomic, strong, nullable) NSArray *filter;
+ 
+ @property (nonatomic, copy, nullable) NSString *id;
+@@ -42,8 +43,7 @@ typedef NS_ENUM(NSInteger, MLRNLayerType) {
+ - (void)removeFromMap:(nonnull MLNStyle *)style;
+ - (nullable MLNStyleLayer *)makeLayer:(nonnull MLNStyle *)style;
+ - (void)addStyles;
+-- (void)insertAbove:(nonnull NSString *)layer;
+-- (void)insertBelow:(nonnull NSString *)layer;
++- (void)commitLayerProps;
+ - (void)insertAtIndex:(NSUInteger)index;
+ - (void)setZoomBounds;
+ 
+diff --git a/ios/components/layer/MLRNLayer.m b/ios/components/layer/MLRNLayer.m
+index 052406f..66338d6 100644
+--- a/ios/components/layer/MLRNLayer.m
++++ b/ios/components/layer/MLRNLayer.m
+@@ -7,87 +7,129 @@
+ #import "MLRNUtils.h"
+ 
+ #import <React/RCTLog.h>
+-
+-@implementation MLRNLayer
++#include <math.h>
++
++@implementation MLRNLayer {
++  BOOL _ownsStyleLayer;
++  BOOL _styleChanged;
++  NSDictionary *_previousReactStyle;
++  NSArray *_placement;
++  NSUInteger _placementRevision;
++}
+ 
+ // MARK: - Property setters with live update support
+ 
+ - (void)setMinZoomLevel:(NSNumber *)minZoomLevel {
+   _minZoomLevel = minZoomLevel;
+ 
+-  if (_styleLayer != nil) {
+-    _styleLayer.minimumZoomLevel = [_minZoomLevel doubleValue];
++  if ([self _hasInitialized]) {
++    _styleLayer.minimumZoomLevel = minZoomLevel ? minZoomLevel.floatValue : -INFINITY;
+   }
+ }
+ 
+ - (void)setMaxZoomLevel:(NSNumber *)maxZoomLevel {
+   _maxZoomLevel = maxZoomLevel;
+ 
+-  if (_styleLayer != nil) {
+-    _styleLayer.maximumZoomLevel = [_maxZoomLevel doubleValue];
++  if ([self _hasInitialized]) {
++    _styleLayer.maximumZoomLevel = maxZoomLevel ? maxZoomLevel.floatValue : INFINITY;
+   }
+ }
+ 
+-- (void)setAboveLayerID:(NSString *)aboveLayerID {
+-  if (_aboveLayerID != nil && _aboveLayerID == aboveLayerID) {
+-    return;
++- (void)setMap:(MLRNMapView *)map {
++  if (map == nil) {
++    [self removeFromMap:_map.style];
++    _map = nil;
++  } else {
++    _map = map;
++    [self addToMap:map style:map.style];
+   }
++}
+ 
+-  _aboveLayerID = aboveLayerID;
+-  if (_styleLayer != nil) {
+-    [self removeFromMap:_style];
+-    [self insertAbove:aboveLayerID];
+-  }
++- (void)setReactStyle:(NSDictionary *)reactStyle {
++  _previousReactStyle = _reactStyle;
++  _reactStyle = reactStyle;
++  _styleChanged = YES;
+ }
+ 
+-- (void)setBelowLayerID:(NSString *)belowLayerID {
+-  if (_belowLayerID != nil && _belowLayerID == belowLayerID) {
++- (void)commitLayerProps {
++  NSArray *placement = [self requestedPlacement];
++  BOOL moved = ![_placement isEqualToArray:placement];
++  _placement = placement;
++  BOOL updateStyle = _styleChanged;
++  NSDictionary *previous = _previousReactStyle;
++  _previousReactStyle = nil;
++  _styleChanged = NO;
++
++  if (![self _hasInitialized]) {
+     return;
+   }
+-
+-  _belowLayerID = belowLayerID;
+-  if (_styleLayer != nil) {
+-    [self removeFromMap:_style];
+-    [self insertBelow:_belowLayerID];
++  BOOL replace = NO;
++  if (_ownsStyleLayer || _oneMapResetAdoptedStyle) {
++    NSMutableDictionary *resets = nil;
++    for (NSString *key in previous) {
++      if (_reactStyle[key] != nil) continue;
++      // MLNTransition has no representation for an unspecified duration and delay.
++      if ([key hasSuffix:@"Transition"]) {
++        replace = YES;
++        break;
++      }
++      if (resets == nil) resets = [NSMutableDictionary new];
++      resets[key] = @{@"styletype": @"reset"};
++    }
++    if (!replace && resets.count > 0) [self applyStyleFields:resets];
+   }
+-}
+-
+-- (void)setLayerIndex:(NSNumber *)layerIndex {
+-  if (_layerIndex != nil && _layerIndex == layerIndex) {
++  if (!replace && !moved) {
++    if (updateStyle) [self addStyles];
+     return;
+   }
+ 
+-  _layerIndex = layerIndex;
+-  if (_styleLayer != nil) {
+-    [self removeFromMap:_style];
+-    [self insertAtIndex:_layerIndex.unsignedIntegerValue];
++  MLNStyleLayer *replacement = replace ? [self makeLayer:_style] : _styleLayer;
++  if (replacement == nil) {
++    return;
+   }
+-}
+ 
+-- (void)setMap:(MLRNMapView *)map {
+-  if (map == nil) {
+-    [self removeFromMap:_map.style];
+-    _map = nil;
+-  } else {
+-    _map = map;
+-    [self addToMap:map style:map.style];
++  NSArray<MLNStyleLayer *> *layers = _style.layers;
++  NSUInteger position = [layers indexOfObjectIdenticalTo:_styleLayer];
++  MLNStyleLayer *next = nil;
++  if (position != NSNotFound) {
++    if (position + 1 < layers.count) next = layers[position + 1];
++    [_style removeLayer:_styleLayer];
+   }
+-}
+ 
+-- (void)setReactStyle:(NSDictionary *)reactStyle {
+-  _reactStyle = reactStyle;
++  _styleLayer = replacement;
++  if (replace) {
++    [self setZoomBounds];
++    [self addedToMap];
++    [self addStyles];
++  } else if (updateStyle) {
++    [self addStyles];
++  }
+ 
+-  if (_styleLayer != nil) {
+-    dispatch_async(dispatch_get_main_queue(), ^{
+-      [self addStyles];
+-    });
++  if (moved) {
++    [self insertLayer];
++  } else if (position != NSNotFound) {
++    // The full SDK stack includes layers from other sources and the base style.
++    if (next != nil) {
++      [_style insertLayer:replacement belowLayer:next];
++    } else {
++      [_style addLayer:replacement];
++    }
++    [_map layerAdded:replacement];
+   }
++  // A layer waiting for an anchor retains its pending insertion.
++}
++
++- (NSArray *)requestedPlacement {
++  if (_aboveLayerID != nil) return @[@"above", _aboveLayerID];
++  if (_belowLayerID != nil) return @[@"below", _belowLayerID];
++  if (_layerIndex != nil) return @[@"index", _layerIndex];
++  return @[];
+ }
+ 
+ - (void)setSourceLayerID:(NSString *)sourceLayerID {
+   _sourceLayerID = sourceLayerID;
+ 
+-  if (_styleLayer != nil && [_styleLayer isKindOfClass:[MLNVectorStyleLayer class]]) {
++  if ([self _hasInitialized] && [_styleLayer isKindOfClass:[MLNVectorStyleLayer class]]) {
+     ((MLNVectorStyleLayer *)_styleLayer).sourceLayerIdentifier = _sourceLayerID;
+   }
+ }
+@@ -95,7 +137,7 @@
+ - (void)setFilter:(NSArray *)filter {
+   _filter = filter;
+ 
+-  if (_styleLayer != nil && [_styleLayer isKindOfClass:[MLNVectorStyleLayer class]]) {
++  if ([self _hasInitialized] && [_styleLayer isKindOfClass:[MLNVectorStyleLayer class]]) {
+     NSPredicate *predicate = [self buildFilters];
+     [self updateFilter:predicate];
+   }
+@@ -124,39 +166,55 @@
+   }
+   _map = map;
+   _style = style;
++  _placementRevision++;
++  _placement = [self requestedPlacement];
++  _styleChanged = NO;
++  _previousReactStyle = nil;
+   if (_id == nil) {
+     RCTLogError(@"Cannot add a layer without id to the map: %@", self);
+     return;
+   }
+   MLNStyleLayer *existingLayer = [style layerWithIdentifier:_id];
++  _ownsStyleLayer = existingLayer == nil || (_ownsStyleLayer && existingLayer == _styleLayer);
+   if (existingLayer != nil) {
+     _styleLayer = existingLayer;
+   } else {
++    _styleLayer = nil;
+     _styleLayer = [self makeLayer:style];
+     if (_styleLayer == nil) {
+       RCTLogError(@"Failed to make layer: %@", _id);
+       return;
+     }
+-    [self insertLayer:map];
++    [self setZoomBounds];
+   }
+ 
+   [self addStyles];
+   [self addedToMap];
++  if (existingLayer == nil) {
++    [self insertLayer];
++  }
+ }
+ 
+ - (nullable MLNSource *)layerWithSourceIDInStyle:(nonnull MLNStyle *)style {
+-  MLNSource *result = [style sourceWithIdentifier:self.sourceID];
+-  if (result == NULL) {
+-    RCTLogError(@"Cannot find source with id: %@ referenced by layer:%@", self.sourceID, _id);
++  NSString *sourceID = _sourceID;
++  if (sourceID == nil && [_styleLayer isKindOfClass:[MLNForegroundStyleLayer class]]) {
++    sourceID = ((MLNForegroundStyleLayer *)_styleLayer).sourceIdentifier;
++  }
++  MLNSource *result = sourceID ? [style sourceWithIdentifier:sourceID] : nil;
++  if (result == nil) {
++    RCTLogError(@"Cannot find source with id: %@ referenced by layer:%@", sourceID, _id);
+   }
+   return result;
+ }
+ 
+ - (void)removeFromMap:(MLNStyle *)style {
+-  if (_styleLayer != nil) {
++  if (style == _style && _styleLayer != nil &&
++      [style layerWithIdentifier:_styleLayer.identifier] == _styleLayer) {
+     [style removeLayer:_styleLayer];
+   }
++  _placementRevision++;
+   _style = nil;
++  _styleLayer = nil;
+ }
+ 
+ - (BOOL)isAddedToMap {
+@@ -211,8 +269,14 @@
+   }
+ 
+   // Set sourceLayerIdentifier for vector layers
+-  if (_sourceLayerID != nil && [layer isKindOfClass:[MLNVectorStyleLayer class]]) {
+-    ((MLNVectorStyleLayer *)layer).sourceLayerIdentifier = _sourceLayerID;
++  if ([layer isKindOfClass:[MLNVectorStyleLayer class]]) {
++    NSString *sourceLayerID = _sourceLayerID;
++    if (sourceLayerID == nil && [_styleLayer isKindOfClass:[MLNVectorStyleLayer class]]) {
++      sourceLayerID = ((MLNVectorStyleLayer *)_styleLayer).sourceLayerIdentifier;
++    }
++    if (sourceLayerID != nil) {
++      ((MLNVectorStyleLayer *)layer).sourceLayerIdentifier = sourceLayerID;
++    }
+   }
+ 
+   return layer;
+@@ -221,47 +285,55 @@
+ // MARK: - Style application (type-based dispatch)
+ 
+ - (void)addStyles {
++  [self applyStyleFields:_reactStyle];
++}
++
++- (void)applyStyleFields:(NSDictionary *)fields {
+   MLRNStyle *style = [[MLRNStyle alloc] initWithMLNStyle:self.style];
+ 
++  __weak MLRNLayer *owner = self;
++  MLNStyleLayer *layer = _styleLayer;
++  NSDictionary *reactStyle = _reactStyle;
+   BOOL (^isValid)(void) = ^{
+-    return [self isAddedToMap];
++    MLRNLayer *view = owner;
++    return [view _hasInitialized] && view.styleLayer == layer && view.reactStyle == reactStyle;
+   };
+ 
+   if ([_styleLayer isKindOfClass:[MLNBackgroundStyleLayer class]]) {
+     [style backgroundLayer:(MLNBackgroundStyleLayer *)_styleLayer
+-            withReactStyle:_reactStyle
++            withReactStyle:fields
+                    isValid:isValid];
+   } else if ([_styleLayer isKindOfClass:[MLNCircleStyleLayer class]]) {
+     [style circleLayer:(MLNCircleStyleLayer *)_styleLayer
+-        withReactStyle:_reactStyle
++        withReactStyle:fields
+                isValid:isValid];
+   } else if ([_styleLayer isKindOfClass:[MLNColorReliefStyleLayer class]]) {
+     [style colorReliefLayer:(MLNColorReliefStyleLayer *)_styleLayer
+-             withReactStyle:_reactStyle
++             withReactStyle:fields
+                     isValid:isValid];
+   } else if ([_styleLayer isKindOfClass:[MLNFillStyleLayer class]]) {
+-    [style fillLayer:(MLNFillStyleLayer *)_styleLayer withReactStyle:_reactStyle isValid:isValid];
++    [style fillLayer:(MLNFillStyleLayer *)_styleLayer withReactStyle:fields isValid:isValid];
+   } else if ([_styleLayer isKindOfClass:[MLNFillExtrusionStyleLayer class]]) {
+     [style fillExtrusionLayer:(MLNFillExtrusionStyleLayer *)_styleLayer
+-               withReactStyle:_reactStyle
++               withReactStyle:fields
+                       isValid:isValid];
+   } else if ([_styleLayer isKindOfClass:[MLNHeatmapStyleLayer class]]) {
+     [style heatmapLayer:(MLNHeatmapStyleLayer *)_styleLayer
+-         withReactStyle:_reactStyle
++         withReactStyle:fields
+                 isValid:isValid];
+   } else if ([_styleLayer isKindOfClass:[MLNHillshadeStyleLayer class]]) {
+     [style hillshadeLayer:(MLNHillshadeStyleLayer *)_styleLayer
+-           withReactStyle:_reactStyle
++           withReactStyle:fields
+                   isValid:isValid];
+   } else if ([_styleLayer isKindOfClass:[MLNLineStyleLayer class]]) {
+-    [style lineLayer:(MLNLineStyleLayer *)_styleLayer withReactStyle:_reactStyle isValid:isValid];
++    [style lineLayer:(MLNLineStyleLayer *)_styleLayer withReactStyle:fields isValid:isValid];
+   } else if ([_styleLayer isKindOfClass:[MLNRasterStyleLayer class]]) {
+     [style rasterLayer:(MLNRasterStyleLayer *)_styleLayer
+-        withReactStyle:_reactStyle
++        withReactStyle:fields
+                isValid:isValid];
+   } else if ([_styleLayer isKindOfClass:[MLNSymbolStyleLayer class]]) {
+     [style symbolLayer:(MLNSymbolStyleLayer *)_styleLayer
+-        withReactStyle:_reactStyle
++        withReactStyle:fields
+                isValid:isValid];
+   }
+ }
+@@ -275,23 +347,22 @@
+ 
+ // MARK: - Layer insertion
+ 
+-- (void)insertLayer:(MLRNMapView *)map {
++- (void)insertLayer {
+   if ([_style layerWithIdentifier:_id] != nil) {
+     return;  // prevent layer from being added twice
+   }
+ 
++  _placementRevision++;
+   if (_aboveLayerID != nil) {
+-    [self insertAbove:_aboveLayerID];
++    [self insertRelativeTo:_aboveLayerID above:YES];
+   } else if (_belowLayerID != nil) {
+-    [self insertBelow:_belowLayerID];
++    [self insertRelativeTo:_belowLayerID above:NO];
+   } else if (_layerIndex != nil) {
+     [self insertAtIndex:_layerIndex.unsignedIntegerValue];
+   } else {
+     [_style addLayer:_styleLayer];
+     [_map layerAdded:_styleLayer];
+   }
+-
+-  [self setZoomBounds];
+ }
+ 
+ - (void)setZoomBounds {
+@@ -304,26 +375,21 @@
+   }
+ }
+ 
+-- (void)insertAbove:(NSString *)aboveLayerIDs {
+-  [_map waitForLayerWithId:aboveLayerIDs
+-                      then:^void(MLNStyleLayer *layer) {
+-                        if (![self _hasInitialized]) {
++- (void)insertRelativeTo:(NSString *)anchor above:(BOOL)above {
++  __weak MLRNLayer *owner = self;
++  NSUInteger revision = _placementRevision;
++  [_map waitForLayerWithId:anchor
++                      then:^(MLNStyleLayer *layer) {
++                        MLRNLayer *view = owner;
++                        if (![view _hasInitialized] || view->_placementRevision != revision) {
+                           return;
+                         }
+-                        [self->_style insertLayer:self->_styleLayer aboveLayer:layer];
+-                        [self->_map layerAdded:self->_styleLayer];
+-                      }];
+-}
+-
+-- (void)insertBelow:(NSString *)belowLayerID {
+-  [_map waitForLayerWithId:belowLayerID
+-                      then:^void(MLNStyleLayer *layer) {
+-                        if (![self _hasInitialized]) {
+-                          return;
++                        if (above) {
++                          [view.style insertLayer:view.styleLayer aboveLayer:layer];
++                        } else {
++                          [view.style insertLayer:view.styleLayer belowLayer:layer];
+                         }
+-
+-                        [self->_style insertLayer:self->_styleLayer belowLayer:layer];
+-                        [self->_map layerAdded:self->_styleLayer];
++                        [view.map layerAdded:view.styleLayer];
+                       }];
+ }
+ 
+@@ -333,16 +399,19 @@
+   }
+   NSArray *layers = _style.layers;
+   if (index >= layers.count) {
+-    RCTLogWarn(@"Layer index is greater than number of layers on map. Layer inserted at end of "
+-               @"layer stack.");
+-    index = layers.count - 1;
++    if (index > layers.count) {
++      RCTLogWarn(@"Layer index is greater than number of layers on map. Layer inserted at end of "
++                 @"layer stack.");
++    }
++    [_style addLayer:_styleLayer];
++  } else {
++    [_style insertLayer:_styleLayer atIndex:index];
+   }
+-  [_style insertLayer:self->_styleLayer atIndex:index];
+   [_map layerAdded:self->_styleLayer];
+ }
+ 
+ - (BOOL)_hasInitialized {
+-  return _style != nil && _styleLayer != nil;
++  return _style != nil && _style == _map.style && _styleLayer != nil;
+ }
+ 
+ @end
+diff --git a/ios/components/layer/MLRNLayerComponentView.mm b/ios/components/layer/MLRNLayerComponentView.mm
+index 3518309..12a5f59 100644
+--- a/ios/components/layer/MLRNLayerComponentView.mm
++++ b/ios/components/layer/MLRNLayerComponentView.mm
+@@ -109,15 +109,15 @@ static MLRNLayerType MLRNLayerTypeFromCppEnum(MLRNLayerLayerType layerType) {
+   }
+ 
+   if (oldViewProps.layerIndex != newViewProps.layerIndex) {
+-    _view.layerIndex = @(newViewProps.layerIndex);
++    _view.layerIndex = newViewProps.layerIndex == -1 ? nil : @(newViewProps.layerIndex);
+   }
+ 
+   if (oldViewProps.minzoom != newViewProps.minzoom) {
+-    _view.minZoomLevel = @(newViewProps.minzoom);
++    _view.minZoomLevel = newViewProps.minzoom == -1 ? nil : @(newViewProps.minzoom);
+   }
+ 
+   if (oldViewProps.maxzoom != newViewProps.maxzoom) {
+-    _view.maxZoomLevel = @(newViewProps.maxzoom);
++    _view.maxZoomLevel = newViewProps.maxzoom == -1 ? nil : @(newViewProps.maxzoom);
+   }
+ 
+   if (oldViewProps.filter != newViewProps.filter) {
+@@ -128,6 +128,8 @@ static MLRNLayerType MLRNLayerTypeFromCppEnum(MLRNLayerLayerType layerType) {
+     _view.reactStyle = MLRN_DYNAMIC_TO_DICT(newViewProps.reactStyle);
+   }
+ 
++  _view.oneMapResetAdoptedStyle = newViewProps.oneMapResetAdoptedStyle;
++  [_view commitLayerProps];
+   [super updateProps:props oldProps:oldProps];
+ }
+ 
+diff --git a/lib/commonjs/components/layer/LayerNativeComponent.ts b/lib/commonjs/components/layer/LayerNativeComponent.ts
+index 75f7a29..9807292 100644
+--- a/lib/commonjs/components/layer/LayerNativeComponent.ts
++++ b/lib/commonjs/components/layer/LayerNativeComponent.ts
+@@ -29,11 +29,12 @@ export interface NativeProps extends ViewProps {
+ 
+   afterId?: string;
+   beforeId?: string;
+-  layerIndex?: CodegenTypes.Int32;
++  layerIndex?: CodegenTypes.WithDefault<CodegenTypes.Int32, -1>;
+ 
+-  minzoom?: CodegenTypes.Double;
+-  maxzoom?: CodegenTypes.Double;
++  minzoom?: CodegenTypes.WithDefault<CodegenTypes.Double, -1>;
++  maxzoom?: CodegenTypes.WithDefault<CodegenTypes.Double, -1>;
+ 
++  oneMapResetAdoptedStyle?: boolean;
+   filter?: UnsafeMixed<unknown[]>;
+   reactStyle?: UnsafeMixed<Record<string, StyleValue>>;
+ }
+diff --git a/lib/module/components/layer/LayerNativeComponent.ts b/lib/module/components/layer/LayerNativeComponent.ts
+index 75f7a29..9807292 100644
+--- a/lib/module/components/layer/LayerNativeComponent.ts
++++ b/lib/module/components/layer/LayerNativeComponent.ts
+@@ -29,11 +29,12 @@ export interface NativeProps extends ViewProps {
+ 
+   afterId?: string;
+   beforeId?: string;
+-  layerIndex?: CodegenTypes.Int32;
++  layerIndex?: CodegenTypes.WithDefault<CodegenTypes.Int32, -1>;
+ 
+-  minzoom?: CodegenTypes.Double;
+-  maxzoom?: CodegenTypes.Double;
++  minzoom?: CodegenTypes.WithDefault<CodegenTypes.Double, -1>;
++  maxzoom?: CodegenTypes.WithDefault<CodegenTypes.Double, -1>;
+ 
++  oneMapResetAdoptedStyle?: boolean;
+   filter?: UnsafeMixed<unknown[]>;
+   reactStyle?: UnsafeMixed<Record<string, StyleValue>>;
+ }
+diff --git a/lib/typescript/commonjs/components/layer/LayerNativeComponent.d.ts b/lib/typescript/commonjs/components/layer/LayerNativeComponent.d.ts
+index 6230a1f..8603830 100644
+--- a/lib/typescript/commonjs/components/layer/LayerNativeComponent.d.ts
++++ b/lib/typescript/commonjs/components/layer/LayerNativeComponent.d.ts
+@@ -8,9 +8,10 @@ export interface NativeProps extends ViewProps {
+     sourceLayer?: string;
+     afterId?: string;
+     beforeId?: string;
+-    layerIndex?: CodegenTypes.Int32;
+-    minzoom?: CodegenTypes.Double;
+-    maxzoom?: CodegenTypes.Double;
++    layerIndex?: CodegenTypes.WithDefault<CodegenTypes.Int32, -1>;
++    minzoom?: CodegenTypes.WithDefault<CodegenTypes.Double, -1>;
++    maxzoom?: CodegenTypes.WithDefault<CodegenTypes.Double, -1>;
++    oneMapResetAdoptedStyle?: boolean;
+     filter?: UnsafeMixed<unknown[]>;
+     reactStyle?: UnsafeMixed<Record<string, StyleValue>>;
+ }
+diff --git a/lib/typescript/module/components/layer/LayerNativeComponent.d.ts b/lib/typescript/module/components/layer/LayerNativeComponent.d.ts
+index 6230a1f..8603830 100644
+--- a/lib/typescript/module/components/layer/LayerNativeComponent.d.ts
++++ b/lib/typescript/module/components/layer/LayerNativeComponent.d.ts
+@@ -8,9 +8,10 @@ export interface NativeProps extends ViewProps {
+     sourceLayer?: string;
+     afterId?: string;
+     beforeId?: string;
+-    layerIndex?: CodegenTypes.Int32;
+-    minzoom?: CodegenTypes.Double;
+-    maxzoom?: CodegenTypes.Double;
++    layerIndex?: CodegenTypes.WithDefault<CodegenTypes.Int32, -1>;
++    minzoom?: CodegenTypes.WithDefault<CodegenTypes.Double, -1>;
++    maxzoom?: CodegenTypes.WithDefault<CodegenTypes.Double, -1>;
++    oneMapResetAdoptedStyle?: boolean;
+     filter?: UnsafeMixed<unknown[]>;
+     reactStyle?: UnsafeMixed<Record<string, StyleValue>>;
+ }
+diff --git a/src/components/layer/LayerNativeComponent.ts b/src/components/layer/LayerNativeComponent.ts
+index 75f7a29..9807292 100644
+--- a/src/components/layer/LayerNativeComponent.ts
++++ b/src/components/layer/LayerNativeComponent.ts
+@@ -29,11 +29,12 @@ export interface NativeProps extends ViewProps {
+ 
+   afterId?: string;
+   beforeId?: string;
+-  layerIndex?: CodegenTypes.Int32;
++  layerIndex?: CodegenTypes.WithDefault<CodegenTypes.Int32, -1>;
+ 
+-  minzoom?: CodegenTypes.Double;
+-  maxzoom?: CodegenTypes.Double;
++  minzoom?: CodegenTypes.WithDefault<CodegenTypes.Double, -1>;
++  maxzoom?: CodegenTypes.WithDefault<CodegenTypes.Double, -1>;
+ 
++  oneMapResetAdoptedStyle?: boolean;
+   filter?: UnsafeMixed<unknown[]>;
+   reactStyle?: UnsafeMixed<Record<string, StyleValue>>;
+ }
+diff --git a/ios/components/layer/style/MLRNStyleValue.m b/ios/components/layer/style/MLRNStyleValue.m
+index 5e29cb1..50b483b 100644
+--- a/ios/components/layer/style/MLRNStyleValue.m
++++ b/ios/components/layer/style/MLRNStyleValue.m
+@@ -7,6 +7,7 @@
+ }
+ 
+ - (NSExpression *)mlnStyleValue {
++  if ([_styleType isEqualToString:@"reset"]) return nil;
+   if ([_styleType isEqualToString:@"color"] &&
+       [expressionJSON respondsToSelector:@selector(objectEnumerator)] &&
+       [[[(NSArray *)expressionJSON objectEnumerator] nextObject] isKindOfClass:[NSNumber class]]) {

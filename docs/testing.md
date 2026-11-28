@@ -8,9 +8,9 @@ Run the checks that match the change. `bun run validate` checks formatting and l
 
 GitHub Actions runs `bun run validate` when a pull request opens, reopens, or receives new commits. The job uses macOS for the Swift and Objective-C++ regression checks. See the [pull request validation workflow](../.github/workflows/validate.yml).
 
-The workflow installs JDK 17 and verifies the SHA-256 of the Kotlin 2.2.0 compiler archive. Both Kotlin regressions require the configured compiler in CI.
+The workflow installs JDK 17 and verifies the SHA-256 of the Kotlin 2.2.0 compiler archive. The Kotlin regressions require the configured compiler in CI.
 
-To run the Kotlin regressions locally, install JDK 17 and extract the compiler archive from the [Kotlin 2.2.0 release](https://github.com/JetBrains/kotlin/releases/tag/v2.2.0). Set `ONE_MAP_KOTLINC` to the absolute path of the extracted `kotlinc/bin/kotlinc` launcher when you run `bun run validate`. Local runs with the variable unset report a skip for the Kotlin portions. The camera-bounds script requires macOS and Xcode for its Swift and Objective-C++ checks.
+To run the Kotlin regressions locally, install JDK 17 and extract the compiler archive from the [Kotlin 2.2.0 release](https://github.com/JetBrains/kotlin/releases/tag/v2.2.0). Set `ONE_MAP_KOTLINC` to the absolute path of the extracted `kotlinc/bin/kotlinc` launcher when you run `bun run validate`. Local runs with the variable unset report a skip for the Kotlin portions. The camera-bounds and layer-order regressions require macOS and Xcode for their Swift and Objective-C++ checks.
 
 `bun run check:docs` checks Markdown structure and local links in tracked files and unignored new files in the Git checkout. Use the referenced source and examples to verify the claims in the text.
 
