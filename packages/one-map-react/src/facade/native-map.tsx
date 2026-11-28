@@ -28,7 +28,7 @@ import {
   type MapRegistry,
   noMapSubscription,
 } from "./map-registry.js";
-import { type ForwardedMapMethodKey, MountedMap } from "./map.js";
+import { type ForwardedMapMethodKey, MountedMap } from "./MountedMap.js";
 import { useSourceOptions } from "./source.js";
 import { useMarkerOptions } from "./ui.js";
 

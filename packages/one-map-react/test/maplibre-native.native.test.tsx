@@ -2190,16 +2190,20 @@ describe("maplibre-native entry binding", () => {
     {
       nativeEvent: { lngLat: [-122.34, 47.61], point: [23, 41] },
     },
-    () => {
+    (featureId) => {
       let complete: (error?: Error) => void = () => {
         throw new Error("Rendered query was never dispatched.");
       };
+      const result =
+        featureId === undefined
+          ? queryFeatures
+          : [{ ...queryFeatures[0], id: featureId }];
       mockQueryRenderedFeatures.mockImplementationOnce(
         () =>
           new Promise((resolve, reject) => {
             complete = (error) => {
               if (error) reject(error);
-              else resolve(queryFeatures);
+              else resolve(result);
             };
           })
       );

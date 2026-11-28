@@ -25,7 +25,10 @@ import type {
 } from "../src/contracts/native-types.js";
 import type { GeoJsonFeature } from "../src/contracts/source-types.js";
 import { type MapSession, useMapSession } from "../src/facade/map-context.js";
-import type { ForwardedMapMethodKey } from "../src/facade/map.js";
+import {
+  MountedMap,
+  type ForwardedMapMethodKey,
+} from "../src/facade/MountedMap.js";
 import { createNativeMapBinding } from "../src/facade/native-map.js";
 import type { MapRef as MapboxMapRef } from "../src/mapbox-native.js";
 import type { MapRef as MaplibreMapRef } from "../src/maplibre-native.js";
@@ -307,6 +310,35 @@ describe("TF07 map-local UI lifetime", () => {
       ]);
     });
     expect(mapClick).not.toHaveBeenCalled();
+  });
+
+  test("reattaching a renderer handle cannot revive a tap from its previous attachment", async () => {
+    const first = createFixture();
+    const other = createFixture();
+    let finish!: (features: []) => void;
+    first.query.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        })
+    );
+    const onClick = vi.fn();
+    const scene = (fixture: typeof first) => (
+      <MountedMap
+        props={{ mapStyle: style, interactiveLayerIds: ["places"], onClick }}
+        implementation={fixture.FakeMap}
+        components={fixture.components}
+        forwardedRef={null}
+      />
+    );
+    const view = render(scene(first));
+    await first.click();
+    view.rerender(scene(other));
+    view.rerender(scene(first));
+    await act(async () => finish([]));
+    expect(onClick).not.toHaveBeenCalled();
+    await first.click();
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   test("failed hit queries report failures without inventing empty successful hits", async () => {
