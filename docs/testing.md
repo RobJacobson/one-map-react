@@ -4,7 +4,9 @@ Test the behavior this library owns: forwarding, conversions, lifecycle, packagi
 
 ## During development
 
-Run the checks that match the change. `bun run validate` checks formatting and lint, runs `bun run check:docs`, builds the packages, and then runs type checks, unit and component tests, and packed-package selection. It does not open a browser, start Metro, or build a native app.
+Run the checks that match the change. `bun run validate` checks formatting, lint, and documentation. It builds the packages once, tests the emitted library, checks types, runs the source tests and regressions, and checks packed-package selection. It does not open a browser, start Metro, or build a native app.
+
+`bun run test` runs unit tests, jsdom component tests, mocked native Jest tests, and cross-package regressions. Run `bun run test:compiled` to build both packages and run the library's jsdom and mocked native suites against `dist`. This command also verifies that selected components and hooks compile and the emitted modules use the React Compiler runtime. A React Compiler error in code selected for compilation fails the library build.
 
 GitHub Actions runs `bun run validate` when a pull request opens, reopens, or receives new commits. The job uses macOS for the Swift and Objective-C++ regression checks. See the [pull request validation workflow](../.github/workflows/validate.yml).
 
