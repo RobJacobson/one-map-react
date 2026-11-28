@@ -21,8 +21,8 @@
       "default": "./dist/acceptance-selection.js"
     },
     "./acceptance-web": {
-      "types": "./dist/acceptance-controls.web.d.ts",
-      "default": "./dist/acceptance-controls.web.js"
+      "types": "./dist/WebAcceptanceWorkspace.web.d.ts",
+      "default": "./dist/WebAcceptanceWorkspace.web.js"
     },
     "./acceptance-native": {
       "types": "./dist/acceptance.native.d.ts",

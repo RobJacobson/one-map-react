@@ -4,27 +4,37 @@ import {
   useExampleMap,
 } from "@one-map/example-map";
 import {
+  acceptanceScenario,
+  webAcceptanceScenarios,
   webAcceptanceSelection,
-  acceptanceScenarios,
+  webAcceptanceUrl,
+  type AcceptanceScenario,
 } from "@one-map/example-map/acceptance-selection";
 import { WebAcceptanceWorkspace } from "@one-map/example-map/acceptance-web";
 import { maps, configureMapbox } from "@one-map/example-map/web";
+import type { ReactElement } from "react";
 
 const token = publicMapboxToken(
   import.meta.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN
 );
 configureMapbox(token);
 
-/** Conventional DOM shell around the shared map and behavior. */
-export const App = () => {
+/**
+ * Selects the Vite development scenario or the standard basemap.
+ *
+ * @returns The selected map screen and its controls.
+ * @throws Error when the development selection is invalid or needs a Mapbox token.
+ */
+export const App = (): ReactElement => {
   const selection = import.meta.env.DEV
     ? webAcceptanceSelection(window.location.search)
     : undefined;
   if (selection?.scenario) {
-    if (selection.engine === "mapbox" && !token)
+    if (selection.engine === "mapbox" && !token) {
       throw new Error(
         "Configure a public Mapbox token before Mapbox acceptance."
       );
+    }
     return (
       <WebAcceptanceWorkspace
         engine={selection.engine}
@@ -98,27 +108,22 @@ const BasemapApp = () => {
                 aria-label="Scenario"
                 defaultValue="basemap"
                 onChange={(event) => {
-                  const url = new URL(window.location.href);
-                  url.searchParams.set("scenario", event.target.value);
-                  url.searchParams.set("engine", model.attachment.engine);
-                  window.location.assign(url);
+                  const { value } = event.currentTarget;
+                  window.location.assign(
+                    webAcceptanceUrl(
+                      window.location.href,
+                      model.attachment.engine,
+                      value === "basemap"
+                        ? undefined
+                        : acceptanceScenario(value)
+                    )
+                  );
                 }}
               >
                 <option value="basemap">Basemap and engine switching</option>
-                {acceptanceScenarios
-                  .filter(
-                    (value) =>
-                      value !== "tf08-storage" &&
-                      value !== "tf06-lifetimes" &&
-                      value !== "tf09-model" &&
-                      (value !== "global-state" ||
-                        model.attachment.engine === "maplibre")
-                  )
-                  .map((value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ))}
+                {webAcceptanceScenarios(model.attachment.engine).map(
+                  renderScenarioOption
+                )}
               </select>
             </label>
             <button
@@ -142,3 +147,9 @@ const BasemapApp = () => {
     </main>
   );
 };
+
+const renderScenarioOption = (scenario: AcceptanceScenario) => (
+  <option key={scenario} value={scenario}>
+    {scenario}
+  </option>
+);

@@ -1,20 +1,24 @@
+import type { ReactElement } from "react";
+
 import {
-  acceptanceScenarios,
   acceptanceScenario,
+  webAcceptanceScenarios,
   webAcceptanceUrl,
+  type AcceptanceScenario,
   type AcceptanceSelection,
 } from "./acceptance-selection.js";
 import { WebAcceptance } from "./acceptance.web.js";
 
 /**
  * Shared DOM scenario controls for Vite and Metro-powered Expo web.
+ *
  * @param props - The explicit engine and scenario selection.
  * @returns The selected development scenario and its controls.
  */
 export const WebAcceptanceWorkspace = ({
   engine,
   scenario,
-}: AcceptanceSelection) => (
+}: AcceptanceSelection): ReactElement => (
   <>
     <WebAcceptance engine={engine} scenario={scenario} />
     <details
@@ -71,22 +75,15 @@ export const WebAcceptanceWorkspace = ({
             )
           }
         >
-          {acceptanceScenarios
-            .filter(
-              (value) =>
-                value !== "tf07-retained" &&
-                value !== "tf09-model" &&
-                value !== "tf08-storage" &&
-                value !== "tf06-lifetimes" &&
-                (value !== "global-state" || engine === "maplibre")
-            )
-            .map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
+          {webAcceptanceScenarios(engine).map(renderScenarioOption)}
         </select>
       </label>
     </details>
   </>
+);
+
+const renderScenarioOption = (scenario: AcceptanceScenario) => (
+  <option key={scenario} value={scenario}>
+    {scenario}
+  </option>
 );

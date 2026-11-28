@@ -135,6 +135,7 @@ export default defineConfig({
         test: {
           name: "web",
           include: [
+            "apps/web/tests/**/*.web.test.tsx",
             "packages/one-map-react/test/**/*.web.test.tsx",
             "packages/example-map/test/**/*.web.test.tsx",
             "packages/example-map/test/**/*.web.test.jsx",

@@ -1,8 +1,8 @@
 import { render } from "@testing-library/react";
 import { expect, test, vi } from "vite-plus/test";
 
-import { WebAcceptanceWorkspace } from "../src/acceptance-controls.web.js";
 import { WebAcceptance } from "../src/acceptance.web.js";
+import { WebAcceptanceWorkspace } from "../src/WebAcceptanceWorkspace.web.js";
 
 vi.mock("../src/scenarios/mapbox-web.js", () => ({
   App: () => <div>Mapbox scene</div>,
