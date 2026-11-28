@@ -5,13 +5,15 @@ import { type Ref, useImperativeHandle, useState } from "react";
  *
  * @param ref - Current consumer of the handle.
  * @param createHandle - Pure initializer whose methods read the live attachment.
+ * @returns The adapter handle that owns events from this map.
  */
 export const useNativeMapHandle = <Handle>(
   ref: Ref<Handle>,
   createHandle: () => Handle
-): void => {
+): Handle => {
   const [handle] = useState(createHandle);
   useImperativeHandle(ref, () => handle, [handle]);
+  return handle;
 };
 
 /**

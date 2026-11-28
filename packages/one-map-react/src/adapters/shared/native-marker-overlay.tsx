@@ -11,9 +11,9 @@ import { View } from "react-native";
 import { Portal } from "react-native-teleport";
 
 import type { NativeBackend } from "../../contracts/backend.js";
-import type { MapRef, Point } from "../../contracts/camera-types.js";
+import type { Point } from "../../contracts/camera-types.js";
 import type { Anchor } from "../../contracts/ui-types.js";
-import { useMapSession } from "../../facade/map-context.js";
+import { type MapAttachment, useMapSession } from "../../facade/map-context.js";
 import {
   NativeCameraContext,
   useNativeMapPresentation,
@@ -31,12 +31,15 @@ import { updateLayoutSize } from "./wrapper-values.js";
 export const NativeMarkerOverlay = (
   props: NativeMarkerOverlayProps
 ): ReactElement => {
-  const { ref, ready, components } = useMapSession();
+  const { loadedAttachment, getLoadedAttachment, components } = useMapSession();
   const { backend } = components;
   const { nativeLayout, overlayHostName } = useNativeMapPresentation();
   const observed = useContext(NativeCameraContext);
   const name = useId();
-  const [point, setPoint] = useState<Point | null>(null);
+  const [projection, setProjection] = useState<{
+    readonly attachment: MapAttachment;
+    readonly point: Point;
+  } | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const reportError = useEffectEvent((error: unknown) =>
     props.onProjectionError?.(error)
@@ -44,74 +47,79 @@ export const NativeMarkerOverlay = (
   const longitude = props.lngLat[0];
   const latitude = props.lngLat[1];
 
-  const projection = useRef<{
-    readonly map: MapRef;
-    readonly refresh: () => void;
-  } | null>(null);
+  const requestProjection = useRef<(() => void) | null>(null);
 
-  // Retire the projection at commit even if there is no new camera sample.
-  useLayoutEffect(
-    () => () => {
-      projection.current = null;
-    },
-    [ref, ready, nativeLayout, longitude, latitude, backend]
-  );
+  useLayoutEffect(() => {
+    if (!loadedAttachment) return;
+    let active = true;
+    let running = false;
+    let pending = false;
+    const isCurrent = (): boolean =>
+      active && getLoadedAttachment() === loadedAttachment;
+    const publishPoint = (next: Point): void => {
+      if (!isCurrent()) return;
+      // Publish each completed sample while newer camera requests coalesce.
+      const point = visiblePoint(next, backend);
+      setProjection(point ? { attachment: loadedAttachment, point } : null);
+    };
+    const project = async (): Promise<void> => {
+      try {
+        publishPoint(await loadedAttachment.map.project([longitude, latitude]));
+      } catch (error) {
+        if (isCurrent()) {
+          setProjection(null);
+          reportError(error);
+        }
+      }
+    };
+    const request = (): void => {
+      if (!isCurrent()) return;
+      if (running) {
+        pending = true;
+        return;
+      }
+      running = true;
+      pending = false;
+      void project().finally(() => {
+        running = false;
+        if (pending) request();
+      });
+    };
+    requestProjection.current = request;
+    return () => {
+      active = false;
+      requestProjection.current = null;
+    };
+  }, [
+    loadedAttachment,
+    getLoadedAttachment,
+    nativeLayout,
+    longitude,
+    latitude,
+    backend,
+  ]);
 
   useLayoutEffect(() => {
     let active = true;
-    const request = (): void => {
-      const map = ref.current;
-      if (!map || !ready) {
-        projection.current = null;
-        return;
-      }
-      const previous = projection.current;
-      if (previous?.map === map) {
-        previous.refresh();
-        return;
-      }
-
-      let running = false;
-      let pending = false;
-      const isCurrent = (): boolean =>
-        projection.current?.refresh === refresh && ref.current === map;
-      const run = async (): Promise<void> => {
-        try {
-          const next = await map.project([longitude, latitude]);
-          // Publish each completed sample even if a newer camera is pending.
-          if (isCurrent()) setPoint(visiblePoint(next, backend));
-        } catch (error) {
-          if (isCurrent()) {
-            setPoint(null);
-            reportError(error);
-          }
-        }
-      };
-      const refresh = (): void => {
-        if (running) {
-          pending = true;
-          return;
-        }
-        running = true;
-        pending = false;
-        void run().finally(() => {
-          running = false;
-          if (isCurrent() && pending) refresh();
-        });
-      };
-      projection.current = { map, refresh };
-      refresh();
-    };
-
     // The map's imperative ref can attach later in the same layout commit.
     void Promise.resolve().then(() => {
-      if (active) request();
+      if (active) requestProjection.current?.();
     });
     return () => {
       active = false;
     };
-  }, [ref, ready, nativeLayout, longitude, latitude, backend, observed]);
+  }, [
+    loadedAttachment,
+    getLoadedAttachment,
+    nativeLayout,
+    longitude,
+    latitude,
+    backend,
+    observed,
+  ]);
 
+  const point =
+    projection?.attachment === loadedAttachment ? projection.point : null;
   const [horizontal, vertical] = anchorFraction(props.anchor);
   return (
     <Portal

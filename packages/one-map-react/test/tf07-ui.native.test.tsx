@@ -49,6 +49,7 @@ import type { MarkerRef } from "../src/contracts/ui-types.js";
 import {
   type MapSession,
   MapSessionContext,
+  type NativeAdapterLoad,
 } from "../src/facade/map-context.js";
 import { createNativeMapBinding } from "../src/facade/native-map.js";
 
@@ -174,13 +175,14 @@ const sessionFixture = (backend: NativeBackend = "mapbox-native") => {
   const lock = jest.fn((_locked: boolean) => undefined);
   // The fixture exercises UI operations only; absent MapRef methods deliberately fail.
   const map = { project, unproject, easeTo } as unknown as MapRef;
+  const attachment = { map };
   const session: FixtureSession & { readonly requestGestureLock: typeof lock } =
     {
       // A removed gesture-lock request would expose accidental drag ownership.
       requestGestureLock: lock,
-      ref: { current: map },
       map,
-      ready: true,
+      loadedAttachment: attachment,
+      getLoadedAttachment: () => attachment,
       components: { ...components, backend },
       viewState: { longitude: 10, latitude: 20, zoom: 4, bearing: 0, pitch: 0 },
       overlayHostName: "fixture-control-host",
@@ -206,6 +208,36 @@ const scaleCamera: ViewState = {
   bearing: 0,
   pitch: 0,
 };
+interface ReplaceableMapProps extends NativeMapInputs {
+  readonly attachment: MapRef;
+}
+
+const ReplaceableMarkerMap = withNativeMapPresentation(
+  forwardRef<MapRef, ReplaceableMapProps & NativeAdapterLoad>((props, ref) => {
+    const { attachment, onMapLoad, onMove, children } = props;
+    useImperativeHandle(ref, () => attachment, [attachment]);
+    return (
+      <View>
+        <Pressable testID="load-map" onPress={() => onMapLoad(attachment)} />
+        <Pressable
+          testID="move-map"
+          onPress={() =>
+            onMove?.({
+              viewState: { ...scaleCamera, zoom: 5 },
+              origin: "user",
+            })
+          }
+        />
+        {children}
+      </View>
+    );
+  })
+);
+const { Map: MarkerAttachmentMap } = createNativeMapBinding<
+  MapRef,
+  ReplaceableMapProps
+>(ReplaceableMarkerMap, components);
+
 const scaleMapProps = jest.fn<(props: MapProps) => void>();
 const ScaleMap = withNativeMapPresentation(
   forwardRef<MapRef, MapProps>((props, _ref) => {
@@ -444,81 +476,119 @@ describe("TF07 native UI composition", () => {
     expect(fixture.project).toHaveBeenCalledTimes(3);
   });
 
-  test("live overlay starts on a replacement attachment while the old projection is pending", async () => {
-    const fixture = sessionFixture();
+  test("live overlay hides between attachments and discards old projections without a camera change", async () => {
+    const first = sessionFixture();
+    const intermediate = sessionFixture();
     const replacement = sessionFixture();
-    const old = deferredPoint();
-    fixture.project.mockReturnValueOnce(old.promise);
+    const firstInitial = deferredPoint();
+    const firstPending = deferredPoint();
+    const intermediatePending = deferredPoint();
+    first.project
+      .mockReturnValueOnce(firstInitial.promise)
+      .mockReturnValueOnce(firstPending.promise);
+    intermediate.project.mockReturnValueOnce(intermediatePending.promise);
     replacement.project.mockResolvedValueOnce([130, 230]);
     const error = jest.fn();
-    const scene = (zoom: number) => (
-      <FixtureSessionProvider
-        value={{ ...fixture.session, viewState: { ...scaleCamera, zoom } }}
+    const marker = (
+      <NativeMarkerOverlay
+        lngLat={[10, 20]}
+        anchor="center"
+        offset={[0, 0]}
+        onProjectionError={error}
       >
-        <NativeMarkerOverlay
-          lngLat={[10, 20]}
-          anchor="center"
-          offset={[0, 0]}
-          onProjectionError={error}
-        >
-          <Text>Content</Text>
-        </NativeMarkerOverlay>
-      </FixtureSessionProvider>
+        <Text>Content</Text>
+      </NativeMarkerOverlay>
     );
-    const view = await render(scene(4));
-    await view.rerender(scene(5));
-    fixture.session.ref.current = replacement.session.map;
-    await view.rerender(scene(6));
-    expect(replacement.project).toHaveBeenCalledWith([10, 20]);
+    const originalRef = jest.fn<(map: MapRef | null) => void>();
+    const replacementRef = jest.fn<(map: MapRef | null) => void>();
+    const scene = (attachment: MapRef, ref = replacementRef) => (
+      <MarkerAttachmentMap
+        attachment={attachment}
+        ref={ref}
+        mapStyle="fixture-style"
+      >
+        {marker}
+      </MarkerAttachmentMap>
+    );
+    const view = await render(scene(first.session.map, originalRef));
+    const host = () => view.getByTestId("native-marker-overlay");
+    const style = () => StyleSheet.flatten(host().props.style);
+    const load = () => fireEvent.press(view.getByTestId("load-map"));
+    await load();
+    await view.rerender(scene(first.session.map));
+    await act(async () => firstInitial.resolve([100, 200]));
+    expect(style()).toMatchObject({ left: 100, top: 200, opacity: 1 });
+    expect(first.project).toHaveBeenCalledTimes(1);
 
-    await act(async () => old.reject(new Error("Detached")));
+    await fireEvent.press(view.getByTestId("move-map"));
+    expect(first.project).toHaveBeenCalledTimes(2);
+
+    await view.rerender(scene(intermediate.session.map));
+    expect(style().opacity).toBe(0);
+    expect(host().props.pointerEvents).toBe("none");
+    expect(intermediate.project).not.toHaveBeenCalled();
+    await load();
+    expect(intermediate.project).toHaveBeenCalledWith([10, 20]);
+    expect(style().opacity).toBe(0);
+    expect(host().props.pointerEvents).toBe("none");
+
+    await view.rerender(scene(replacement.session.map));
+    await load();
+    expect(replacement.project).toHaveBeenCalledWith([10, 20]);
+    await act(async () => {
+      firstPending.resolve([999, 999]);
+      intermediatePending.reject(new Error("Detached"));
+    });
     expect(error).not.toHaveBeenCalled();
-    expect(fixture.project).toHaveBeenCalledTimes(1);
-    expect(
-      StyleSheet.flatten(view.getByTestId("native-marker-overlay").props.style)
-    ).toMatchObject({ left: 130, top: 230, opacity: 1 });
+    expect(style()).toMatchObject({ left: 130, top: 230, opacity: 1 });
+    expect(host().props.pointerEvents).toBe("auto");
   });
 
   test("live overlay resumes projection when Suspense reveals its map", async () => {
     const fixture = sessionFixture();
     const suspended = deferredPoint();
     const old = deferredPoint();
-    fixture.project.mockReturnValueOnce(old.promise);
+    const fresh = deferredPoint();
     const MaybeSuspend = ({ hidden }: { readonly hidden: boolean }) => {
       if (hidden) throw suspended.promise;
       return null;
     };
     const marker = (
-      <FixtureSessionProvider value={fixture.session}>
-        <NativeMarkerOverlay lngLat={[10, 20]} anchor="center" offset={[0, 0]}>
-          <Text>Content</Text>
-        </NativeMarkerOverlay>
-      </FixtureSessionProvider>
+      <NativeMarkerOverlay lngLat={[10, 20]} anchor="center" offset={[0, 0]}>
+        <Text>Content</Text>
+      </NativeMarkerOverlay>
     );
-    const AttachedMap = ({ hidden }: { readonly hidden: boolean }) => {
-      useImperativeHandle(fixture.session.ref, () => fixture.session.map, []);
-      return (
-        <>
-          {marker}
-          <MaybeSuspend hidden={hidden} />
-        </>
-      );
-    };
     const scene = (hidden: boolean) => (
       <Suspense fallback={<Text>Loading</Text>}>
-        <AttachedMap hidden={hidden} />
+        <MarkerAttachmentMap
+          attachment={fixture.session.map}
+          mapStyle="fixture-style"
+        >
+          {marker}
+          <MaybeSuspend hidden={hidden} />
+        </MarkerAttachmentMap>
       </Suspense>
     );
     const view = await render(scene(false));
+    const host = () => view.getByTestId("native-marker-overlay");
+    const style = () => StyleSheet.flatten(host().props.style);
+    await fireEvent.press(view.getByTestId("load-map"));
+    expect(style().opacity).toBe(1);
+
+    fixture.project
+      .mockReturnValueOnce(old.promise)
+      .mockReturnValueOnce(fresh.promise);
+    await fireEvent.press(view.getByTestId("move-map"));
     await view.rerender(scene(true));
     expect(view.getByText("Loading")).toBeTruthy();
 
     await view.rerender(scene(false));
     await act(async () => old.resolve([999, 999]));
-    expect(fixture.project).toHaveBeenCalledTimes(2);
-    expect(
-      StyleSheet.flatten(view.getByTestId("native-marker-overlay").props.style)
-    ).toMatchObject({ left: 100, top: 200, opacity: 1 });
+    expect(fixture.project).toHaveBeenCalledTimes(3);
+    expect(style().opacity).toBe(0);
+
+    await act(async () => fresh.resolve([140, 240]));
+    expect(style()).toMatchObject({ left: 140, top: 240, opacity: 1 });
   });
 
   test("live overlay follows observed cameras under an unchanged controlled target", async () => {

@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import type { MapErrorEvent, MoveEvent } from "../../contracts/event-types.js";
+import type { NativeAdapterLoad } from "../../facade/map-context.js";
 import type { NativeMapProps } from "../../mapbox-native.js";
 import { useNativeMapHandle } from "../index.js";
 import {
@@ -54,7 +55,7 @@ type RnPressFeature = Parameters<
 /** Mapbox-native map that renders RNMapbox `MapView` with a `Camera` child. */
 const MapboxNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
-  NativeMapProps & NativeCameraPresentationProps
+  NativeMapProps & NativeAdapterLoad & NativeCameraPresentationProps
 >((props, ref) => {
   const session = useNativeMapPresentation();
   const { viewState } = props;
@@ -83,7 +84,7 @@ const MapboxNativeMapImplementation = forwardRef<
     onIdle,
     onClick,
     onLongPress,
-    onLoad,
+    onMapLoad,
     onStyleLoad,
     onError,
     children,
@@ -100,6 +101,9 @@ const MapboxNativeMapImplementation = forwardRef<
   const [geoJsonSources] = useState(createGeoJsonSourceRegistry);
   const { zoomEnabled: _zoomEnabled, ...mapOptions } = props.options ?? {};
   const gestures = useRnmapboxGestures(props, props.options);
+  const handle = useNativeMapHandle(ref, () =>
+    createMapboxMapRef(cameraRef, mapViewRef, geoJsonSources)
+  );
   // RNMapbox class event handlers read this.props, including props from a suspended render.
   const report = useActiveCallbacks({
     onMove,
@@ -107,7 +111,7 @@ const MapboxNativeMapImplementation = forwardRef<
     onIdle,
     onClick,
     onLongPress,
-    onLoad,
+    onLoad: () => onMapLoad(handle),
     onStyleLoad,
     onStyleData: props.onStyleData,
     onError,
@@ -115,10 +119,6 @@ const MapboxNativeMapImplementation = forwardRef<
   const styleProps = toRnmapboxStyleProps(mapStyle);
   // The snapshot preserves the light fields and removes omitted transition values.
   const light = omitUndefinedFields(props.light) as NativeMapProps["light"];
-
-  useNativeMapHandle(ref, () =>
-    createMapboxMapRef(cameraRef, mapViewRef, geoJsonSources)
-  );
 
   const reportChanging = (state: MapState) => {
     sawMove.current = true;
@@ -147,9 +147,7 @@ const MapboxNativeMapImplementation = forwardRef<
           style={{ flex: 1 }}
           {...styleProps}
           {...gestures}
-          onDidFinishLoadingMap={() => {
-            report.onLoad();
-          }}
+          onDidFinishLoadingMap={report.onLoad}
           onDidFinishLoadingStyle={() => {
             report.onStyleLoad();
             report.onStyleData();
@@ -261,5 +259,5 @@ const mapLoadingErrorEvent = (payload: unknown): MapErrorEvent => {
 /** Selected native map with adapter-owned presentation. */
 export const MapboxNativeMap = withNativeMapPresentation<
   NativeAdvancedMapRef,
-  NativeMapProps
+  NativeMapProps & NativeAdapterLoad
 >(MapboxNativeMapImplementation);

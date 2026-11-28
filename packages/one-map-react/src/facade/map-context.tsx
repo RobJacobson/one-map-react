@@ -2,7 +2,6 @@ import {
   type ComponentType,
   createContext,
   type RefAttributes,
-  type RefObject,
   useContext,
 } from "react";
 
@@ -31,11 +30,26 @@ export interface NativeComponents {
   >;
 }
 
+/** One concrete renderer attachment for the mounted native map. */
+export interface MapAttachment {
+  /** Adapter handle used by work that belongs to this attachment. */
+  readonly map: MapRef;
+}
+
+/** Load reporting reserved for the selected adapter. */
+export interface NativeAdapterLoad {
+  /** Publishes a load from the adapter handle associated with that event. */
+  onMapLoad(map: MapRef): void;
+}
+
 /** Resources owned by a mounted native map. */
 export interface MapSession {
-  readonly ref: RefObject<MapRef | null>;
+  /** Stable map access handle that forwards to the current adapter. */
   readonly map: MapRef;
-  readonly ready: boolean;
+  /** Loaded attachment published for React consumers. */
+  readonly loadedAttachment: MapAttachment | null;
+  /** Returns the loaded attachment synchronously, or null while detached or loading. */
+  getLoadedAttachment(): MapAttachment | null;
   /** Components belonging to this map. */
   readonly components: NativeComponents;
 }

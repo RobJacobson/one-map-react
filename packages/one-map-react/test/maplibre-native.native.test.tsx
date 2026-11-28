@@ -2,6 +2,7 @@ import { describe, expect, jest, test } from "@jest/globals";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import {
   createRef,
+  Suspense,
   type ComponentProps,
   type ComponentRef,
   type ReactNode,
@@ -381,6 +382,34 @@ const vectorTree = (ref?: Ref<MapRef>) => (
   </NativeMap>
 );
 
+test("a loaded MapLibre camera resumes after Suspense reveals the same map", async () => {
+  const ref = createRef<MapRef>();
+  const onLoad = jest.fn();
+  const pending = new Promise<void>(() => {});
+  const Pause = ({ hidden }: { readonly hidden: boolean }) => {
+    if (hidden) throw pending;
+    return null;
+  };
+  const scene = (hidden: boolean) => (
+    <Suspense fallback={<Text>Loading</Text>}>
+      {example(ref, undefined, { onLoad })}
+      <Pause hidden={hidden} />
+    </Suspense>
+  );
+  const screen = await render(scene(false));
+  await finishMapLoad();
+  const map = ref.current;
+  if (!map) throw new Error("Expected an attached map.");
+  await screen.rerender(scene(true));
+  expect(screen.getByText("Loading")).toBeTruthy();
+  expect(ref.current).toBeNull();
+  await expect(map.zoomTo(7)).rejects.toThrow("not attached");
+  await screen.rerender(scene(false));
+  expect(ref.current).toBe(map);
+  await expect(map.zoomTo(9)).resolves.toBeUndefined();
+  expect(onLoad).toHaveBeenCalledTimes(1);
+});
+
 describe("maplibre-native adapter", () => {
   test.each(["selected", "enclosing", "named"] as const)(
     "%s wrapper access follows attachment before load and rejects after detach",
@@ -393,7 +422,10 @@ describe("maplibre-native adapter", () => {
         observed = access === "named" ? maps.borrowed : maps.current;
         return null;
       };
-      const loaded = jest.fn();
+      const command = { center: [1, 2] as const, zoom: 3 };
+      const loaded = jest.fn(() =>
+        (access === "selected" ? ref.current : observed)?.flyTo(command)
+      );
       const scene = (mapStyle: MapProps["mapStyle"]) => (
         <MapProvider>
           {access === "named" && <Probe />}
@@ -438,13 +470,17 @@ describe("maplibre-native adapter", () => {
       expect(replacement).not.toBe(original);
       expect(view.getByTestId("wrapper-map").props.mapId).toBe(mapId);
       await expect(retained.getWrapperMap()).resolves.toBe(replacement);
-      await expect(retained.flyTo({ center: [1, 2], zoom: 3 })).rejects.toThrow(
-        "not attached"
-      );
+      await expect(retained.flyTo(command)).rejects.toThrow("not attached");
       expect(mockFlyTo).not.toHaveBeenCalled();
       await finishMapLoad();
-      await retained.flyTo({ center: [1, 2], zoom: 3 });
-      expect(mockFlyTo).toHaveBeenCalledTimes(1);
+      await expect(loaded.mock.results[0]?.value).resolves.toBeUndefined();
+      expect(mockFlyTo).toHaveBeenCalledWith(command);
+
+      await view.rerender(scene(emptyStyle));
+      await expect(getWrapperMap()).resolves.not.toBe(replacement);
+      expect(view.getByTestId("wrapper-map").props.mapId).toBe(mapId);
+      await expect(retained.flyTo(command)).resolves.toBeUndefined();
+      expect(mockFlyTo).toHaveBeenCalledTimes(2);
       await expect(Promise.resolve(retained)).resolves.toBe(retained);
 
       await view.unmount();
@@ -457,6 +493,55 @@ describe("maplibre-native adapter", () => {
       await expect(Promise.resolve(retained)).resolves.toBe(retained);
     }
   );
+
+  test("switching the Android map view resets readiness and ignores retired load events", async () => {
+    const platform = jest.replaceProperty(Platform, "OS", "android");
+    try {
+      const onLoad = jest.fn();
+      const command = { center: [1, 2] as const, zoom: 3 };
+      const observed = jest.fn<(map: MapRef | undefined) => void>();
+      const Probe = () => {
+        observed(useMap().current);
+        return null;
+      };
+      const scene = (androidView: "surface" | "texture") => (
+        <NativeMap
+          mapStyle={emptyStyle}
+          options={{ androidView }}
+          onLoad={onLoad}
+        >
+          <Probe />
+        </NativeMap>
+      );
+      const view = await render(scene("surface"));
+      const map = observed.mock.lastCall?.[0];
+      if (!map) throw new Error("Map reference was not attached.");
+      const retiredLoad = lastMapProps<{
+        onDidFinishLoadingMap: () => void;
+      }>().onDidFinishLoadingMap;
+
+      await finishMapLoad();
+      await expect(map.flyTo(command)).resolves.toBeUndefined();
+      expect(onLoad).toHaveBeenCalledTimes(1);
+
+      await view.rerender(scene("texture"));
+      expect(observed).toHaveBeenLastCalledWith(map);
+      await expect(map.flyTo(command)).rejects.toThrow(
+        "Map camera is not attached."
+      );
+      await act(async () => retiredLoad());
+      expect(onLoad).toHaveBeenCalledTimes(1);
+      await expect(map.flyTo(command)).rejects.toThrow(
+        "Map camera is not attached."
+      );
+
+      await finishMapLoad();
+      expect(onLoad).toHaveBeenCalledTimes(2);
+      await expect(map.flyTo(command)).resolves.toBeUndefined();
+    } finally {
+      platform.restore();
+    }
+  });
 
   test("nested GeoJSONSource injects source onto the line layer", async () => {
     await render(example());
