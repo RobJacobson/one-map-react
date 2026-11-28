@@ -13,13 +13,12 @@ import {
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
 import {
+  createNativeRenderedQuery,
   isScreenBounds,
   nativeBounds,
   nativeBoundsInput,
   nativeLngLat,
   nativePoint,
-  nativeRenderedQuery,
-  prepareNativeRenderedQueryLayers,
 } from "../shared/index.js";
 import { createNativeClusterLookup } from "../shared/native-clusters.js";
 import {
@@ -137,45 +136,33 @@ export const createMaplibreMapRef = (
       nativeLngLat(
         lngLatFromWrapper(await getMap().unproject(pointFromWrapper(point)))
       ),
-    queryRenderedFeatures: async (input, queryOptionsInput) => {
-      const [target, options] = nativeRenderedQuery(input, queryOptionsInput);
-      const map = getMap();
-      const layers = prepareNativeRenderedQueryLayers(options);
-      if (layers === null) return [];
+    queryRenderedFeatures: createNativeRenderedQuery(
+      getMap,
+      (map, { target, options, layers }) => {
+        const queryOptions = toMaplibreRenderedQueryOptions(options, layers);
+        if (target === undefined) {
+          return map.queryRenderedFeatures(queryOptions);
+        }
 
-      const queryOptions = toMaplibreRenderedQueryOptions(options, layers);
-      // Narrow each target separately for the wrapper's overloads.
-      let features;
-      if (target === undefined) {
-        features = await map.queryRenderedFeatures(queryOptions);
-      } else if (isScreenBounds(target)) {
-        features = await map.queryRenderedFeatures(target, queryOptions);
-      } else {
-        features = await map.queryRenderedFeatures(target, queryOptions);
+        // Narrow each target separately for the wrapper's overloads.
+        return isScreenBounds(target)
+          ? map.queryRenderedFeatures(target, queryOptions)
+          : map.queryRenderedFeatures(target, queryOptions);
       }
-
-      return featuresFromWrapper(features, "queryRenderedFeatures");
-    },
+    ),
     querySourceFeatures: async (sourceId, options) => {
       getMap();
       const entry = requireMaplibreSource(sources, sourceId);
 
-      if (entry.kind === "geojson") {
-        // Both native getData implementations query loaded source tiles, including
-        // hidden features. Results may be clipped or duplicated at tile boundaries.
-        const collection = await entry.ref.getData(
-          toMaplibreFilter(options?.filter)
-        );
-
-        return featuresFromWrapper(collection, "querySourceFeatures");
-      }
-
-      return featuresFromWrapper(
-        await entry.ref.querySourceFeatures(
-          toMaplibreSourceQueryOptions(options)
-        ),
-        "querySourceFeatures"
-      );
+      // Both native getData implementations query loaded source tiles, including
+      // hidden features. Results may be clipped or duplicated at tile boundaries.
+      const result =
+        entry.kind === "geojson"
+          ? await entry.ref.getData(toMaplibreFilter(options?.filter))
+          : await entry.ref.querySourceFeatures(
+              toMaplibreSourceQueryOptions(options)
+            );
+      return featuresFromWrapper(result, "querySourceFeatures");
     },
     ...createMaplibreFeatureStateMethods(sources, getMap),
     resize: rejectNativeResize,

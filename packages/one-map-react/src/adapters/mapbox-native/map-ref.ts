@@ -10,12 +10,12 @@ import {
 } from "../native-map-options.js";
 import { featuresFromWrapper } from "../shared/feature-values.js";
 import {
+  createNativeRenderedQuery,
+  isScreenBounds,
   nativeBounds,
   nativeBoundsInput,
   nativeLngLat,
   nativePoint,
-  nativeRenderedQuery,
-  prepareNativeRenderedQueryLayers,
 } from "../shared/index.js";
 import { createNativeClusterLookup } from "../shared/native-clusters.js";
 import {
@@ -31,7 +31,7 @@ import {
 } from "./convert-camera.js";
 import {
   toRnmapboxClusterFeature,
-  toRnmapboxQueryRect,
+  toRnmapboxRect,
   toRnmapboxRenderedQueryArgs,
   toRnmapboxSourceQueryArgs,
 } from "./convert-query.js";
@@ -148,32 +148,19 @@ export const createMapboxMapRef = (
           await getMap().getCoordinateFromView(pointFromWrapper(point))
         )
       ),
-    queryRenderedFeatures: async (input, queryOptionsInput) => {
-      const [target, options] = nativeRenderedQuery(input, queryOptionsInput);
-      const map = getMap();
-      const layerSelection = prepareNativeRenderedQueryLayers(options);
-      if (layerSelection === null) return [];
-      const [filter, layers] = toRnmapboxRenderedQueryArgs(
-        options,
-        layerSelection
-      );
-      const geometry = toRnmapboxQueryRect(target);
+    queryRenderedFeatures: createNativeRenderedQuery(
+      getMap,
+      (map, { target, options, layers }) => {
+        const args = toRnmapboxRenderedQueryArgs(options, layers);
+        if (target !== undefined && !isScreenBounds(target)) {
+          return map.queryRenderedFeaturesAtPoint(target, ...args);
+        }
 
-      const collection =
-        geometry.kind === "point"
-          ? await map.queryRenderedFeaturesAtPoint(
-              geometry.point,
-              filter,
-              layers
-            )
-          : await map.queryRenderedFeaturesInRect(
-              geometry.rect,
-              filter,
-              layers
-            );
-
-      return featuresFromWrapper(collection, "queryRenderedFeatures");
-    },
+        // RNMapbox uses an empty rectangle for the whole viewport.
+        const rect = target === undefined ? [] : toRnmapboxRect(target);
+        return map.queryRenderedFeaturesInRect(rect, ...args);
+      }
+    ),
     querySourceFeatures: async (sourceId, options) => {
       const map = getMap();
       const [filter, sourceLayerIds] = toRnmapboxSourceQueryArgs(options);

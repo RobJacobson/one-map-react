@@ -566,6 +566,40 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     expect(layerReads).toBe(1);
   });
 
+  test.each(["rendered", "source"] as const)(
+    "%s queries read each applicable option once",
+    async (kind) => {
+      const ref = createRef<Handle>();
+      await render(
+        <NativeMap ref={ref} mapStyle={emptyStyle}>
+          <Source id="tiles" type="vector" url="https://example.com/t.json" />
+        </NativeMap>
+      );
+      const map = ref.current;
+      if (!map) throw new Error("Map is detached.");
+
+      const readFilter = jest.fn(() => ["==", "kind", "route"] as const);
+      const readSourceLayer = jest.fn(() => "way");
+      const options = {
+        get filter() {
+          return readFilter();
+        },
+        get sourceLayer() {
+          return readSourceLayer();
+        },
+      };
+
+      if (kind === "rendered") {
+        await map.queryRenderedFeatures([10, 20], options);
+      } else {
+        await map.querySourceFeatures("tiles", options);
+      }
+
+      expect(readFilter).toHaveBeenCalledTimes(1);
+      expect(readSourceLayer).toHaveBeenCalledTimes(kind === "source" ? 1 : 0);
+    }
+  );
+
   test.each([
     {
       name: "point missing x",

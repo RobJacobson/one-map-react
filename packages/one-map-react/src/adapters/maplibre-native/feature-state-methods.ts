@@ -8,26 +8,9 @@ import {
   featureStateFromWrapper,
 } from "../shared/feature-values.js";
 import {
-  toMaplibreFeatureId,
-  toMaplibreVectorFeature,
-} from "./convert-query.js";
-import {
   type MaplibreSourceRegistry,
   requireMaplibreSource,
 } from "./source-registry.js";
-
-type FeatureStateArgs = {
-  setFeatureState: [state: ReturnType<typeof copyValidatedFeatureState>];
-  getFeatureState: [];
-  removeFeatureState: [key?: string];
-};
-
-type SourceFeatureStateMethods<Feature> = {
-  [Method in keyof FeatureStateArgs]: (
-    feature: Feature,
-    ...args: FeatureStateArgs[Method]
-  ) => Promise<unknown>;
-};
 
 /**
  * Validates and copies inputs before dispatch to the current source ref.
@@ -40,47 +23,48 @@ export const createMaplibreFeatureStateMethods = (
   sources: MaplibreSourceRegistry,
   requireMap: () => unknown
 ): FeatureStateMethods => {
-  const invokeFeatureState = <Method extends keyof FeatureStateArgs>(
-    method: Method,
-    target: FeatureIdentifier,
-    ...args: FeatureStateArgs[Method]
-  ): Promise<unknown> => {
+  const getAttachedSource = (id: string) => {
     requireMap();
-    const source = requireMaplibreSource(sources, target.source);
-
-    if (source.kind === "geojson") {
-      const ref: SourceFeatureStateMethods<
-        ReturnType<typeof toMaplibreFeatureId>
-      > = source.ref;
-      return ref[method](toMaplibreFeatureId(target), ...args);
-    }
-
-    const ref: SourceFeatureStateMethods<
-      ReturnType<typeof toMaplibreVectorFeature>
-    > = source.ref;
-    return ref[method](toMaplibreVectorFeature(target), ...args);
+    return requireMaplibreSource(sources, id);
   };
 
   return {
     setFeatureState: async (identifier, state) => {
       const target = assertFeatureIdentifier(identifier);
       const mutableState = copyValidatedFeatureState(state);
+      const { kind, ref } = getAttachedSource(target.source);
 
-      await invokeFeatureState("setFeatureState", target, mutableState);
+      await (kind === "geojson"
+        ? ref.setFeatureState({ id: target.id }, mutableState)
+        : ref.setFeatureState(toVectorFeature(target), mutableState));
     },
-    getFeatureState: async (identifier) =>
-      featureStateFromWrapper(
-        await invokeFeatureState(
-          "getFeatureState",
-          assertFeatureIdentifier(identifier)
-        )
-      ),
+    getFeatureState: async (identifier) => {
+      const target = assertFeatureIdentifier(identifier);
+      const { kind, ref } = getAttachedSource(target.source);
+      const state = await (kind === "geojson"
+        ? ref.getFeatureState({ id: target.id })
+        : ref.getFeatureState(toVectorFeature(target)));
+
+      return featureStateFromWrapper(state);
+    },
     removeFeatureState: async (identifier, key) => {
-      await invokeFeatureState(
-        "removeFeatureState",
-        assertFeatureIdentifier(identifier),
-        ...(key === undefined ? [] : [key])
-      );
+      const target = assertFeatureIdentifier(identifier);
+      const { kind, ref } = getAttachedSource(target.source);
+      const keyArgs: [key?: string] = key === undefined ? [] : [key];
+
+      await (kind === "geojson"
+        ? ref.removeFeatureState({ id: target.id }, ...keyArgs)
+        : ref.removeFeatureState(toVectorFeature(target), ...keyArgs));
     },
   };
+};
+
+const toVectorFeature = ({ id, sourceLayer }: FeatureIdentifier) => {
+  if (sourceLayer === undefined) {
+    throw new Error(
+      "Feature-state methods need sourceLayer for vector sources on maplibre-native."
+    );
+  }
+
+  return { id, sourceLayer };
 };

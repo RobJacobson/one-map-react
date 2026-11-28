@@ -2,7 +2,6 @@ import type { FilterSpecification } from "@maplibre/maplibre-react-native";
 
 import type { FilterExpression } from "../../contracts/layer-types.js";
 import type {
-  FeatureIdentifier,
   QueryRenderedFeaturesOptions,
   QuerySourceFeaturesOptions,
 } from "../../contracts/query-types.js";
@@ -32,15 +31,14 @@ export const toMaplibreFilter = (
 export const toMaplibreRenderedQueryOptions = (
   options: Pick<QueryRenderedFeaturesOptions, "filter"> | undefined,
   layers: string[] | undefined
-): { layers?: string[]; filter?: FilterSpecification } | undefined =>
-  options === undefined
-    ? undefined
-    : {
-        ...(layers === undefined ? {} : { layers }),
-        ...(options.filter === undefined
-          ? {}
-          : { filter: toMaplibreFilter(options.filter) }),
-      };
+): { layers?: string[]; filter?: FilterSpecification } | undefined => {
+  if (options === undefined) return undefined;
+
+  return {
+    ...(layers === undefined ? {} : { layers }),
+    ...filterOption(options.filter),
+  };
+};
 
 /**
  * Converts common source-query options into wrapper `querySourceFeatures`
@@ -62,37 +60,9 @@ export const toMaplibreSourceQueryOptions = (
 
   return {
     sourceLayer: requireSourceLayerName(sourceLayer),
-    ...(options?.filter === undefined
-      ? {}
-      : { filter: toMaplibreFilter(options.filter) }),
+    ...filterOption(options?.filter),
   };
 };
 
-/**
- * Converts a feature identifier into the GeoJSON ref feature argument.
- *
- * @param identifier - Source, feature id, and optional vector source layer.
- * @returns The `{ id }` argument the source refs take.
- */
-export const toMaplibreFeatureId = (
-  identifier: FeatureIdentifier
-): { id: string | number } => ({ id: identifier.id });
-
-/**
- * Converts a feature identifier into the vector ref feature argument.
- *
- * @param identifier - Source, feature id, and vector source layer.
- * @returns The `{ id, sourceLayer }` argument the vector ref takes.
- * @throws When `sourceLayer` is missing; the vector ref requires it.
- */
-export const toMaplibreVectorFeature = (
-  identifier: FeatureIdentifier
-): { id: string | number; sourceLayer: string } => {
-  if (identifier.sourceLayer === undefined) {
-    throw new Error(
-      "Feature-state methods need sourceLayer for vector sources on maplibre-native."
-    );
-  }
-
-  return { id: identifier.id, sourceLayer: identifier.sourceLayer };
-};
+const filterOption = (filter: FilterExpression | undefined) =>
+  filter === undefined ? {} : { filter: toMaplibreFilter(filter) };

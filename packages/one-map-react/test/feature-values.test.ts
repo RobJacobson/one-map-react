@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vite-plus/test";
 
-import { toRnmapboxQueryRect } from "../src/adapters/mapbox-native/convert-query.js";
 import {
   assertFeatureIdentifier,
   copyValidatedFeatureState,
@@ -10,7 +9,7 @@ import {
 import {
   isScreenBounds,
   nativeRenderedQuery,
-} from "../src/adapters/shared/native-values.js";
+} from "../src/adapters/shared/index.js";
 import type {
   FeatureIdentifier,
   FeatureState,
@@ -183,15 +182,6 @@ test("native rendered query preserves a rectangle with a named y property", () =
   const options = { layers: ["roads"] };
 
   expect(nativeRenderedQuery(rectangle, options)).toEqual([corners, options]);
-});
-
-test("RNMapbox rendered queries reorder corners into top, left, bottom, right", () => {
-  expect(
-    toRnmapboxQueryRect([
-      [10, 20],
-      [30, 40],
-    ])
-  ).toEqual({ kind: "rect", rect: [20, 10, 40, 30] });
 });
 
 describe("assertFeatureIdentifier", () => {
