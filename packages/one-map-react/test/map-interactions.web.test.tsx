@@ -7,6 +7,8 @@ import type { ClickEvent } from "../src/contracts/event-types.js";
 import type { MapProps } from "../src/contracts/map-types.js";
 import { useMapInteractions } from "../src/facade/use-map-interactions.js";
 
+type QueryRenderedFeatures = MapRef["queryRenderedFeatures"];
+
 const event: ClickEvent = { lngLat: [1, 2], point: [3, 4] };
 const props: MapProps = {
   initialViewState: {
@@ -37,11 +39,10 @@ test("callback teardown suppresses retained movement and click handlers", async 
 });
 
 test("a retained filtered click skips the query after unmount", async () => {
-  const query = vi.fn<MapRef["queryRenderedFeatures"]>().mockResolvedValue([]);
+  const query = vi.fn<QueryRenderedFeatures>().mockResolvedValue([]);
   const onClick = vi.fn();
   const onError = vi.fn();
-  // The hook only reads queryRenderedFeatures from the attached map.
-  const map = { queryRenderedFeatures: query } as unknown as MapRef;
+  const map = { queryRenderedFeatures: query };
   const mounted = renderHook(() =>
     useMapInteractions(
       { ...props, onClick, onError, interactiveLayerIds: ["route-line"] },
@@ -59,15 +60,14 @@ test("a retained filtered click skips the query after unmount", async () => {
 });
 
 test("custom forwarding proxies retain common queries", async () => {
-  const query = vi.fn<MapRef["queryRenderedFeatures"]>().mockResolvedValue([]);
+  const query = vi.fn<QueryRenderedFeatures>().mockResolvedValue([]);
   const unknownMethod = vi.fn();
   const map = new Proxy(
     { queryRenderedFeatures: query },
     {
-      get: (target, key) =>
-        (target as Record<PropertyKey, unknown>)[key] ?? unknownMethod,
+      get: (target, key) => Reflect.get(target, key) ?? unknownMethod,
     }
-  ) as unknown as MapRef;
+  );
   const mounted = renderHook(() =>
     useMapInteractions(
       { ...props, interactiveLayerIds: ["route-line"] },
@@ -107,16 +107,16 @@ test.each(["detach", "replace", "unmount", "current"] as const)(
   "pending map query %s keeps delivery bound to its concrete owner",
   async (change) => {
     let resolve!: (
-      features: Awaited<ReturnType<MapRef["queryRenderedFeatures"]>>
+      features: Awaited<ReturnType<QueryRenderedFeatures>>
     ) => void;
-    const query = vi.fn<MapRef["queryRenderedFeatures"]>(
+    const query = vi.fn<QueryRenderedFeatures>(
       () =>
         new Promise((done) => {
           resolve = done;
         })
     );
-    const original = { queryRenderedFeatures: query } as unknown as MapRef;
-    const ref = { current: original as MapRef | null };
+    const original = { queryRenderedFeatures: query };
+    const ref: { current: typeof original | null } = { current: original };
     const onClick = vi.fn();
     const updated = vi.fn();
     const onError = vi.fn();
@@ -139,7 +139,7 @@ test.each(["detach", "replace", "unmount", "current"] as const)(
     });
     if (change === "detach") ref.current = null;
     if (change === "replace")
-      ref.current = { queryRenderedFeatures: vi.fn() } as unknown as MapRef;
+      ref.current = { queryRenderedFeatures: vi.fn<QueryRenderedFeatures>() };
     if (change === "unmount") mounted.unmount();
     if (change === "current") mounted.rerender({ callback: updated });
     const features = [
@@ -172,14 +172,14 @@ test.each([false, true])(
   "query rejection is observable only for current owner (replaced=%s)",
   async (replaced) => {
     let reject!: (error: Error) => void;
-    const query = vi.fn<MapRef["queryRenderedFeatures"]>(
+    const query = vi.fn<QueryRenderedFeatures>(
       () =>
         new Promise((_done, fail) => {
           reject = fail;
         })
     );
     const ref = {
-      current: { queryRenderedFeatures: query } as unknown as MapRef,
+      current: { queryRenderedFeatures: query },
     };
     const onError = vi.fn();
     const onClick = vi.fn();
@@ -190,7 +190,8 @@ test.each([false, true])(
       )
     );
     const pending = mounted.result.current.click(event);
-    if (replaced) ref.current = {} as MapRef;
+    if (replaced)
+      ref.current = { queryRenderedFeatures: vi.fn<QueryRenderedFeatures>() };
     const error = new Error("SDK query rejected");
     await act(async () => {
       reject(error);
@@ -201,6 +202,103 @@ test.each([false, true])(
     expect(onClick).not.toHaveBeenCalled();
   }
 );
+
+test("an unfiltered tap waits for a preceding query error and uses the current callbacks", async () => {
+  let reject!: (error: Error) => void;
+  const query = vi.fn<QueryRenderedFeatures>(
+    () =>
+      new Promise((_, fail) => {
+        reject = fail;
+      })
+  );
+  const ref = {
+    current: { queryRenderedFeatures: query },
+  };
+  const delivered: unknown[] = [];
+  const oldError = vi.fn();
+  const error = new Error("Feature query failed");
+  const mounted = renderHook(
+    (filtered: boolean) =>
+      useMapInteractions(
+        {
+          interactiveLayerIds: filtered ? ["poi"] : undefined,
+          onClick: (tap) => delivered.push(tap),
+          onError: filtered
+            ? oldError
+            : (failure) => delivered.push(failure.error),
+        },
+        ref
+      ),
+    { initialProps: true }
+  );
+  const first = mounted.result.current.click(event);
+  mounted.rerender(false);
+  const second = mounted.result.current.click(event);
+  expect(delivered).toEqual([]);
+  reject(error);
+  await Promise.all([first, second]);
+  expect(delivered).toEqual([error, event]);
+  expect(oldError).not.toHaveBeenCalled();
+  expect(query).toHaveBeenCalledTimes(1);
+
+  const idle = mounted.result.current.click(event);
+  expect(delivered).toEqual([error, event, event]);
+  await idle;
+});
+
+test("a replacement map delivers taps while the previous map's first query is stalled", async () => {
+  let finish!: (features: []) => void;
+  const query = vi
+    .fn<QueryRenderedFeatures>()
+    .mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        })
+    )
+    .mockResolvedValueOnce([]);
+  const ref = {
+    current: { queryRenderedFeatures: query },
+  };
+  const onClick = vi.fn();
+  const mounted = renderHook(() =>
+    useMapInteractions({ interactiveLayerIds: ["poi"], onClick }, ref)
+  );
+  const first = mounted.result.current.click(event);
+  const second = mounted.result.current.click(event);
+  expect(query).toHaveBeenCalledTimes(2);
+  expect(onClick).not.toHaveBeenCalled();
+
+  ref.current = {
+    queryRenderedFeatures: vi.fn<QueryRenderedFeatures>().mockResolvedValue([]),
+  };
+  await mounted.result.current.click(event);
+  expect(onClick).toHaveBeenCalledTimes(1);
+  await Promise.all([first, second]);
+  await act(async () => finish([]));
+  expect(onClick).toHaveBeenCalledTimes(1);
+});
+
+test("an exception from a click callback leaves the next tap deliverable", async () => {
+  const query = vi.fn<QueryRenderedFeatures>().mockResolvedValue([]);
+  const ref = {
+    current: { queryRenderedFeatures: query },
+  };
+  const error = new Error("Click callback failed");
+  const onClick = vi.fn().mockImplementationOnce(() => {
+    throw error;
+  });
+  const onError = vi.fn();
+  const mounted = renderHook(() =>
+    useMapInteractions({ interactiveLayerIds: ["poi"], onClick, onError }, ref)
+  );
+  const first = mounted.result.current.click(event);
+  const second = mounted.result.current.click(event);
+  await expect(first).rejects.toBe(error);
+  await second;
+  expect(onClick).toHaveBeenCalledTimes(2);
+  expect(onError).not.toHaveBeenCalled();
+});
 
 test("simultaneous maps keep feature results and callbacks local", async () => {
   const firstClick = vi.fn();
@@ -222,21 +320,21 @@ test("simultaneous maps keep feature results and callbacks local", async () => {
     },
   ];
   const firstQuery = vi
-    .fn<MapRef["queryRenderedFeatures"]>()
+    .fn<QueryRenderedFeatures>()
     .mockResolvedValue(firstFeatures);
   const secondQuery = vi
-    .fn<MapRef["queryRenderedFeatures"]>()
+    .fn<QueryRenderedFeatures>()
     .mockResolvedValue(secondFeatures);
   const first = renderHook(() =>
     useMapInteractions(
       { ...props, onClick: firstClick, interactiveLayerIds: ["a"] },
-      { current: { queryRenderedFeatures: firstQuery } as unknown as MapRef }
+      { current: { queryRenderedFeatures: firstQuery } }
     )
   );
   const second = renderHook(() =>
     useMapInteractions(
       { ...props, onClick: secondClick, interactiveLayerIds: ["b"] },
-      { current: { queryRenderedFeatures: secondQuery } as unknown as MapRef }
+      { current: { queryRenderedFeatures: secondQuery } }
     )
   );
   await act(async () => {
@@ -258,14 +356,17 @@ test("simultaneous maps keep feature results and callbacks local", async () => {
 test.each(["replace", "unmount"] as const)(
   "a synchronous SDK query %s suppresses its former map callback",
   async (change) => {
-    const ref = { current: {} as MapRef };
+    const ref = {
+      current: { queryRenderedFeatures: vi.fn<QueryRenderedFeatures>() },
+    };
     const onClick = vi.fn();
-    const query = vi.fn<MapRef["queryRenderedFeatures"]>(() => {
-      if (change === "replace") ref.current = {} as MapRef;
+    const query = vi.fn<QueryRenderedFeatures>(() => {
+      if (change === "replace")
+        ref.current = { queryRenderedFeatures: vi.fn<QueryRenderedFeatures>() };
       else mounted.unmount();
       return Promise.resolve([]);
     });
-    ref.current = { queryRenderedFeatures: query } as unknown as MapRef;
+    ref.current = { queryRenderedFeatures: query };
     const mounted = renderHook(() =>
       useMapInteractions(
         { ...props, onClick, interactiveLayerIds: ["point"] },
@@ -279,17 +380,15 @@ test.each(["replace", "unmount"] as const)(
 );
 
 test("a suspended transition cannot replace the committed click callback", async () => {
-  let resolve!: (
-    features: Awaited<ReturnType<MapRef["queryRenderedFeatures"]>>
-  ) => void;
-  const query = vi.fn<MapRef["queryRenderedFeatures"]>(
+  let resolve!: (features: Awaited<ReturnType<QueryRenderedFeatures>>) => void;
+  const query = vi.fn<QueryRenderedFeatures>(
     () =>
       new Promise((done) => {
         resolve = done;
       })
   );
   const ref = {
-    current: { queryRenderedFeatures: query } as unknown as MapRef,
+    current: { queryRenderedFeatures: query },
   };
   const committed = vi.fn();
   const suspended = vi.fn();

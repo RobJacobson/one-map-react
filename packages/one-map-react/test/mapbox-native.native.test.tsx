@@ -2777,16 +2777,23 @@ describe("mapbox-native entry binding", () => {
       geometry: { coordinates: [-122.34, 47.61] },
       properties: { screenPointX: 23, screenPointY: 41 },
     },
-    () => {
+    (featureId) => {
       let complete: (error?: Error) => void = () => {
         throw new Error("Rendered query was never dispatched.");
       };
+      const result =
+        featureId === undefined
+          ? queryCollection
+          : {
+              ...queryCollection,
+              features: [{ ...queryCollection.features[0], id: featureId }],
+            };
       mockQueryRenderedFeaturesAtPoint.mockImplementationOnce(
         () =>
           new Promise((resolve, reject) => {
             complete = (error) => {
               if (error) reject(error);
-              else resolve(queryCollection);
+              else resolve(result);
             };
           })
       );

@@ -5,6 +5,7 @@ import {
   type ReactElement,
   type Ref,
   type RefAttributes,
+  type RefObject,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -61,7 +62,13 @@ export const MountedMap = <
   useStableOptions("Map", {
     id: props.id,
   });
-  const { mapRef, handle, attach } = useMapAttachment(forwardedRef);
+  const mapRef = useRef<Handle | null>(null);
+  const { move, click, syncAttachment } = useMapInteractions(props, mapRef);
+  const { handle, attach } = useMapAttachment(
+    forwardedRef,
+    mapRef,
+    syncAttachment
+  );
   const id = props.id;
   useLayoutEffect(() => register?.(id, handle), [id, register, handle]);
   const [ready, setReady] = useState(false);
@@ -69,7 +76,6 @@ export const MountedMap = <
     setReady(true);
     props.onLoad?.();
   });
-  const { move, click } = useMapInteractions(props, mapRef);
   const handlesClick =
     props.onClick !== undefined ||
     (props.onError !== undefined && props.interactiveLayerIds !== undefined);
@@ -204,9 +210,10 @@ const useMapAttachment = <
   Handle extends MapRef &
     Record<Exclude<keyof Handle, ForwardedMapMethodKey>, never>,
 >(
-  forwardedRef: Ref<Handle>
+  forwardedRef: Ref<Handle>,
+  mapRef: RefObject<Handle | null>,
+  syncAttachment: () => void
 ) => {
-  const mapRef = useRef<Handle | null>(null);
   const [handle] = useState(() => {
     const forwarding: Record<string, (...args: unknown[]) => unknown> = {};
     for (const key of Object.keys(
@@ -232,18 +239,24 @@ const useMapAttachment = <
   });
   const attach = useCallback(
     (map: Handle | null) => {
-      mapRef.current = map;
+      const updateAttachment = (attached: Handle | null): void => {
+        mapRef.current = attached;
+        if (attached) syncAttachment();
+        // React also detaches and reattaches the same handle when its ref changes.
+        else void Promise.resolve().then(syncAttachment);
+      };
+      updateAttachment(map);
       const cleanup = assignMapRef(forwardedRef, map);
       if (typeof cleanup === "function") {
         return () => {
-          mapRef.current = null;
+          updateAttachment(null);
           cleanup();
         };
       }
     },
-    [forwardedRef]
+    [forwardedRef, mapRef, syncAttachment]
   );
-  return { mapRef, handle, attach };
+  return { handle, attach };
 };
 
 /** Forwards a renderer attachment, including the cleanup returned by a React 19 ref. */

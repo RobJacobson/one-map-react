@@ -59,7 +59,7 @@ type WrapperEvents = {
  * @param entry - Native entry under test.
  * @param backend - SDK represented by this entry.
  * @param press - The selected wrapper's press payload.
- * @param beginPressQuery - Fakes a pending rendered-feature query and returns a function to resolve it or reject it with an error.
+ * @param beginPressQuery - Defers a rendered-feature query, optionally with a single feature ID, and returns its completion function.
  * @param clusterZoom - Mock cluster call exposed by mounted source refs.
  * @param checkRenderedQuery - Verifies the wrapper receives the selected layer ids.
  * @param renderedQueryCount - Counts rendered queries dispatched to the wrapper.
@@ -69,7 +69,7 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
   entry: NativeEntry<Handle>,
   backend: NativeBackend,
   press: object,
-  beginPressQuery: () => (error?: Error) => void,
+  beginPressQuery: (featureId?: number) => (error?: Error) => void,
   clusterZoom: jest.Mock<(...args: never[]) => Promise<number>>,
   checkRenderedQuery: (layers: readonly string[]) => void,
   renderedQueryCount: () => number,
@@ -269,6 +269,52 @@ export const testNativeEntryBinding = <Handle extends SelectedHandle>(
     await act(async () => completePress());
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(onClick.mock.lastCall?.[0].features).toHaveLength(2);
+  });
+
+  test("delivers filtered clicks in press order when native queries finish in reverse", async () => {
+    const onClick = jest.fn<(event: NativeClickEvent) => void>();
+    const view = await render(
+      <NativeMap
+        mapStyle={emptyStyle}
+        interactiveLayerIds={["route-line"]}
+        onClick={onClick}
+      />
+    );
+    const wrapper = view.getByTestId("wrapper-map");
+    const secondPress =
+      backend === "mapbox-native"
+        ? {
+            geometry: { coordinates: [-122.35, 47.62] },
+            properties: { screenPointX: 24, screenPointY: 42 },
+          }
+        : { nativeEvent: { lngLat: [-122.35, 47.62], point: [24, 42] } };
+    const calls = renderedQueryCount();
+    const finishFirst = beginPressQuery(1);
+    const finishSecond = beginPressQuery(2);
+    await fireEvent(wrapper, "press", press);
+    await fireEvent(wrapper, "press", secondPress);
+    expect(renderedQueryCount()).toBe(calls + 2);
+
+    await act(async () => finishSecond());
+    expect(onClick).not.toHaveBeenCalled();
+
+    await act(async () => finishFirst());
+    expect(onClick.mock.calls).toEqual([
+      [
+        {
+          lngLat: [-122.34, 47.61],
+          point: [23, 41],
+          features: [expect.objectContaining({ id: 1 })],
+        },
+      ],
+      [
+        {
+          lngLat: [-122.35, 47.62],
+          point: [24, 42],
+          features: [expect.objectContaining({ id: 2 })],
+        },
+      ],
+    ]);
   });
 
   test("binds a map, source, layer, and marker without setup", async () => {

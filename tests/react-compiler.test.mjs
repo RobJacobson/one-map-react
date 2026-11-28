@@ -17,7 +17,7 @@ for (const [relative, names] of [
     "adapters/maplibre-native/MaplibreNativeMap.tsx",
     ["MaplibreNativeMapImplementation"],
   ],
-  ["facade/map.tsx", ["MountedMap", "useMapAttachment"]],
+  ["facade/MountedMap.tsx", ["MountedMap", "useMapAttachment"]],
   ["facade/user-location.tsx", ["UserLocation"]],
   ["facade/native-map.tsx", ["Source", "NativeMap"]],
   ["facade/use-stable-options.ts", ["useStableOptions"]],
