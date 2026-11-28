@@ -7,6 +7,20 @@ import compiler from "babel-plugin-react-compiler";
 
 import { reactCompiler } from "../scripts/react-compiler.mjs";
 
+const { handler: transform } = reactCompiler().transform;
+const invalidFilename = resolve("packages/one-map-react/src/InvalidMap.tsx");
+const mutatingComponent = `
+export const InvalidMap = ({ options }) => {
+  options.zoom = 3;
+  return <div>{options.zoom}</div>;
+};
+`;
+
+await assert.rejects(
+  transform(mutatingComponent, invalidFilename),
+  /This value cannot be modified/
+);
+
 // Check the actual component, since another compiled hook in its file proves nothing.
 for (const [relative, names] of [
   [
@@ -75,7 +89,7 @@ for (const [relative, names] of [
       successes.has(locations.get(name)),
       `${relative}: ${name} was skipped`
     );
-  const transformed = await reactCompiler().transform.handler(source, filename);
+  const transformed = await transform(source, filename);
   assert.match(transformed.code, /react\/compiler-runtime/);
   assert(
     transformed.map,
