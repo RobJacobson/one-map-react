@@ -2140,7 +2140,7 @@ describe("maplibre-native entry binding", () => {
     });
   });
 
-  test("overlapping legacy and portable style keys preserve the host until a key disappears", async () => {
+  test("overlapping legacy and portable style keys preserve the host through a field removal", async () => {
     // The wrapper merges both forms at runtime when JavaScript callers pass both.
     const legacyProps = { style: { fillColor: "#2563eb", fillSortKey: 1 } };
     const view = await render(
@@ -2177,7 +2177,11 @@ describe("maplibre-native entry binding", () => {
         layout={{ "fill-sort-key": undefined }}
       />
     );
-    expect(view.getByTestId("Layer")).not.toBe(original);
+    expect(view.getByTestId("Layer")).toBe(original);
+    expect(LayerMock.mock.lastCall?.[0]).toMatchObject({
+      layout: {},
+      oneMapResetAdoptedStyle: true,
+    });
   });
 
   testNativeEntryBinding(

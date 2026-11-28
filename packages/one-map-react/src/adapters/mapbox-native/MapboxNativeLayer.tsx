@@ -9,15 +9,11 @@ import {
   RasterLayer,
   SymbolLayer,
 } from "@rnmapbox/maps";
-import type { ComponentType, ReactElement } from "react";
+import { type ComponentType, type ReactElement, useState } from "react";
 
 import type { LayerProps } from "../../contracts/layer-types.js";
 import { useLayerOptions } from "../../facade/layer.js";
-import {
-  omitUndefinedFields,
-  toNativeLayerStyleKey,
-  useNativeLayerKey,
-} from "../shared/index.js";
+import { omitUndefinedFields, toNativeLayerStyleKey } from "../shared/index.js";
 
 /**
  * Renders a style-spec layer through RNMapbox.
@@ -41,10 +37,20 @@ export const MapboxNativeLayer = (props: LayerProps): ReactElement => {
   const NativeLayer = nativeLayers[props.type] as ComponentType<
     ReturnType<typeof rnmapboxLayerFields> & { style: Record<string, unknown> }
   >;
-  const key = useNativeLayerKey(Object.keys(style), layer);
+  const key = useLayerPlacementKey(layer.beforeId);
   return (
     <NativeLayer key={key} {...rnmapboxLayerFields(layer)} style={style} />
   );
+};
+
+/** RNMapbox needs a fresh default insertion when an explicit anchor is removed. */
+const useLayerPlacementKey = (beforeId: string | undefined): number => {
+  const anchored = beforeId !== undefined;
+  const [previous, setPrevious] = useState({ anchored, key: 0 });
+  if (previous.anchored === anchored) return previous.key;
+  const key = anchored ? previous.key : previous.key + 1;
+  setPrevious({ anchored, key });
+  return key;
 };
 
 const nativeLayers = {

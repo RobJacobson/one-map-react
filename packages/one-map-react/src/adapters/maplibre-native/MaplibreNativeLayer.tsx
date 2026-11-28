@@ -3,11 +3,7 @@ import type { ComponentProps, ReactElement } from "react";
 
 import type { LayerProps } from "../../contracts/layer-types.js";
 import { useLayerOptions } from "../../facade/layer.js";
-import {
-  omitUndefinedFields,
-  toNativeLayerStyleKey,
-  useNativeLayerKey,
-} from "../shared/index.js";
+import { omitUndefinedFields } from "../shared/index.js";
 import { assertMaplibreLayerStyle } from "./style-roots.js";
 
 /** Style-spec and SDK-specific options for a MapLibre native Layer. */
@@ -43,15 +39,6 @@ export const MaplibreNativeLayer = (props: NativeLayerProps): ReactElement => {
   useLayerOptions({ ...props, layout }, "maplibre-native");
   assertMaplibreLayerStyle({ paint, layout, filter, style: legacyStyle });
   const source = "source" in props ? (props.source ?? sourceID) : sourceID;
-  // Match the pinned wrapper's mergeStyleProps for paint and layout keys.
-  const styleKeys = new Set(legacyStyle && Object.keys(legacyStyle));
-  for (const fields of [layout, paint]) {
-    if (!fields) continue;
-    for (const key of Object.keys(fields)) {
-      styleKeys.add(toNativeLayerStyleKey(key));
-    }
-  }
-  const key = useNativeLayerKey(styleKeys, { ...wrapperProps, filter });
   const layer = {
     ...wrapperProps,
     source,
@@ -59,13 +46,9 @@ export const MaplibreNativeLayer = (props: NativeLayerProps): ReactElement => {
     paint,
     layout,
     style: legacyStyle,
+    oneMapResetAdoptedStyle: true,
   };
-  return (
-    <MaplibreLayer
-      key={key}
-      {...(layer as ComponentProps<typeof MaplibreLayer>)}
-    />
-  );
+  return <MaplibreLayer {...(layer as ComponentProps<typeof MaplibreLayer>)} />;
 };
 
 /**

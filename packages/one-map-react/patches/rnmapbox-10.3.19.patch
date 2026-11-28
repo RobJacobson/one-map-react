@@ -1479,3 +1479,1272 @@ diff --git a/src/specs/NativeMapViewModule.ts b/src/specs/NativeRNMBXMapViewModu
 similarity index 100%
 rename from src/specs/NativeMapViewModule.ts
 rename to src/specs/NativeRNMBXMapViewModule.ts
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/RNMBXStyle.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/RNMBXStyle.kt
+index edf3c4f..8873c82 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/RNMBXStyle.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/RNMBXStyle.kt
+@@ -10,7 +10,12 @@ import com.rnmapbox.rnmbx.utils.Logger
+ import java.util.AbstractMap
+ import java.util.ArrayList
+ 
+-class RNMBXStyle(private val mContext: Context, reactStyle: ReadableMap?, map: MapboxMap) {
++class RNMBXStyle(
++    private val mContext: Context,
++    reactStyle: ReadableMap?,
++    map: MapboxMap,
++    private val isCurrent: () -> Boolean = { true }
++) {
+     private val mReactStyle: ReadableMap?
+     private val mMap: MapboxMap
+     val allStyleKeys: List<String>
+@@ -57,7 +62,14 @@ class RNMBXStyle(private val mContext: Context, reactStyle: ReadableMap?, map: M
+                 imageEntry(styleValue)
+             )
+         )
+-        val task = DownloadMapImageTask(mContext, mMap, null, callback)
++        val checkedCallback = callback?.let {
++            object : DownloadMapImageTask.OnAllImagesLoaded {
++                override fun onAllImagesLoaded() {
++                    if (isCurrent()) it.onAllImagesLoaded()
++                }
++            }
++        }
++        val task = DownloadMapImageTask(mContext, mMap, null, checkedCallback, isCurrent)
+         task.execute(images)
+     }
+ 
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXBackgroundLayer.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXBackgroundLayer.kt
+index 8de1f2b..d82667d 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXBackgroundLayer.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXBackgroundLayer.kt
+@@ -2,7 +2,6 @@ package com.rnmapbox.rnmbx.components.styles.layers
+ 
+ import android.content.Context
+ import com.mapbox.maps.extension.style.layers.generated.BackgroundLayer
+-import com.rnmapbox.rnmbx.components.styles.RNMBXStyle
+ import com.rnmapbox.rnmbx.components.styles.RNMBXStyleFactory
+ import com.rnmapbox.rnmbx.utils.Logger
+ 
+@@ -17,7 +16,7 @@ class RNMBXBackgroundLayer(context: Context?) : RNMBXLayer<BackgroundLayer?>(
+         mLayer?.also {
+             RNMBXStyleFactory.setBackgroundLayerStyle(
+                 it,
+-                RNMBXStyle(context, mReactStyle, mMap!!)
++                layerStyle()
+             )
+         } ?: run {
+             Logger.e("RNMBXBackgroundLayer", "mLayer is null")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXBackgroundLayerManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXBackgroundLayerManager.kt
+index f890bbf..64ce369 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXBackgroundLayerManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXBackgroundLayerManager.kt
+@@ -55,17 +55,17 @@ class RNMBXBackgroundLayerManager : ViewGroupManager<RNMBXBackgroundLayer>(),
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: RNMBXBackgroundLayer, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: RNMBXBackgroundLayer, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: RNMBXBackgroundLayer, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "filter")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXCircleLayerManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXCircleLayerManager.kt
+index f7db870..762767e 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXCircleLayerManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXCircleLayerManager.kt
+@@ -57,17 +57,17 @@ class RNMBXCircleLayerManager : ViewGroupManager<RNMBXCircleLayer>(),
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: RNMBXCircleLayer, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: RNMBXCircleLayer, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: RNMBXCircleLayer, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "sourceLayerID")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillExtrusionLayer.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillExtrusionLayer.kt
+index 0e166dd..70eb15a 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillExtrusionLayer.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillExtrusionLayer.kt
+@@ -4,7 +4,6 @@ import android.content.Context
+ import com.mapbox.maps.extension.style.expressions.generated.Expression
+ import com.mapbox.maps.extension.style.layers.generated.FillExtrusionLayer
+ import com.rnmapbox.rnmbx.components.mapview.RNMBXMapView
+-import com.rnmapbox.rnmbx.components.styles.RNMBXStyle
+ import com.rnmapbox.rnmbx.components.styles.RNMBXStyleFactory
+ import com.rnmapbox.rnmbx.utils.Logger
+ 
+@@ -32,7 +31,7 @@ class RNMBXFillExtrusionLayer(context: Context?) : RNMBXLayer<FillExtrusionLayer
+         mLayer?.also {
+             RNMBXStyleFactory.setFillExtrusionLayerStyle(
+                 it,
+-                RNMBXStyle(context, mReactStyle, mMap!!)
++                layerStyle()
+             )
+         } ?: run {
+             Logger.e("RNMBXFillExtrusionLayer", "Layer is null")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillExtrusionLayerManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillExtrusionLayerManager.kt
+index 6fbea9d..66af713 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillExtrusionLayerManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillExtrusionLayerManager.kt
+@@ -55,17 +55,17 @@ class RNMBXFillExtrusionLayerManager : ViewGroupManager<RNMBXFillExtrusionLayer>
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: RNMBXFillExtrusionLayer, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: RNMBXFillExtrusionLayer, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: RNMBXFillExtrusionLayer, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "sourceLayerID")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillLayer.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillLayer.kt
+index bd14a36..3a6598c 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillLayer.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillLayer.kt
+@@ -4,7 +4,6 @@ import android.content.Context
+ import com.mapbox.maps.extension.style.expressions.generated.Expression
+ import com.mapbox.maps.extension.style.layers.generated.FillLayer
+ import com.rnmapbox.rnmbx.components.mapview.RNMBXMapView
+-import com.rnmapbox.rnmbx.components.styles.RNMBXStyle
+ import com.rnmapbox.rnmbx.components.styles.RNMBXStyleFactory
+ import com.rnmapbox.rnmbx.utils.Logger
+ 
+@@ -30,7 +29,7 @@ class RNMBXFillLayer(context: Context?) : RNMBXLayer<FillLayer?>(
+ 
+     override fun addStyles() {
+         mLayer?.also {
+-            RNMBXStyleFactory.setFillLayerStyle(it, RNMBXStyle(context, mReactStyle, mMap!!))
++            RNMBXStyleFactory.setFillLayerStyle(it, layerStyle())
+         } ?: run {
+             Logger.e("RNMBXStyleFactory", "mLayer is null")
+         }
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillLayerManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillLayerManager.kt
+index 46e35e8..c54728c 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillLayerManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXFillLayerManager.kt
+@@ -56,17 +56,17 @@ class RNMBXFillLayerManager : ViewGroupManager<RNMBXFillLayer>(),
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: RNMBXFillLayer, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: RNMBXFillLayer, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: RNMBXFillLayer, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "sourceLayerID")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXHeatmapLayerManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXHeatmapLayerManager.kt
+index 5f284d7..0d383fd 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXHeatmapLayerManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXHeatmapLayerManager.kt
+@@ -56,17 +56,17 @@ class RNMBXHeatmapLayerManager : ViewGroupManager<RNMBXHeatmapLayer>(),
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: RNMBXHeatmapLayer, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: RNMBXHeatmapLayer, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: RNMBXHeatmapLayer, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "sourceLayerID")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXHillshadeLayerManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXHillshadeLayerManager.kt
+index 0a79c65..683058b 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXHillshadeLayerManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXHillshadeLayerManager.kt
+@@ -56,17 +56,17 @@ class RNMBXHillshadeLayerManager : ViewGroupManager<RNMBXHillshadeLayer>(),
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: RNMBXHillshadeLayer, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: RNMBXHillshadeLayer, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: RNMBXHillshadeLayer, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "sourceLayerID")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXLayer.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXLayer.kt
+index be1a597..60f794d 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXLayer.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXLayer.kt
+@@ -3,7 +3,10 @@ package com.rnmapbox.rnmbx.components.styles.layers
+ import android.content.Context
+ import com.mapbox.maps.extension.style.layers.Layer
+ import com.rnmapbox.rnmbx.components.mapview.RNMBXMapView
++import com.mapbox.bindgen.Value
++import com.mapbox.maps.LayerPosition
+ import com.mapbox.maps.Style
++import com.rnmapbox.rnmbx.components.styles.RNMBXStyle
+ import com.rnmapbox.rnmbx.components.styles.sources.AbstractSourceConsumer
+ import com.facebook.react.bridge.ReadableMap
+ import com.mapbox.maps.MapboxMap
+@@ -17,6 +20,7 @@ import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
+ import com.rnmapbox.rnmbx.components.RemovalReason
+ import com.rnmapbox.rnmbx.utils.ExpressionParser
+ import java.lang.ClassCastException
++import java.lang.ref.WeakReference
+ import com.rnmapbox.rnmbx.utils.Logger
+ import com.rnmapbox.rnmbx.v11compat.layer.*
+ 
+@@ -39,6 +43,9 @@ abstract class RNMBXLayer<T : Layer?>(protected var mContext: Context) : Abstrac
+     protected var mMap: MapboxMap? = null
+     protected var mLayer: T? = null
+     protected var mHadFilter = false
++    private var attachment = 0L
++    // A removed Mapbox layer handle still writes through to its former style.
++    private var pendingAnchorResets: MutableSet<String>? = null
+ 
+     protected var mExisting : Boolean? = null
+ 
+@@ -99,30 +106,136 @@ abstract class RNMBXLayer<T : Layer?>(protected var mContext: Context) : Abstrac
+         }
+     }
+ 
+-    fun setMinZoomLevel(minZoomLevel: Double) {
++    fun setMinZoomLevel(minZoomLevel: Double?) {
++        val changed = mMinZoomLevel != minZoomLevel
+         mMinZoomLevel = minZoomLevel
+-        if (mLayer != null) {
+-            mLayer!!.minZoom(minZoomLevel.toFloat().toDouble())
++        if (!changed) return
++        pendingAnchorResets?.let { fields ->
++            if (minZoomLevel == null) fields.add("minzoom")
++            return
++        }
++        if (minZoomLevel == null) {
++            resetProperties(setOf("minzoom"))
++            if (mLayer != null) addStyles()
++        } else {
++            mLayer?.minZoom(minZoomLevel.toFloat().toDouble())
+         }
+     }
+ 
+-    fun setMaxZoomLevel(maxZoomLevel: Double) {
++    fun setMaxZoomLevel(maxZoomLevel: Double?) {
++        val changed = mMaxZoomLevel != maxZoomLevel
+         mMaxZoomLevel = maxZoomLevel
+-        mLayer?.let {
+-           it.maxZoom(maxZoomLevel.toFloat().toDouble())
++        if (!changed) return
++        pendingAnchorResets?.let { fields ->
++            if (maxZoomLevel == null) fields.add("maxzoom")
++            return
++        }
++        if (maxZoomLevel == null) {
++            resetProperties(setOf("maxzoom"))
++            if (mLayer != null) addStyles()
++        } else {
++            mLayer?.maxZoom(maxZoomLevel.toFloat().toDouble())
+         }
+     }
+ 
+     fun setReactStyle(reactStyle: ReadableMap?) {
++        val previous = mReactStyle
+         mReactStyle = reactStyle
+-        if (mLayer != null) {
+-            addStyles()
++        if (mLayer == null) return
++        val removed = mutableSetOf<String>()
++        previous?.keySetIterator()?.let { keys ->
++            while (keys.hasNextKey()) {
++                val key = keys.nextKey()
++                if (key != "__MAPBOX_STYLESHEET__" && reactStyle?.hasKey(key) != true) {
++                    removed.add(key.replace(Regex("[A-Z]")) { "-" + it.value.lowercase() })
++                }
++            }
++        }
++        pendingAnchorResets?.let {
++            it.addAll(removed)
++            return
++        }
++        resetProperties(removed)
++        addStyles()
++    }
++
++    private fun resetProperties(fields: Set<String>) {
++        if (fields.isEmpty()) return
++        val style = style ?: return
++        val id = checkID() ?: return
++        val snapshot = style.getStyleLayerProperties(id)
++        val original = snapshot.value ?: run {
++            Logger.e(LOG_TAG, "Cannot read layer $id for reset: ${snapshot.error}")
++            return
++        }
++        val present = explicitProperties(original, fields)
++        if (present.isEmpty()) return
++        val didClear = present.all { style.setStyleLayerProperty(id, it, Value.nullValue()).error == null }
++        val updated = style.getStyleLayerProperties(id).value
++        if (!didClear || updated == null || explicitProperties(updated, fields).isNotEmpty()) {
++            val cleared = withoutLayerProperties(original, fields) ?: return
++            val layers = style.styleLayers
++            val index = layers.indexOfFirst { it.id == id }
++            if (index < 0) {
++                Logger.e(LOG_TAG, "Cannot find the style index for layer $id")
++                return
++            }
++            style.removeStyleLayer(id).error?.let {
++                Logger.e(LOG_TAG, "Cannot replace layer $id for reset: $it")
++                return
++            }
++            val position = if (index == layers.lastIndex) null else LayerPosition(null, null, index)
++            style.addStyleLayer(cleared, position).error?.let { error ->
++                val rollbackError = style.addStyleLayer(original, position).error
++                Logger.e(LOG_TAG, "Reset failed for layer $id: $error. Rollback error: $rollbackError")
++            }
++        }
++        // Replace the typed wrapper over the existing layer so a later placement move
++        // cannot reapply the previously cached values.
++        mLayer = getLayerAs(style, id)
++    }
++
++    private fun explicitProperties(raw: Value, fields: Set<String>): Set<String> {
++        val properties = raw.contents as? Map<*, *> ?: return emptySet()
++        val paint = (properties["paint"] as? Value)?.contents as? Map<*, *>
++        val layout = (properties["layout"] as? Value)?.contents as? Map<*, *>
++        return fields.filterTo(mutableSetOf()) { field ->
++            listOf(properties[field], paint?.get(field), layout?.get(field))
++                .any { (it as? Value)?.contents != null }
++        }
++    }
++
++    private fun withoutLayerProperties(raw: Value, fields: Set<String>): Value? {
++        val properties = raw.contents as? Map<*, *> ?: return null
++        val cleared = hashMapOf<String, Value>()
++        for ((key, value) in properties) {
++            if (key !is String || value !is Value) return null
++            if (key in fields) continue
++            cleared[key] = if (key == "layout" || key == "paint") {
++                withoutLayerProperties(value, fields) ?: return null
++            } else {
++                value
++            }
++        }
++        return Value.valueOf(cleared)
++    }
++
++    protected fun layerStyle(): RNMBXStyle {
++        val currentStyle = style
++        val currentLayer = mLayer
++        val currentProps = mReactStyle
++        return RNMBXStyle(context, currentProps, mMap!!) {
++            pendingAnchorResets == null && style === currentStyle && mLayer === currentLayer && mReactStyle === currentProps
+         }
+     }
+ 
+     fun setFilter(readableFilterArray: ReadableArray?) {
+         val filterExpression = ExpressionParser.from(readableFilterArray)
+         mFilter = filterExpression
++        if (pendingAnchorResets == null) applyFilter()
++    }
++
++    private fun applyFilter() {
+         if (mLayer != null) {
+             if (mFilter != null) {
+                 mHadFilter = true
+@@ -137,7 +250,7 @@ abstract class RNMBXLayer<T : Layer?>(protected var mContext: Context) : Abstrac
+ 
+     fun setSlot(slot: String?) {
+         mSlot = slot
+-        applySlot()
++        if (pendingAnchorResets == null) applySlot()
+     }
+ 
+     fun setExisting(existing: Boolean) {
+@@ -168,57 +281,58 @@ abstract class RNMBXLayer<T : Layer?>(protected var mContext: Context) : Abstrac
+     }
+ 
+     fun addAbove(mapView: RNMBXMapView, aboveLayerID: String) {
+-        mapView.waitForLayer(aboveLayerID, object : FoundLayerCallback {
+-            override fun found(aboveLayer: Layer?) {
+-                if (!hasInitialized()) {
+-                    return
+-                }
+-                mapView.savedStyle?.let { style ->
+-                    mLayer?.let {layer ->
+-                        style.addLayerAbove(layer, aboveLayerID)
+-                        mapView.layerAdded(layer)
+-                        mMapView = mapView
+-                    }
+-                }
+-            }
+-        })
++        addRelative(mapView, aboveLayerID, above = true)
+     }
+ 
+     fun addBelow(mapView: RNMBXMapView, belowLayerID: String) {
+-        mapView.waitForLayer(belowLayerID, object : FoundLayerCallback {
+-            override fun found(belowLayer: Layer?) {
+-                if (!hasInitialized()) {
+-                    return
+-                }
+-                mapView.savedStyle?.let { style ->
+-                    mLayer?.let { layer ->
+-                        style.addLayerBelow(layer, belowLayerID)
+-                        mapView.layerAdded(layer)
+-                        mMapView = mapView
+-                    }
++        addRelative(mapView, belowLayerID, above = false)
++    }
++
++    private fun addRelative(mapView: RNMBXMapView, anchor: String, above: Boolean) {
++        val owner = WeakReference(this)
++        val currentAttachment = attachment
++        if (mapView.savedStyle?.styleLayerExists(anchor) != true && pendingAnchorResets == null) {
++            pendingAnchorResets = mutableSetOf()
++        }
++        mapView.waitForLayer(anchor, object : FoundLayerCallback {
++            override fun found(anchorLayer: Layer?) {
++                val view = owner.get() ?: return
++                if (view.attachment != currentAttachment || view.mMapView !== mapView) return
++                val style = mapView.savedStyle ?: return
++                val layer = view.mLayer ?: return
++                if (style.styleLayerExists(layer.layerId)) return
++                if (above) {
++                    style.addLayerAbove(layer, anchor)
++                } else {
++                    style.addLayerBelow(layer, anchor)
+                 }
++                view.finishInsertion(mapView, layer)
+             }
+         })
+     }
+ 
+     fun addAtIndex(index: Int) {
+-        var index = index
+-        if (!hasInitialized()) {
+-            return
+-        }
+         val style = this.style ?: return
+-        val layerSize = style!!.styleLayers.size
+-        if (index >= layerSize) {
+-            FLog.e(
+-                LOG_TAG,
+-                "Layer index is greater than number of layers on map. Layer inserted at end of layer stack."
+-            )
+-            index = layerSize - 1
+-        }
+         val layer = mLayer ?: return
+         val mapView = mMapView ?: return
+-        style.addLayerAt(layer, index)
+-        mapView.layerAdded(layer)
++        if (index >= style.styleLayers.size) {
++            style.addLayer(layer)
++        } else {
++            style.addLayerAt(layer, index)
++        }
++        finishInsertion(mapView, layer)
++    }
++
++    private fun finishInsertion(mapView: RNMBXMapView, layer: Layer) {
++        pendingAnchorResets?.let { fields ->
++            pendingAnchorResets = null
++            resetProperties(fields)
++            applyZoomBounds()
++            applySlot()
++            applyFilter()
++            addStyles()
++        }
++        mapView.layerAdded(mLayer ?: layer)
+     }
+ 
+     protected fun insertLayer() {
+@@ -239,8 +353,10 @@ abstract class RNMBXLayer<T : Layer?>(protected var mContext: Context) : Abstrac
+                     add ()
+                 } } }
+             }
+-            applyZoomBounds()
+-            applySlot()
++            if (pendingAnchorResets == null) {
++                applyZoomBounds()
++                applySlot()
++            }
+         }
+     }
+ 
+@@ -278,6 +394,9 @@ abstract class RNMBXLayer<T : Layer?>(protected var mContext: Context) : Abstrac
+ 
+     override fun addToMap(mapView: RNMBXMapView) {
+         super.addToMap(mapView)
++        attachment++
++        mHadFilter = false
++        pendingAnchorResets = null
+         mMap = mapView.getMapboxMap()
+         val style = style ?: return
+         val id = checkID() ?: return
+@@ -297,25 +416,27 @@ abstract class RNMBXLayer<T : Layer?>(protected var mContext: Context) : Abstrac
+             insertLayer()
+         }
+ 
+-        addStyles()
+-        if (mFilter != null) {
+-            mHadFilter = true
+-            updateFilter(mFilter)
++        if (pendingAnchorResets == null) {
++            addStyles()
++            applyFilter()
+         }
+     }
+ 
+     override fun removeFromMap(mapView: RNMBXMapView, reason: RemovalReason): Boolean {
+-        style?.let {
+-            val layer = mLayer
+-            if (layer != null) {
+-                it.removeStyleLayer(layer.layerId)
+-                if (reason != RemovalReason.REORDER) {
+-                    mLayer = null // see https://github.com/rnmapbox/maps/pull/3392
++        attachment++
++        style?.let { style ->
++            mLayer?.let { layer ->
++                if (style.styleLayerExists(layer.layerId)) {
++                    style.removeStyleLayer(layer.layerId)
+                 }
+-            } else {
+-                Logger.e("RNMBXLayer","mLayer is null on removal layer from map")
+             }
+         }
++        if (reason == RemovalReason.REORDER) {
++            return true
++        }
++        pendingAnchorResets = null
++        mLayer = null // see https://github.com/rnmapbox/maps/pull/3392
++        mMap = null
+         return super.removeFromMap(mapView, reason)
+     }
+ 
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXLineLayer.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXLineLayer.kt
+index 9feab0c..2ec6a20 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXLineLayer.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXLineLayer.kt
+@@ -4,7 +4,6 @@ import android.content.Context
+ import com.mapbox.maps.extension.style.expressions.generated.Expression
+ import com.mapbox.maps.extension.style.layers.generated.LineLayer
+ import com.rnmapbox.rnmbx.components.mapview.RNMBXMapView
+-import com.rnmapbox.rnmbx.components.styles.RNMBXStyle
+ import com.rnmapbox.rnmbx.components.styles.RNMBXStyleFactory
+ import com.rnmapbox.rnmbx.utils.Logger
+ 
+@@ -30,7 +29,7 @@ class RNMBXLineLayer(context: Context?) : RNMBXLayer<LineLayer?>(
+ 
+     override fun addStyles() {
+         mLayer?.also {
+-            RNMBXStyleFactory.setLineLayerStyle(it, RNMBXStyle(context, mReactStyle, mMap!!))
++            RNMBXStyleFactory.setLineLayerStyle(it, layerStyle())
+         } ?: run {
+             Logger.e("RNMBXLineLayer", "mLayer is null")
+         }
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXLineLayerManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXLineLayerManager.kt
+index 9c12420..f3e668a 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXLineLayerManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXLineLayerManager.kt
+@@ -56,17 +56,17 @@ class RNMBXLineLayerManager : ViewGroupManager<RNMBXLineLayer>(),
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: RNMBXLineLayer, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: RNMBXLineLayer, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: RNMBXLineLayer, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "sourceLayerID")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXModelLayerManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXModelLayerManager.kt
+index cc8f2af..25d6bb2 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXModelLayerManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXModelLayerManager.kt
+@@ -58,17 +58,17 @@ class RNMBXModelLayerManager : ViewGroupManager<RNMBXModelLayer>(),
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: RNMBXModelLayer, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: RNMBXModelLayer, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: RNMBXModelLayer, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "sourceLayerID")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXRasterLayerManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXRasterLayerManager.kt
+index 32f3a4c..be048ff 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXRasterLayerManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXRasterLayerManager.kt
+@@ -56,17 +56,17 @@ class RNMBXRasterLayerManager : ViewGroupManager<RNMBXRasterLayer>(),
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: RNMBXRasterLayer, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: RNMBXRasterLayer, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: RNMBXRasterLayer, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "sourceLayerID")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXSkyLayerManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXSkyLayerManager.kt
+index d6dca50..c9a32ab 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXSkyLayerManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXSkyLayerManager.kt
+@@ -55,17 +55,17 @@ class RNMBXSkyLayerManager : ViewGroupManager<RNMBXSkyLayer>(),
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: RNMBXSkyLayer, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: RNMBXSkyLayer, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: RNMBXSkyLayer, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "filter")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXSymbolLayer.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXSymbolLayer.kt
+index 6a111d1..f2fac0e 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXSymbolLayer.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXSymbolLayer.kt
+@@ -4,7 +4,6 @@ import android.content.Context
+ import com.mapbox.maps.extension.style.expressions.generated.Expression
+ import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
+ import com.rnmapbox.rnmbx.components.mapview.RNMBXMapView
+-import com.rnmapbox.rnmbx.components.styles.RNMBXStyle
+ import com.rnmapbox.rnmbx.components.styles.RNMBXStyleFactory
+ import com.rnmapbox.rnmbx.utils.Logger
+ 
+@@ -32,7 +31,7 @@ class RNMBXSymbolLayer(context: Context?) : RNMBXLayer<SymbolLayer?>(
+         mLayer?.also {
+             RNMBXStyleFactory.setSymbolLayerStyle(
+                 it,
+-                RNMBXStyle(context, mReactStyle, mMap!!)
++                layerStyle()
+             )
+         } ?: run {
+             Logger.e("RNMBXSymbolLayer", "mLayer is null")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXSymbolLayerManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXSymbolLayerManager.kt
+index 24c189c..62fa745 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXSymbolLayerManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/RNMBXSymbolLayerManager.kt
+@@ -56,17 +56,17 @@ class RNMBXSymbolLayerManager : ViewGroupManager<RNMBXSymbolLayer>(),
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: RNMBXSymbolLayer, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: RNMBXSymbolLayer, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: RNMBXSymbolLayer, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "sourceLayerID")
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/codeparts/LayerManagerCommonProps.codepart-kt.ejs b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/codeparts/LayerManagerCommonProps.codepart-kt.ejs
+index d047f36..e681702 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/codeparts/LayerManagerCommonProps.codepart-kt.ejs
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/styles/layers/codeparts/LayerManagerCommonProps.codepart-kt.ejs
+@@ -30,17 +30,17 @@
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: <%= layerType %>, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: <%= layerType %>, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: <%= layerType %>, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "sourceLayerID")
+diff --git a/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/components/styles/layers/RNMBXRasterParticleLayerManager.kt b/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/components/styles/layers/RNMBXRasterParticleLayerManager.kt
+index 2a7b72a..9c6fb55 100644
+--- a/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/components/styles/layers/RNMBXRasterParticleLayerManager.kt
++++ b/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/components/styles/layers/RNMBXRasterParticleLayerManager.kt
+@@ -49,17 +49,17 @@ class RNMBXRasterParticleLayerManager : ViewGroupManager<RNMBXRasterParticleLaye
+ 
+     @ReactProp(name = "minZoomLevel")
+     override fun setMinZoomLevel(layer: RNMBXRasterParticleLayer, minZoomLevel: Dynamic) {
+-        layer.setMinZoomLevel(minZoomLevel.asDouble())
++        layer.setMinZoomLevel(if (minZoomLevel.isNull) null else minZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "maxZoomLevel")
+     override fun setMaxZoomLevel(layer: RNMBXRasterParticleLayer, maxZoomLevel: Dynamic) {
+-        layer.setMaxZoomLevel(maxZoomLevel.asDouble())
++        layer.setMaxZoomLevel(if (maxZoomLevel.isNull) null else maxZoomLevel.asDouble())
+     }
+ 
+     @ReactProp(name = "reactStyle")
+     override fun setReactStyle(layer: RNMBXRasterParticleLayer, style: Dynamic) {
+-        layer.setReactStyle(style.asMap())
++        layer.setReactStyle(if (style.isNull) null else style.asMap())
+     }
+ 
+     @ReactProp(name = "sourceLayerID")
+diff --git a/ios/RNMBX/RNMBXBackgroundLayer.swift b/ios/RNMBX/RNMBXBackgroundLayer.swift
+index 095b3d3..f81b76d 100644
+--- a/ios/RNMBX/RNMBXBackgroundLayer.swift
++++ b/ios/RNMBX/RNMBXBackgroundLayer.swift
+@@ -23,8 +23,7 @@ public class RNMBXBackgroundLayer: RNMBXLayer {
+ 
+   override func addStyles() {
+     if let style : Style = self.style {
+-      let styler =  RNMBXStyle(style: self.style!)
+-      styler.bridge = self.bridge
++      let styler = makeStyler(style)
+       if var styleLayer = self.styleLayer as? LayerType,
+          let reactStyle = self.reactStyle {
+         styler.backgroundLayer(
+diff --git a/ios/RNMBX/RNMBXFabricHelpers.h b/ios/RNMBX/RNMBXFabricHelpers.h
+index 974ee24..be34386 100644
+--- a/ios/RNMBX/RNMBXFabricHelpers.h
++++ b/ios/RNMBX/RNMBXFabricHelpers.h
+@@ -78,9 +78,7 @@ void RNMBXSetCommonLayerPropsWithoutSourceID(const T& newProps, RNMBXLayer *_vie
+         _view.sourceID = sourceID;
+     }
+     id filter = RNMBXConvertFollyDynamicToId(newProps.filter);
+-    if (filter != nil) {
+-        _view.filter = filter;
+-    }
++    _view.filter = filter;
+     id aboveLayerID = RNMBXConvertFollyDynamicToId(newProps.aboveLayerID);
+     if (aboveLayerID != nil) {
+         _view.aboveLayerID = aboveLayerID;
+@@ -94,17 +92,11 @@ void RNMBXSetCommonLayerPropsWithoutSourceID(const T& newProps, RNMBXLayer *_vie
+         _view.layerIndex = layerIndex;
+     }
+     id reactStyle = RNMBXConvertFollyDynamicToId(newProps.reactStyle);
+-    if (reactStyle != nil) {
+-        _view.reactStyle = reactStyle;
+-    }
++    _view.reactStyle = reactStyle;
+     id maxZoomLevel = RNMBXConvertFollyDynamicToId(newProps.maxZoomLevel);
+-    if (maxZoomLevel != nil) {
+-        _view.maxZoomLevel = maxZoomLevel;
+-    }
++    _view.maxZoomLevel = maxZoomLevel;
+     id minZoomLevel = RNMBXConvertFollyDynamicToId(newProps.minZoomLevel);
+-    if (minZoomLevel != nil) {
+-        _view.minZoomLevel = minZoomLevel;
+-    }
++    _view.minZoomLevel = minZoomLevel;
+ }
+ 
+ template <typename T>
+diff --git a/ios/RNMBX/RNMBXFillExtrusionLayer.swift b/ios/RNMBX/RNMBXFillExtrusionLayer.swift
+index d403689..f9ec33b 100644
+--- a/ios/RNMBX/RNMBXFillExtrusionLayer.swift
++++ b/ios/RNMBX/RNMBXFillExtrusionLayer.swift
+@@ -72,8 +72,7 @@ public class RNMBXFillExtrusionLayer: RNMBXVectorLayer {
+   override func addStyles() {
+     if let style : Style = self.style,
+        let reactStyle = self.reactStyle {
+-      let styler =  RNMBXStyle(style: self.style!)
+-      styler.bridge = self.bridge
++      let styler = makeStyler(style)
+       if var styleLayer = self.styleLayer as? LayerType {
+         styler.fillExtrusionLayer(
+           layer: &styleLayer,
+diff --git a/ios/RNMBX/RNMBXFillLayer.swift b/ios/RNMBX/RNMBXFillLayer.swift
+index 3300306..9ab64f4 100644
+--- a/ios/RNMBX/RNMBXFillLayer.swift
++++ b/ios/RNMBX/RNMBXFillLayer.swift
+@@ -73,8 +73,7 @@ public class RNMBXFillLayer: RNMBXVectorLayer {
+   override func addStyles() {
+     if let style : Style = self.style,
+        let reactStyle = reactStyle {
+-      let styler = RNMBXStyle(style: self.style!)
+-      styler.bridge = self.bridge
++      let styler = makeStyler(style)
+       
+       if var styleLayer = self.styleLayer as? FillLayer {
+         styler.fillLayer(
+diff --git a/ios/RNMBX/RNMBXLayer.swift b/ios/RNMBX/RNMBXLayer.swift
+index 1967a5e..fadbd82 100644
+--- a/ios/RNMBX/RNMBXLayer.swift
++++ b/ios/RNMBX/RNMBXLayer.swift
+@@ -20,12 +20,17 @@ public class RNMBXLayer : UIView, RNMBXMapComponent, RNMBXSourceConsumer {
+   }
+ 
+   var oldReactStyle: Dictionary<String, Any>? = nil
++  private var attachment = UUID()
++  private var scheduledStyleAttachment: UUID?
++
+   @objc public var reactStyle : Dictionary<String, Any>? = nil {
+-    willSet {
+-      oldReactStyle = reactStyle
+-    }
+     didSet {
+-      DispatchQueue.main.async {
++      let attachment = attachment
++      guard scheduledStyleAttachment != attachment else { return }
++      scheduledStyleAttachment = attachment
++      DispatchQueue.main.async { [weak self] in
++        guard let self = self, self.attachment == attachment else { return }
++        self.scheduledStyleAttachment = nil
+         self.addStylesAndUpdate()
+       }
+     }
+@@ -34,7 +39,10 @@ public class RNMBXLayer : UIView, RNMBXMapComponent, RNMBXSourceConsumer {
+   var style: Style? = nil
+ 
+   @objc public var filter : Array<Any>? = nil {
+-    didSet { optionsChanged() }
++    didSet {
++      let removed = oldValue?.isEmpty == false && filter?.isEmpty != false
++      optionsChanged(clearing: removed ? "filter" : nil)
++    }
+   }
+ 
+   @objc public var id: String! = nil {
+@@ -56,10 +64,14 @@ public class RNMBXLayer : UIView, RNMBXMapComponent, RNMBXSourceConsumer {
+   }
+ 
+   @objc public var minZoomLevel : NSNumber? = nil {
+-    didSet { optionsChanged() }
++    didSet {
++      optionsChanged(clearing: oldValue != nil && minZoomLevel == nil ? "minzoom" : nil)
++    }
+   }
+   @objc public var maxZoomLevel : NSNumber? = nil {
+-    didSet { optionsChanged() }
++    didSet {
++      optionsChanged(clearing: oldValue != nil && maxZoomLevel == nil ? "maxzoom" : nil)
++    }
+   }
+ 
+   @objc public var aboveLayerID : String? = nil {
+@@ -132,19 +144,100 @@ public class RNMBXLayer : UIView, RNMBXMapComponent, RNMBXSourceConsumer {
+   }
+ 
+   func addStylesAndUpdate() {
+-    guard styleLayer != nil else {
+-      return
++    guard styleLayer != nil, let style = style, let map = map else { return }
++    let removed = (oldReactStyle?.keys.filter { reactStyle?[$0] == nil } ?? [])
++      .filter { $0 != "__MAPBOX_STYLESHEET__" }
++      .map { styleSpecName($0) }
++    resetLayerProperties(removed)
++    applyReactStyle()
++    if styleLayerExists(style, id: id) {
++      updateLayer(map)
++    }
++  }
++
++  private func applyReactStyle() {
++    if reactStyle?.isEmpty == false {
++      addStyles()
+     }
++    oldReactStyle = reactStyle
++  }
++
++  private func styleSpecName(_ key: String) -> String {
++    key.replacingOccurrences(of: "([A-Z])", with: "-$1", options: .regularExpression).lowercased()
++  }
+ 
+-    addStyles()
+-    if let style = style,
+-      let map = map {
+-      if styleLayerExists(style, id: id) {
+-        self.updateLayer(map)
++  private func resetLayerProperties(_ fields: [String]) {
++    guard !fields.isEmpty, let style = style, let layer = styleLayer else { return }
++    logged("resetLayerProperties", info: { self.id }) {
++      let isInserted = styleLayerExists(style, id: id)
++      let original = try isInserted ? style.layerProperties(for: id) : layer.jsonObject()
++      var cleared = original
++      for field in fields {
++        cleared[field] = nil
++        for group in ["paint", "layout"] {
++          if var properties = cleared[group] as? [String: Any] {
++            properties[field] = nil
++            cleared[group] = properties
++          }
++        }
+       }
++      let replacement = try type(of: layer).init(jsonObject: cleared)
++      if isInserted {
++        let didClear: Bool
++        do {
++          for field in fields where containsLayerProperty(original, field: field) {
++            try style.setLayerProperty(for: id, property: field, value: NSNull())
++          }
++          let updated = try style.layerProperties(for: id)
++          didClear = !fields.contains { containsLayerProperty(updated, field: $0) }
++        } catch {
++          didClear = false
++        }
++        if !didClear {
++          try replaceLayer(style, original: original, cleared: cleared)
++        }
++      }
++      styleLayer = replacement
+     }
+   }
+ 
++  private func containsLayerProperty(_ properties: [String: Any], field: String) -> Bool {
++    [properties[field], (properties["layout"] as? [String: Any])?[field],
++      (properties["paint"] as? [String: Any])?[field]].contains { $0 != nil && !($0 is NSNull) }
++  }
++
++  private func replaceLayer(_ style: Style, original: [String: Any], cleared: [String: Any]) throws {
++    let layers = style.allLayerIdentifiers
++    guard let index = layers.firstIndex(where: { $0.id == id }) else {
++      throw LayerResetError.missingPosition
++    }
++    // Keep the exact insertion point, including neighboring SDK-owned layers.
++    let position: LayerPosition = index == layers.count - 1 ? .default : .at(index)
++    try style.removeLayer(withId: id)
++    do {
++      try style.addLayer(with: cleared, layerPosition: position)
++    } catch {
++      try style.addLayer(with: original, layerPosition: position)
++      throw error
++    }
++  }
++
++  private enum LayerResetError: Error {
++    case missingPosition
++  }
++
++  func makeStyler(_ style: Style) -> RNMBXStyle {
++    let styler = RNMBXStyle(style: style)
++    styler.bridge = bridge
++    let attachment = attachment
++    styler.isLayerImageCurrent = { [weak self] property, value in
++      guard let self = self, self.attachment == attachment,
++        let current = self.reactStyle?[property] as? NSDictionary else { return false }
++      return current.isEqual(value)
++    }
++    return styler
++  }
++
+   func makeLayer(style: Style) throws -> Layer {
+     fatalError("Subclasses need to implement the `makeLayer(style:)` method.")
+   }
+@@ -190,8 +283,8 @@ public class RNMBXLayer : UIView, RNMBXMapComponent, RNMBXSourceConsumer {
+       print("inserLayer but style is nil")
+     }
+     if let style = style, let styleLayer = styleLayer {
+-      insert(style, layerPosition: position()) {
+-        map.layerAdded(styleLayer)
++      insert(style, layerPosition: position()) { [weak map] in
++        map?.layerAdded(styleLayer)
+       }
+     }
+   }
+@@ -217,8 +310,13 @@ public class RNMBXLayer : UIView, RNMBXMapComponent, RNMBXSourceConsumer {
+   }
+ 
+   public func addToMap(_ map: RNMBXMapView, style: Style) {
++    attachment = UUID()
++    scheduledStyleAttachment = nil
++    waitingForID = nil
+     self.map = map
+     self.style = style
++    styleLayer = nil
++    oldReactStyle = nil
+     guard let id = id else {
+       Logger.log(level: .error, message: "Cannot add layer without id to the map: \(map)")
+       return
+@@ -241,7 +339,7 @@ public class RNMBXLayer : UIView, RNMBXMapComponent, RNMBXSourceConsumer {
+       return
+     }
+     setOptions(&self.styleLayer!)
+-    addStyles()
++    applyReactStyle()
+     if !existingLayer {
+       inserLayer(map)
+     } else {
+@@ -252,6 +350,13 @@ public class RNMBXLayer : UIView, RNMBXMapComponent, RNMBXSourceConsumer {
+ 
+   func removeFromMap(_ map: RNMBXMapView, style: Style) {
+     removeFromMap(style)
++    self.style = nil
++    self.map = nil
++    styleLayer = nil
++    oldReactStyle = nil
++    attachment = UUID()
++    scheduledStyleAttachment = nil
++    waitingForID = nil
+   }
+ 
+   func _toSlot(_ slot: String) -> Slot? {
+@@ -285,15 +390,19 @@ public class RNMBXLayer : UIView, RNMBXMapComponent, RNMBXSourceConsumer {
+     setBaseOptions(&layer)
+   }
+ 
+-  private func optionsChanged() {
+-    if let style = self.style, self.styleLayer != nil {
+-      self.setOptions(&self.styleLayer!)
++  private func optionsChanged(clearing field: String? = nil) {
++    guard let style = self.style, self.styleLayer != nil else { return }
++    if let field = field {
++      resetLayerProperties([field])
++    }
++    self.setOptions(&self.styleLayer!)
++    if styleLayerExists(style, id: id) {
+       self.loggedApply(style: style)
+     }
+   }
+ 
+   public func removeFromMap(_ map: RNMBXMapView, reason: RemovalReason) -> Bool {
+-    removeFromMap(map.mapboxMap.style)
++    removeFromMap(map, style: map.mapboxMap.style)
+     return true
+   }
+ 
+@@ -303,7 +412,9 @@ public class RNMBXLayer : UIView, RNMBXMapComponent, RNMBXSourceConsumer {
+     }
+ 
+     do {
+-      try style.removeLayer(withId: self.id)
++      if let id = id, styleLayerExists(style, id: id) {
++        try style.removeLayer(withId: id)
++      }
+     } catch {
+       Logger.log(level: .error, message: "RNMBXLayer.removeFromMap: removing layer failed for layer \(optional: id): \(error.localizedDescription)")
+     }
+@@ -325,7 +436,9 @@ public class RNMBXLayer : UIView, RNMBXMapComponent, RNMBXSourceConsumer {
+ 
+     if let idToWaitFor = idToWaitFor {
+       self.waitingForID = idToWaitFor
+-      map!.waitForLayerWithID(idToWaitFor) { _ in
++      let attachment = attachment
++      map?.waitForLayerWithID(idToWaitFor) { [weak self] _ in
++        guard let self = self, self.attachment == attachment else { return }
+         self.waitingForID = nil
+         self.attemptInsert(style, layerPosition: layerPosition, onInsert: onInsert)
+       }
+diff --git a/ios/RNMBX/RNMBXLineLayer.swift b/ios/RNMBX/RNMBXLineLayer.swift
+index 0ab48cc..9a05f58 100644
+--- a/ios/RNMBX/RNMBXLineLayer.swift
++++ b/ios/RNMBX/RNMBXLineLayer.swift
+@@ -71,8 +71,7 @@ public class RNMBXLineLayer: RNMBXVectorLayer {
+   
+   override func addStyles() {
+     if let style : Style = self.style {
+-      let styler =  RNMBXStyle(style: self.style!)
+-      styler.bridge = self.bridge
++      let styler = makeStyler(style)
+       
+       if var styleLayer = self.styleLayer as? LayerType,
+          let reactStyle = reactStyle {
+diff --git a/ios/RNMBX/RNMBXStyle.swift b/ios/RNMBX/RNMBXStyle.swift
+index a4d14a9..25eafb9 100644
+--- a/ios/RNMBX/RNMBXStyle.swift
++++ b/ios/RNMBX/RNMBXStyle.swift
+@@ -12,6 +12,8 @@ class RNMBXStyle {
+   }
+ 
+ 
++var isLayerImageCurrent: (String, Any) -> Bool = { _, _ in true }
++
+ func fillLayer(layer: inout FillLayer, reactStyle:Dictionary<String, Any>, oldReactStyle:Dictionary<String, Any>?, applyUpdater: @escaping  ((inout FillLayer)->Void)->Void, isValid: @escaping () -> Bool)
+ {
+   guard self._hasReactStyle(reactStyle) else {
+@@ -57,7 +59,7 @@ func fillLayer(layer: inout FillLayer, reactStyle:Dictionary<String, Any>, oldRe
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setFillPattern(&layer, styleValue:styleValue) },
+-        isLayerStillValid: isValid,
++        isLayerStillValid: { isValid() && self.isLayerImageCurrent(prop, reactStyle[prop]!) },
+         setImageOnLayerLater: { (_) in applyUpdater { (layer: inout FillLayer) in self.setFillPattern(&layer, styleValue: styleValue) } },
+         name: "Fill.\(prop)"
+       )
+@@ -67,7 +69,7 @@ func fillLayer(layer: inout FillLayer, reactStyle:Dictionary<String, Any>, oldRe
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setFillPatternCrossFade(&layer, styleValue:styleValue) },
+-        isLayerStillValid: isValid,
++        isLayerStillValid: { isValid() && self.isLayerImageCurrent(prop, reactStyle[prop]!) },
+         setImageOnLayerLater: { (_) in applyUpdater { (layer: inout FillLayer) in self.setFillPatternCrossFade(&layer, styleValue: styleValue) } },
+         name: "Fill.\(prop)"
+       )
+@@ -146,7 +148,7 @@ func lineLayer(layer: inout LineLayer, reactStyle:Dictionary<String, Any>, oldRe
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setLinePattern(&layer, styleValue:styleValue) },
+-        isLayerStillValid: isValid,
++        isLayerStillValid: { isValid() && self.isLayerImageCurrent(prop, reactStyle[prop]!) },
+         setImageOnLayerLater: { (_) in applyUpdater { (layer: inout LineLayer) in self.setLinePattern(&layer, styleValue: styleValue) } },
+         name: "Line.\(prop)"
+       )
+@@ -176,7 +178,7 @@ func lineLayer(layer: inout LineLayer, reactStyle:Dictionary<String, Any>, oldRe
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setLinePatternCrossFade(&layer, styleValue:styleValue) },
+-        isLayerStillValid: isValid,
++        isLayerStillValid: { isValid() && self.isLayerImageCurrent(prop, reactStyle[prop]!) },
+         setImageOnLayerLater: { (_) in applyUpdater { (layer: inout LineLayer) in self.setLinePatternCrossFade(&layer, styleValue: styleValue) } },
+         name: "Line.\(prop)"
+       )
+@@ -247,7 +249,7 @@ func symbolLayer(layer: inout SymbolLayer, reactStyle:Dictionary<String, Any>, o
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setIconImage(&layer, styleValue:styleValue) },
+-        isLayerStillValid: isValid,
++        isLayerStillValid: { isValid() && self.isLayerImageCurrent(prop, reactStyle[prop]!) },
+         setImageOnLayerLater: { (_) in applyUpdater { (layer: inout SymbolLayer) in self.setIconImage(&layer, styleValue: styleValue) } },
+         name: "Symbol.\(prop)"
+       )
+@@ -383,7 +385,7 @@ func symbolLayer(layer: inout SymbolLayer, reactStyle:Dictionary<String, Any>, o
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setIconImageCrossFade(&layer, styleValue:styleValue) },
+-        isLayerStillValid: isValid,
++        isLayerStillValid: { isValid() && self.isLayerImageCurrent(prop, reactStyle[prop]!) },
+         setImageOnLayerLater: { (_) in applyUpdater { (layer: inout SymbolLayer) in self.setIconImageCrossFade(&layer, styleValue: styleValue) } },
+         name: "Symbol.\(prop)"
+       )
+@@ -556,7 +558,7 @@ func fillExtrusionLayer(layer: inout FillExtrusionLayer, reactStyle:Dictionary<S
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setFillExtrusionPattern(&layer, styleValue:styleValue) },
+-        isLayerStillValid: isValid,
++        isLayerStillValid: { isValid() && self.isLayerImageCurrent(prop, reactStyle[prop]!) },
+         setImageOnLayerLater: { (_) in applyUpdater { (layer: inout FillExtrusionLayer) in self.setFillExtrusionPattern(&layer, styleValue: styleValue) } },
+         name: "FillExtrusion.\(prop)"
+       )
+@@ -586,7 +588,7 @@ func fillExtrusionLayer(layer: inout FillExtrusionLayer, reactStyle:Dictionary<S
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setFillExtrusionPatternCrossFade(&layer, styleValue:styleValue) },
+-        isLayerStillValid: isValid,
++        isLayerStillValid: { isValid() && self.isLayerImageCurrent(prop, reactStyle[prop]!) },
+         setImageOnLayerLater: { (_) in applyUpdater { (layer: inout FillExtrusionLayer) in self.setFillExtrusionPatternCrossFade(&layer, styleValue: styleValue) } },
+         name: "FillExtrusion.\(prop)"
+       )
+@@ -913,7 +915,7 @@ func backgroundLayer(layer: inout BackgroundLayer, reactStyle:Dictionary<String,
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setBackgroundPattern(&layer, styleValue:styleValue) },
+-        isLayerStillValid: isValid,
++        isLayerStillValid: { isValid() && self.isLayerImageCurrent(prop, reactStyle[prop]!) },
+         setImageOnLayerLater: { (_) in applyUpdater { (layer: inout BackgroundLayer) in self.setBackgroundPattern(&layer, styleValue: styleValue) } },
+         name: "Background.\(prop)"
+       )
+diff --git a/ios/RNMBX/RNMBXSymbolLayer.swift b/ios/RNMBX/RNMBXSymbolLayer.swift
+index a2e2a35..1e65f2f 100644
+--- a/ios/RNMBX/RNMBXSymbolLayer.swift
++++ b/ios/RNMBX/RNMBXSymbolLayer.swift
+@@ -72,8 +72,7 @@ public class RNMBXSymbolLayer: RNMBXVectorLayer {
+   
+   override func addStyles() {
+     if let style : Style = self.style {
+-      let styler =  RNMBXStyle(style: self.style!)
+-      styler.bridge = self.bridge
++      let styler = makeStyler(style)
+       
+       if var styleLayer = self.styleLayer as? LayerType,
+          let reactStyle = self.reactStyle {

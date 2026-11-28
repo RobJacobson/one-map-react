@@ -1,6 +1,6 @@
 import type { NativeComponents } from "../../facade/map-context.js";
 import { MaplibreNativeImages } from "./images.js";
-import { MaplibreNativeLayer } from "./layers.js";
+import { MaplibreNativeLayer } from "./MaplibreNativeLayer.js";
 import { MaplibreNativeSource } from "./sources.js";
 import { maplibreNativeUI } from "./ui.js";
 
@@ -14,6 +14,9 @@ export const nativeComponents = {
 } satisfies NativeComponents;
 
 export { MaplibreNativeMap } from "./MaplibreNativeMap.js";
-export { MaplibreNativeLayer, type NativeLayerProps } from "./layers.js";
+export {
+  MaplibreNativeLayer,
+  type NativeLayerProps,
+} from "./MaplibreNativeLayer.js";
 export { maplibreLightForNative } from "./style-roots.js";
 export { useMaplibreMapStyle } from "./use-maplibre-map-style.js";

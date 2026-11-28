@@ -259,7 +259,53 @@ export const testNativeRendering = <Handle extends NativeMapRef>(
     );
   });
 
-  test("selected Layer forwards source, transitions and ordering, then resets removed paint", async () => {
+  test("clearing fields on a lower layer keeps both wrapper layers mounted", async () => {
+    const scene = (
+      style: Pick<LayerProps, "minzoom" | "maxzoom"> & {
+        readonly width?: number;
+        readonly filtered?: boolean;
+        readonly hidden?: boolean;
+      }
+    ) =>
+      tree(
+        <Source id="route-data" type="geojson" data={routes}>
+          <Layer
+            id="outline"
+            type="line"
+            paint={{ "line-width": style.width }}
+            layout={{ visibility: style.hidden ? "none" : undefined }}
+            filter={
+              style.filtered ? ["==", ["get", "active"], true] : undefined
+            }
+            minzoom={style.minzoom}
+            maxzoom={style.maxzoom}
+          />
+          <Layer id="route" type="line" paint={{ "line-width": 2 }} />
+        </Source>
+      );
+    const view = await render(
+      scene({ width: 6, hidden: true, filtered: true, minzoom: 0, maxzoom: 12 })
+    );
+    const [outline, route] = view.getAllByTestId(layerTestId);
+    expect(outline.props.id).toBe("outline");
+    expect(route.props.id).toBe("route");
+    for (const settings of [
+      { hidden: true, filtered: true, minzoom: 0, maxzoom: 12 },
+      { filtered: true, minzoom: 0, maxzoom: 12 },
+      { minzoom: 0, maxzoom: 12 },
+      { maxzoom: 12 },
+      {},
+      { width: 4 },
+      {},
+    ]) {
+      await view.rerender(scene(settings));
+      const [lower, upper] = view.getAllByTestId(layerTestId);
+      expect(lower).toBe(outline);
+      expect(upper).toBe(route);
+    }
+  });
+
+  test("selected Layer honors changed placement and restores default placement on removal", async () => {
     const transition = { duration: 450 };
     const paintProp = isMapbox ? "style" : "paint";
     const widthProp = isMapbox ? "lineWidth" : "line-width";
@@ -284,13 +330,17 @@ export const testNativeRendering = <Handle extends NativeMapRef>(
         />
       </NativeMap>
     );
-    const view = await render(scene(2, "water"));
+    const view = await render(scene(2));
     const original = view.getByTestId(layerTestId);
     expect(original.props[sourceProp]).toBe("route-data");
     expect(original.props[paintProp]).toEqual({
       [widthProp]: 2,
       [transitionProp]: transition,
     });
+
+    await view.rerender(scene(2, "water"));
+    expect(view.getByTestId(layerTestId)).toBe(original);
+    expect(original.props[beforeProp]).toBe("water");
 
     await view.rerender(scene(3, "label"));
     expect(view.getByTestId(layerTestId)).toBe(original);
@@ -300,9 +350,13 @@ export const testNativeRendering = <Handle extends NativeMapRef>(
       [transitionProp]: transition,
     });
 
+    await view.rerender(scene(undefined, "buildings"));
+    expect(view.getByTestId(layerTestId)).toBe(original);
+    expect(original.props[beforeProp]).toBe("buildings");
+    expect(original.props[paintProp]).toEqual({ [transitionProp]: transition });
+
     await view.rerender(scene());
     const replacement = view.getByTestId(layerTestId);
-    expect(replacement).not.toBe(original);
     expect(replacement.props[paintProp]).toEqual({
       [transitionProp]: transition,
     });
