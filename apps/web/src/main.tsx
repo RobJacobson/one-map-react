@@ -4,7 +4,7 @@ import { createRoot } from "react-dom/client";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { App } from "./app.js";
+import { App } from "./App.js";
 import "./style.css";
 
 const root = document.getElementById("root");
