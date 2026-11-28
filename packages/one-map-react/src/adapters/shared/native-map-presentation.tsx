@@ -172,7 +172,7 @@ const NativeCameraProvider = ({
     stop: CameraStop
   ) => ReactNode;
 }) => {
-  const loaded = useContext(MapSessionContext)?.ready ?? false;
+  const loaded = Boolean(useContext(MapSessionContext)?.loadedAttachment);
   const [initialCamera] = useState<NativeCameraState>(() => ({
     viewState: nativeInitialCamera(initial),
   }));

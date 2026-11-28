@@ -20,8 +20,10 @@ import type {
   NativeMapRef,
 } from "../contracts/native-types.js";
 import {
+  type MapAttachment,
   type MapSession,
   MapSessionContext,
+  type NativeAdapterLoad,
   type NativeComponents,
 } from "./map-context.js";
 import type { MapRegistry } from "./map-registry.js";
@@ -34,7 +36,9 @@ interface MountedMapProps<
   Props extends NativeMapInputs,
 > {
   readonly props: Props;
-  readonly implementation: ComponentType<Props & RefAttributes<Handle>>;
+  readonly implementation: ComponentType<
+    Omit<Props, "onLoad"> & NativeAdapterLoad & RefAttributes<Handle>
+  >;
   readonly components: NativeComponents;
   readonly forwardedRef: ForwardedRef<Handle>;
   readonly register?: MapRegistry<Handle>["register"];
@@ -62,33 +66,31 @@ export const MountedMap = <
   useStableOptions("Map", {
     id: props.id,
   });
+  const { onLoad, ...rendererProps } = props;
   const mapRef = useRef<Handle | null>(null);
   const { move, click, syncAttachment } = useMapInteractions(props, mapRef);
-  const { handle, attach } = useMapAttachment(
-    forwardedRef,
-    mapRef,
-    syncAttachment
-  );
+  const { handle, attach, loadedAttachment, getLoadedAttachment, reportLoad } =
+    useMapAttachment(forwardedRef, mapRef, syncAttachment, onLoad);
   const id = props.id;
   useLayoutEffect(() => register?.(id, handle), [id, register, handle]);
-  const [ready, setReady] = useState(false);
-  const load = useActiveCallback(() => {
-    setReady(true);
-    props.onLoad?.();
-  });
   const handlesClick =
     props.onClick !== undefined ||
     (props.onError !== undefined && props.interactiveLayerIds !== undefined);
   const session = useMemo<MapSession>(
-    () => ({ ref: mapRef, map: handle, ready, components }),
-    [mapRef, handle, ready, components]
+    () => ({
+      map: handle,
+      loadedAttachment,
+      getLoadedAttachment,
+      components,
+    }),
+    [handle, loadedAttachment, getLoadedAttachment, components]
   );
   return (
     <MapSessionContext.Provider value={session}>
       <RendererMap
-        {...props}
+        {...rendererProps}
         ref={attach}
-        onLoad={load}
+        onMapLoad={reportLoad}
         onMove={move}
         onClick={
           handlesClick
@@ -212,8 +214,22 @@ const useMapAttachment = <
 >(
   forwardedRef: Ref<Handle>,
   mapRef: RefObject<Handle | null>,
-  syncAttachment: () => void
+  syncAttachment: () => void,
+  onLoad: (() => void) | undefined
 ) => {
+  const lastLoaded = useRef<MapAttachment | null>(null);
+  const [loadedAttachment, publishLoadedAttachment] =
+    useState<MapAttachment | null>(null);
+  const getLoadedAttachment = useCallback((): MapAttachment | null => {
+    const loaded = lastLoaded.current;
+    return loaded?.map === mapRef.current ? loaded : null;
+  }, [mapRef]);
+  const reportLoad = useActiveCallback((map: MapRef): void => {
+    if (mapRef.current !== map) return;
+    if (!lastLoaded.current) lastLoaded.current = { map };
+    publishLoadedAttachment(lastLoaded.current);
+    onLoad?.();
+  });
   const [handle] = useState(() => {
     const forwarding: Record<string, (...args: unknown[]) => unknown> = {};
     for (const key of Object.keys(
@@ -237,14 +253,30 @@ const useMapAttachment = <
     }
     return Object.freeze(forwarding) as unknown as Handle;
   });
+  const updateAttachment = useCallback(
+    (map: Handle | null): void => {
+      mapRef.current = map;
+      if (map) {
+        if (lastLoaded.current?.map !== map) lastLoaded.current = null;
+        syncAttachment();
+        publishLoadedAttachment(lastLoaded.current);
+        return;
+      }
+
+      // Ref changes can reattach the same adapter during this layout commit.
+      void Promise.resolve().then(() => {
+        if (mapRef.current) return;
+        // Keep load readiness for Suspense reveal but discard the old projection token.
+        if (lastLoaded.current)
+          lastLoaded.current = { map: lastLoaded.current.map };
+        syncAttachment();
+        publishLoadedAttachment(null);
+      });
+    },
+    [mapRef, syncAttachment]
+  );
   const attach = useCallback(
     (map: Handle | null) => {
-      const updateAttachment = (attached: Handle | null): void => {
-        mapRef.current = attached;
-        if (attached) syncAttachment();
-        // React also detaches and reattaches the same handle when its ref changes.
-        else void Promise.resolve().then(syncAttachment);
-      };
       updateAttachment(map);
       const cleanup = assignMapRef(forwardedRef, map);
       if (typeof cleanup === "function") {
@@ -254,9 +286,9 @@ const useMapAttachment = <
         };
       }
     },
-    [forwardedRef, mapRef, syncAttachment]
+    [forwardedRef, updateAttachment]
   );
-  return { handle, attach };
+  return { handle, attach, loadedAttachment, getLoadedAttachment, reportLoad };
 };
 
 /** Forwards a renderer attachment, including the cleanup returned by a React 19 ref. */

@@ -56,15 +56,15 @@ export type NativeAdvancedMapRef = NativeMapRefWithWrapper<
  *
  * @param cameraRef - Ref to the MapLibre Native `Camera` child.
  * @param mapRef - Ref to the MapLibre Native `Map`.
- * @param mapLoaded - Ref tracking `onDidFinishLoadingMap`, after which the
- * camera applies imperative stops.
+ * @param isMapLoaded - Whether the attached map has finished loading and the
+ * camera can apply imperative stops.
  * @param sources - Registry of mounted GeoJSON and vector source refs.
  * @returns The selected native map ref.
  */
 export const createMaplibreMapRef = (
   cameraRef: { readonly current: ComponentRef<typeof Camera> | null },
   mapRef: { readonly current: ComponentRef<typeof MaplibreMap> | null },
-  mapLoaded: { readonly current: boolean },
+  isMapLoaded: (map: NativeAdvancedMapRef) => boolean,
   sources: MaplibreSourceRegistry
 ): NativeAdvancedMapRef => {
   const getSource = createNativeClusterLookup(
@@ -72,7 +72,8 @@ export const createMaplibreMapRef = (
     (clusterId) => clusterId
   );
   const getMap = () => requireAttachedMap(mapRef.current);
-  return {
+  const getCamera = () => requireCamera(cameraRef.current, isMapLoaded(handle));
+  const handle: NativeAdvancedMapRef = {
     getSource: (id) => (mapRef.current ? getSource(id) : undefined),
     getWrapperMap: async () => getMap(),
 
@@ -83,22 +84,22 @@ export const createMaplibreMapRef = (
     },
     jumpTo: async (options) => {
       rejectJumpTiming(options);
-      const camera = requireCamera(cameraRef.current, mapLoaded.current);
+      const camera = getCamera();
 
       await camera.jumpTo(toMaplibreCommand(options));
     },
     easeTo: async (options) => {
-      const camera = requireCamera(cameraRef.current, mapLoaded.current);
+      const camera = getCamera();
 
       await camera.easeTo(toMaplibreCommand(options));
     },
     flyTo: async (options) => {
-      const camera = requireCamera(cameraRef.current, mapLoaded.current);
+      const camera = getCamera();
 
       await camera.flyTo(toMaplibreCommand(options));
     },
     fitBounds: async (bounds, options) => {
-      const camera = requireCamera(cameraRef.current, mapLoaded.current);
+      const camera = getCamera();
 
       await camera.fitBounds(
         toFlatBounds(nativeBoundsInput(bounds)),
@@ -106,7 +107,7 @@ export const createMaplibreMapRef = (
       );
     },
     zoomTo: async (zoom, options) => {
-      const camera = requireCamera(cameraRef.current, mapLoaded.current);
+      const camera = getCamera();
       rejectNativeEasing(options?.easing);
 
       const duration = options?.duration;
@@ -179,6 +180,7 @@ export const createMaplibreMapRef = (
     ...createMaplibreFeatureStateMethods(sources, getMap),
     resize: rejectNativeResize,
   };
+  return handle;
 };
 
 const requireCamera = (

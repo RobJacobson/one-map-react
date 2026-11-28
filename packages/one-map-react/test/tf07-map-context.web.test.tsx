@@ -1,5 +1,6 @@
 import { act, render } from "@testing-library/react";
 import {
+  createContext,
   forwardRef,
   type ReactNode,
   StrictMode,
@@ -24,7 +25,11 @@ import type {
   NativeMapInputs,
 } from "../src/contracts/native-types.js";
 import type { GeoJsonFeature } from "../src/contracts/source-types.js";
-import { type MapSession, useMapSession } from "../src/facade/map-context.js";
+import {
+  type MapSession,
+  type NativeAdapterLoad,
+  useMapSession,
+} from "../src/facade/map-context.js";
 import {
   MountedMap,
   type ForwardedMapMethodKey,
@@ -39,9 +44,14 @@ const hit: NativeClickEvent = {
 };
 const camera = { longitude: 1, latitude: 2, zoom: 3, bearing: 0, pitch: 0 };
 const style = { version: 8 as const, sources: {}, layers: [] };
+type RendererProps = NativeMapInputs & NativeAdapterLoad;
+const RendererContext = createContext<{
+  readonly map: MapRef;
+  readonly recordProps: (props: RendererProps) => void;
+} | null>(null);
 
 const createFixture = () => {
-  let mapProps: NativeMapInputs | undefined;
+  let mapProps: RendererProps | undefined;
   const query = vi.fn<MapRef["queryRenderedFeatures"]>();
   const features: (GeoJsonFeature & { source: string })[] = [
     {
@@ -56,10 +66,16 @@ const createFixture = () => {
     queryRenderedFeatures: query,
     getZoom: vi.fn<MapRef["getZoom"]>().mockResolvedValue(3),
   } as unknown as MapRef;
-  const FakeMap = forwardRef<MapRef, NativeMapInputs>((props, ref) => {
+  const recordProps = (props: RendererProps) => {
     // eslint-disable-next-line react/globals -- Test-only readback captures the mocked render for assertions and event dispatch.
     mapProps = props;
-    useImperativeHandle(ref, () => map, []);
+  };
+  const FakeMap = forwardRef<MapRef, RendererProps>((props, ref) => {
+    const replacement = useContext(RendererContext);
+    const attached = replacement?.map ?? map;
+    const record = replacement?.recordProps ?? recordProps;
+    record(props);
+    useImperativeHandle(ref, () => attached, [attached]);
     return <div>{props.children}</div>;
   });
   const components = {
@@ -82,6 +98,7 @@ const createFixture = () => {
     map,
     query,
     click,
+    recordProps,
     props: () => mapProps,
   };
 };
@@ -447,9 +464,10 @@ describe("TF07 map-local UI lifetime", () => {
     await expect(named?.getZoom()).rejects.toThrow("not attached");
   });
 
-  test("bound map replacement resets readiness and discards pending hits", async () => {
+  test("replacing the renderer inside a bound map resets readiness and discards pending hits", async () => {
     const first = createFixture();
     const second = createFixture();
+    const { Map: NativeMap, useMap } = first.binding;
     let resolve: ((features: readonly GeoJsonFeature[]) => void) | undefined;
     first.query.mockImplementation(
       () =>
@@ -459,36 +477,50 @@ describe("TF07 map-local UI lifetime", () => {
     );
     const firstClick = vi.fn();
     const secondClick = vi.fn();
-    const observed = vi.fn<(session: MapSession) => void>();
+    const onLoad = vi.fn();
+    const observed = vi.fn<(session: MapSession, map?: MapRef) => void>();
     const SessionProbe = () => {
-      observed(useMapSession());
+      observed(useMapSession(), useMap().current);
       return null;
     };
-    const tree = (replacement: boolean) => {
-      const { Map: NativeMap } = replacement ? second.binding : first.binding;
-      return (
+    const tree = (replacement: boolean) => (
+      <RendererContext.Provider value={replacement ? second : null}>
         <NativeMap
           mapStyle={style}
           initialViewState={camera}
           interactiveLayerIds={["places"]}
           onClick={replacement ? secondClick : firstClick}
+          onLoad={onLoad}
         >
           <SessionProbe />
         </NativeMap>
-      );
-    };
+      </RendererContext.Provider>
+    );
     const rendered = render(tree(false));
-    act(() => first.props()?.onLoad?.());
-    expect(observed.mock.calls.at(-1)?.[0].ready).toBe(true);
+    const initial = observed.mock.lastCall;
+    if (!initial?.[1]) throw new Error("Map reference was not attached.");
+    const [, map] = initial;
+    const loadedAttachment = () => observed.mock.lastCall?.[0].loadedAttachment;
+    const firstLoad = first.props()?.onMapLoad;
+    const finishFirstLoad = () => firstLoad?.(first.map);
+
+    expect(loadedAttachment()).toBeNull();
+    act(finishFirstLoad);
+    expect(loadedAttachment()?.map).toBe(first.map);
     await first.click();
     expect(first.query).toHaveBeenCalledTimes(1);
     rendered.rerender(tree(true));
-    expect(observed.mock.calls.at(-1)?.[0].ready).toBe(false);
+    expect(observed.mock.lastCall?.[1]).toBe(map);
+    expect(loadedAttachment()).toBeNull();
+    act(finishFirstLoad);
+    expect(onLoad).toHaveBeenCalledTimes(1);
+    expect(loadedAttachment()).toBeNull();
     await act(async () => resolve?.([]));
     expect(firstClick).not.toHaveBeenCalled();
     expect(secondClick).not.toHaveBeenCalled();
-    act(() => second.props()?.onLoad?.());
-    expect(observed.mock.calls.at(-1)?.[0].ready).toBe(true);
+    act(() => second.props()?.onMapLoad(second.map));
+    expect(onLoad).toHaveBeenCalledTimes(2);
+    expect(loadedAttachment()?.map).toBe(second.map);
     await second.click();
     expect(secondClick).toHaveBeenCalledTimes(1);
   });
@@ -530,7 +562,7 @@ test("native camera observations and controls leave unrelated contexts unchanged
   const fixture = createFixture();
   const rendererRendered = vi.fn();
   const { FakeMap, components } = fixture;
-  const ObservedMap = forwardRef<MapRef, NativeMapInputs>((props, ref) => {
+  const ObservedMap = forwardRef<MapRef, RendererProps>((props, ref) => {
     rendererRendered();
     return <FakeMap {...props} ref={ref} />;
   });

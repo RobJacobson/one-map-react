@@ -22,7 +22,11 @@ import type {
 } from "../contracts/native-types.js";
 import type { SourceProps } from "../contracts/source-types.js";
 import type { MarkerProps, MarkerRef } from "../contracts/ui-types.js";
-import { MapSessionContext, type NativeComponents } from "./map-context.js";
+import {
+  MapSessionContext,
+  type NativeAdapterLoad,
+  type NativeComponents,
+} from "./map-context.js";
 import {
   createMapRegistry,
   type MapRegistry,
@@ -87,7 +91,9 @@ export const createNativeMapBinding = <
     Record<Exclude<keyof Handle, ForwardedMapMethodKey>, never>,
   Props extends NativeMapInputs,
 >(
-  implementation: ComponentType<Props & RefAttributes<Handle>>,
+  implementation: ComponentType<
+    Omit<Props, "onLoad"> & NativeAdapterLoad & RefAttributes<Handle>
+  >,
   components: NativeComponents
 ): NativeMapBinding<Handle, Props> => {
   const RegistryContext = createContext<MapRegistry<Handle> | null>(null);

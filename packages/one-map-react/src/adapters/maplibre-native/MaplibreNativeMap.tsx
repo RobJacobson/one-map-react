@@ -12,6 +12,10 @@ import {
 } from "react";
 import { type NativeSyntheticEvent, Platform } from "react-native";
 
+import {
+  type NativeAdapterLoad,
+  useMapSession,
+} from "../../facade/map-context.js";
 import type { NativeMapProps } from "../../maplibre-native.js";
 import { useNativeMapHandle } from "../index.js";
 import { moveEventFromNative, reportSettledMove } from "../shared/index.js";
@@ -47,7 +51,7 @@ type MaplibreRegionEvent = Parameters<
 /** Maplibre-native map that renders MapLibre React Native `Map` with a `Camera` child. */
 const MaplibreNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
-  NativeMapProps & NativeCameraPresentationProps
+  NativeMapProps & NativeAdapterLoad & NativeCameraPresentationProps
 >((props, ref) => {
   const mapStyle = useMaplibreMapStyle(props.mapStyle);
   validateMaplibreMapOptions(props);
@@ -66,19 +70,24 @@ const MaplibreNativeMapImplementation = forwardRef<
     onMoveEnd,
     onClick,
     onLongPress,
-    onLoad,
+    onMapLoad,
     onStyleLoad,
     onError,
     children,
   } = props;
   const cameraRef = useRef<ComponentRef<typeof Camera>>(null);
   const mapRef = useRef<ComponentRef<typeof MaplibreMap>>(null);
-  // onDidFinishLoadingMap is the signal that MapLibre will apply an
-  // imperative stop. Before that, setStop can resolve after the native map
-  // drops it. The same callback is the common onLoad event.
-  const mapLoaded = useRef(false);
+  const { getLoadedAttachment } = useMapSession();
   const sawMove = useRef(false);
   const [sources] = useState(createMaplibreSourceRegistry);
+  const handle = useNativeMapHandle(ref, () =>
+    createMaplibreMapRef(
+      cameraRef,
+      mapRef,
+      (map) => getLoadedAttachment()?.map === map,
+      sources
+    )
+  );
   // One settled native event can report several callbacks; an earlier one may unmount the map.
   const report = useActiveCallbacks({
     onMove,
@@ -86,16 +95,12 @@ const MaplibreNativeMapImplementation = forwardRef<
     onMoveEnd,
     onClick,
     onLongPress,
-    onLoad,
+    onLoad: () => onMapLoad(handle),
     onStyleLoad,
     onStyleData: props.onStyleData,
     onError,
   });
   const gestures = toMaplibreGestures(props);
-
-  useNativeMapHandle(ref, () =>
-    createMaplibreMapRef(cameraRef, mapRef, mapLoaded, sources)
-  );
 
   const reportRegion = (
     event: NativeSyntheticEvent<ViewStateChangeEvent>,
@@ -153,10 +158,7 @@ const MaplibreNativeMapImplementation = forwardRef<
           style={{ flex: 1 }}
           mapStyle={mapStyle}
           {...gestures}
-          onDidFinishLoadingMap={() => {
-            mapLoaded.current = true;
-            report.onLoad();
-          }}
+          onDidFinishLoadingMap={report.onLoad}
           onDidFinishLoadingStyle={() => {
             report.onStyleLoad();
             report.onStyleData();
@@ -225,8 +227,24 @@ const pressEvent = (nativeEvent: {
   readonly features?: readonly object[];
 }) => nativeClick(nativeEvent.lngLat, nativeEvent.point, nativeEvent.features);
 
-/** Selected native map with adapter-owned presentation. */
-export const MaplibreNativeMap = withNativeMapPresentation<
+const MaplibrePresentedMap = withNativeMapPresentation<
   NativeAdvancedMapRef,
-  NativeMapProps
+  NativeMapProps & NativeAdapterLoad
 >(MaplibreNativeMapImplementation);
+
+/** Selected native map with a distinct attachment for each Android view type. */
+export const MaplibreNativeMap = forwardRef<
+  NativeAdvancedMapRef,
+  NativeMapProps & NativeAdapterLoad
+>((props, ref) => (
+  <MaplibrePresentedMap
+    // The SDK swaps the native map component only for Android texture views.
+    key={
+      Platform.OS === "android" && props.options?.androidView === "texture"
+        ? "texture"
+        : "surface"
+    }
+    {...props}
+    ref={ref}
+  />
+));

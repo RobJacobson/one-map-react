@@ -5,6 +5,7 @@ import type { NativeSceneComponents } from "../../example-map/src/scenarios/scen
 import type { MapRef } from "../src/contracts/camera-types.js";
 import type { NativeMapInputs } from "../src/contracts/native-types.js";
 import type { SourceProps } from "../src/contracts/source-types.js";
+import type { NativeAdapterLoad } from "../src/facade/map-context.js";
 import { createNativeMapBinding } from "../src/facade/native-map.js";
 
 const MapWithChildren = forwardRef<MapRef, NativeMapInputs>(
@@ -21,11 +22,11 @@ const Layer = () => <></>;
  */
 export const createNativeSceneFixture = (
   renderer: ComponentType<
-    NativeMapInputs & RefAttributes<MapRef>
+    Omit<NativeMapInputs, "onLoad"> & NativeAdapterLoad & RefAttributes<MapRef>
   > = MapWithChildren
 ): NativeSceneComponents =>
   createNativeSceneComponents("mapbox-native", {
-    ...createNativeMapBinding(renderer, {
+    ...createNativeMapBinding<MapRef, NativeMapInputs>(renderer, {
       backend: "mapbox-native",
       Source: SourceWithChildren,
       Layer,
