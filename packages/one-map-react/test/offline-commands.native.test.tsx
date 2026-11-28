@@ -31,26 +31,51 @@ jest.mock("one-map-react/maplibre-native", () => ({
 type MapboxPack = NonNullable<Awaited<ReturnType<typeof Mapbox.getPack>>>;
 type MaplibrePack = Awaited<ReturnType<typeof Maplibre.getPack>>;
 
-const mapboxPack = {
+const downloadedResources = {
+  percentage: 100,
+  completedResourceCount: 1,
+  completedResourceSize: 42,
+  completedTileCount: 1,
+  completedTileSize: 42,
+  requiredResourceCount: 1,
+};
+const mapboxStatus = {
+  ...downloadedResources,
   name: "native-name",
+  state: 2,
+};
+const maplibreStatus = {
+  ...downloadedResources,
+  id: "generated",
+  state: "complete",
+} satisfies Awaited<ReturnType<MaplibrePack["status"]>>;
+const mapboxPack = {
+  name: mapboxStatus.name,
   metadata: {
     oneMapReactOffline: { version: 1, id: "saved" },
     user: { retained: true },
   },
-  status: jest.fn(async () => ({ state: "complete", percentage: 100 })),
+  status: jest.fn(async () => mapboxStatus),
   pause: jest.fn(async () => {}),
   resume: jest.fn(async () => {}),
 } as unknown as MapboxPack;
 const maplibrePack = {
-  id: "generated",
+  id: maplibreStatus.id,
   metadata: {
     oneMapReactOffline: { version: 1, id: "saved" },
     user: { retained: true },
   },
-  status: jest.fn(async () => ({ state: "complete", percentage: 100 })),
+  status: jest.fn(async () => maplibreStatus),
   pause: jest.fn(async () => {}),
   resume: jest.fn(async () => {}),
 } as unknown as MaplibrePack;
+
+const mockSavedPacks = (librePack = maplibrePack) => {
+  jest.mocked(Mapbox.getPacks).mockResolvedValue([mapboxPack]);
+  jest.mocked(Mapbox.getPack).mockResolvedValue(mapboxPack);
+  jest.mocked(Maplibre.getPacks).mockResolvedValue([librePack]);
+  jest.mocked(Maplibre.getPack).mockResolvedValue(librePack);
+};
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -58,10 +83,7 @@ afterEach(() => {
 
 describe("U11 selected offline application commands", () => {
   test("read-only discovery retains native names, generated IDs and legacy user data", async () => {
-    jest.mocked(Mapbox.getPacks).mockResolvedValue([mapboxPack]);
-    jest.mocked(Mapbox.getPack).mockResolvedValue(mapboxPack);
-    jest.mocked(Maplibre.getPacks).mockResolvedValue([maplibrePack]);
-    jest.mocked(Maplibre.getPack).mockResolvedValue(maplibrePack);
+    mockSavedPacks();
     for (const commands of [
       createMapboxOfflineCommands(),
       createMaplibreOfflineCommands(),
@@ -95,12 +117,110 @@ describe("U11 selected offline application commands", () => {
     ).rejects.toBe(error);
   });
 
+  test.each([
+    ["RNMapbox", createMapboxOfflineCommands, Mapbox.createPack],
+    [
+      "MapLibre React Native",
+      createMaplibreOfflineCommands,
+      Maplibre.createPack,
+    ],
+  ])(
+    "%s can subscribe after a malformed create identity",
+    async (_backend, createCommands, createPack) => {
+      mockSavedPacks();
+      const commands = createCommands();
+      try {
+        await expect(
+          commands.command("offline-create", { id: "\uD800" })
+        ).rejects.toThrow(URIError);
+        expect(createPack).not.toHaveBeenCalled();
+        await expect(
+          commands.command("offline-subscribe", { id: "saved" })
+        ).resolves.toBeNull();
+      } finally {
+        commands.dispose();
+      }
+    }
+  );
+
+  test("both backends can observe the same native key with independent event histories", async () => {
+    const sameKeyPack: MaplibrePack = {
+      ...maplibrePack,
+      id: mapboxStatus.name,
+    };
+    const sameKeyStatus = { ...maplibreStatus, id: sameKeyPack.id };
+    mockSavedPacks(sameKeyPack);
+    jest.mocked(mapboxPack.status).mockResolvedValue(mapboxStatus);
+    jest.mocked(sameKeyPack.status).mockResolvedValue(sameKeyStatus);
+
+    const mapbox = createMapboxOfflineCommands();
+    const maplibre = createMaplibreOfflineCommands();
+    const replacement = createMapboxOfflineCommands();
+    const value = { id: "saved" };
+    try {
+      await Promise.all([
+        mapbox.command("offline-subscribe", value),
+        maplibre.command("offline-subscribe", value),
+      ]);
+      const [mapboxKey, mapboxProgress, mapboxError] = jest.mocked(
+        Mapbox.subscribe
+      ).mock.calls[0];
+      const [maplibreKey, maplibreProgress, maplibreError] = jest.mocked(
+        Maplibre.addListener
+      ).mock.calls[0];
+      expect(mapboxKey).toBe(maplibreKey);
+
+      const mapboxFailure = { name: mapboxKey, message: "RNMapbox error" };
+      const maplibreFailure = { id: maplibreKey, message: "MapLibre error" };
+      mapboxProgress(mapboxPack, mapboxStatus);
+      mapboxError?.(mapboxPack, mapboxFailure);
+      await expect(mapbox.command("offline-unsubscribe", value)).resolves.toBe(
+        null
+      );
+      expect(Mapbox.unsubscribe).toHaveBeenCalledWith(mapboxKey);
+      expect(Maplibre.removeListener).not.toHaveBeenCalled();
+      mapboxProgress(mapboxPack, { ...mapboxStatus, percentage: 0 });
+      mapboxError?.(mapboxPack, mapboxFailure);
+      maplibreProgress(sameKeyPack, sameKeyStatus);
+      maplibreError(sameKeyPack, maplibreFailure);
+
+      await expect(mapbox.command("offline-status", value)).resolves.toEqual({
+        pack: expect.objectContaining({ id: value.id, nativeId: mapboxKey }),
+        status: mapboxStatus,
+        progress: [mapboxStatus],
+        errors: 1,
+        errorMessages: [mapboxFailure],
+      });
+      await expect(maplibre.command("offline-status", value)).resolves.toEqual({
+        pack: expect.objectContaining({ id: value.id, nativeId: maplibreKey }),
+        status: sameKeyStatus,
+        progress: [sameKeyStatus],
+        errors: 1,
+        errorMessages: [maplibreFailure],
+      });
+      await expect(
+        replacement.command("offline-status", value)
+      ).resolves.toMatchObject({ progress: [], errors: 0, errorMessages: [] });
+    } finally {
+      mapbox.dispose();
+      maplibre.dispose();
+      replacement.dispose();
+    }
+  });
+
   test("RNMapbox creation uses SDK names and NE/SW bounds and preserves persisted failures", async () => {
-    jest.mocked(Mapbox.getPacks).mockResolvedValue([]);
+    jest
+      .mocked(Mapbox.getPacks)
+      .mockResolvedValueOnce([mapboxPack])
+      .mockResolvedValue([]);
     jest
       .mocked(Mapbox.createPack)
       .mockRejectedValue(new Error("persisted then failed"));
     const commands = createMapboxOfflineCommands();
+    await expect(
+      commands.command("offline-create", { id: "native-name" })
+    ).rejects.toThrow("already exists");
+    expect(Mapbox.createPack).not.toHaveBeenCalled();
     await expect(
       commands.command("offline-create", { id: "new" })
     ).rejects.toThrow("persisted then failed");
@@ -342,9 +462,13 @@ for (const backend of ["mapbox", "maplibre"] as const) {
       const pending = old
         .command("offline-subscribe", { id: "saved" })
         .catch(() => undefined);
+      await expect(old.command("offline-list")).rejects.toThrow(
+        "already pending"
+      );
       await new Promise<void>((resolve) => setTimeout(resolve, 0));
       const stale = [...slots.values()][0];
       old.dispose();
+      await expect(old.command("offline-list")).rejects.toThrow("detached");
       const claim = await replacement
         .command("offline-subscribe", { id: "saved" })
         .then(
