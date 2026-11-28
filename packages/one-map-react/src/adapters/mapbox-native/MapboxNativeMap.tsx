@@ -12,13 +12,13 @@ import type { MapErrorEvent, MoveEvent } from "../../contracts/event-types.js";
 import type { NativeMapProps } from "../../mapbox-native.js";
 import { useNativeMapHandle } from "../index.js";
 import {
-  type NativeMoveCallbacks,
   type NativeViewportBounds,
   omitUndefinedFields,
   reportSettledMove,
 } from "../shared/index.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
 import {
+  type NativeCameraPresentationProps,
   useNativeMapPresentation,
   withNativeMapPresentation,
 } from "../shared/native-map-presentation.js";
@@ -29,7 +29,6 @@ import {
   toRnmapboxControlledCamera,
   toRnmapboxCornerBounds,
   toRnmapboxDefaultSettings,
-  toRnmapboxPadding,
 } from "./convert-camera.js";
 import {
   clickEventFromRnmapbox,
@@ -55,7 +54,7 @@ type RnPressFeature = Parameters<
 /** Mapbox-native map that renders RNMapbox `MapView` with a `Camera` child. */
 const MapboxNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
-  NativeMapProps & Partial<NativeMoveCallbacks>
+  NativeMapProps & NativeCameraPresentationProps
 >((props, ref) => {
   const session = useNativeMapPresentation();
   const { viewState } = props;
@@ -77,7 +76,7 @@ const MapboxNativeMapImplementation = forwardRef<
     minZoom,
     maxZoom,
     maxBounds,
-    padding,
+    cameraStop,
     style,
     onMove,
     onMoveEnd,
@@ -131,9 +130,10 @@ const MapboxNativeMapImplementation = forwardRef<
     reportSettledMove(sawMove, event, report, viewportBoundsFromState(state));
     report.onIdle();
   };
-  const controlled = viewState
-    ? toRnmapboxControlledCamera(viewState)
-    : undefined;
+  const stop =
+    cameraStop.kind === "apply"
+      ? toRnmapboxControlledCamera(cameraStop.target)
+      : undefined;
 
   return (
     <NativeMapHost style={style} hostProps={props.hostProps}>
@@ -185,12 +185,9 @@ const MapboxNativeMapImplementation = forwardRef<
                 ? undefined
                 : toRnmapboxCornerBounds(nativeBoundsInput(maxBounds))
             }
-            padding={
-              padding === undefined ? undefined : toRnmapboxPadding(padding)
-            }
             {...locationSettings}
             followUserLocation={followUserLocation}
-            {...(controlled ?? {})}
+            {...stop}
           />
           {children}
           {props.terrain !== undefined && (
@@ -262,6 +259,7 @@ const mapLoadingErrorEvent = (payload: unknown): MapErrorEvent => {
 };
 
 /** Selected native map with adapter-owned presentation. */
-export const MapboxNativeMap = withNativeMapPresentation(
-  MapboxNativeMapImplementation
-);
+export const MapboxNativeMap = withNativeMapPresentation<
+  NativeAdvancedMapRef,
+  NativeMapProps
+>(MapboxNativeMapImplementation);

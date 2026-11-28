@@ -27,6 +27,134 @@ index e51687f..e3d2b95 100644
      }
  
      companion object {
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCamera.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCamera.kt
+index 230a1fc..40c9e2b 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCamera.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCamera.kt
+@@ -48,6 +48,8 @@ class RNMBXCamera(private val mContext: Context, private val mManager: RNMBXCame
+     private var hasSentFirstRegion = false
+     private var mDefaultStop: CameraStop? = null
+     private var mCameraStop: CameraStop? = null
++    private var cameraStopChanged = false
++    private var boundsChanged = false
+     private val mCameraUpdateQueue = CameraUpdateQueue()
+ 
+     /*
+@@ -117,17 +119,26 @@ class RNMBXCamera(private val mContext: Context, private val mManager: RNMBXCame
+             return super.removeFromMap(mapView, reason);
+         }
+     }
+-    fun setStop(stop: CameraStop) {
++    fun setStop(stop: CameraStop?) {
+         mCameraStop = stop
+-        stop.setCallback(mCameraCallback)
+-        withMapView { mapView ->
+-            stop.let { updateCamera(it, mapView) }
++        stop?.setCallback(mCameraCallback)
++        cameraStopChanged = true
++    }
++
++    fun commitCameraProps() {
++        val mapView = mMapView
++        if (mapView != null) {
++            if (boundsChanged) updateMaxBounds(mapView)
++            if (cameraStopChanged) mCameraStop?.let { updateCamera(it, mapView) }
+         }
++        boundsChanged = false
++        cameraStopChanged = false
+     }
+ 
+     fun updateCameraStop(map: ReadableMap) {
+-        val stop = CameraStop.fromReadableMap(mContext, map, null)
+-        setStop(stop)
++        val stop = CameraStop.fromReadableMap(mContext, map, mCameraCallback)
++        mCameraStop = stop
++        withMapView { mapView -> updateCamera(stop, mapView) }
+     }
+ 
+     fun setDefaultStop(stop: CameraStop?) {
+@@ -175,9 +186,7 @@ class RNMBXCamera(private val mContext: Context, private val mManager: RNMBXCame
+ 
+     fun setMaxBounds(bounds: LatLngBounds?) {
+         mMaxBounds = bounds
+-        withMapView { mapView ->
+-            updateMaxBounds(mapView)
+-        }
++        boundsChanged = true
+     }
+ 
+ 
+@@ -186,12 +195,21 @@ class RNMBXCamera(private val mContext: Context, private val mManager: RNMBXCame
+         val currentBounds = map.getBounds()
+         val builder = CameraBoundsOptions.Builder()
+         builder.bounds(mMaxBounds?.toBounds() ?: CoordinateBounds.world()) // Passing null does not reset this value.
+-        builder.minZoom(mMinZoomLevel ?: 0.0) // Passing null does not reset this value.
+-        builder.maxZoom(mMaxZoomLevel ?: 25.0) // Passing null does not reset this value.
++        val minZoom = mMinZoomLevel ?: 0.0 // Passing null does not reset this value.
++        val maxZoom = mMaxZoomLevel ?: 25.0
++        builder.minZoom(minZoom)
++        builder.maxZoom(maxZoom)
+         builder.minPitch(currentBounds.minPitch)
+         builder.maxPitch(currentBounds.maxPitch)
++        // Widen a disjoint range before applying both limits.
++        if (minZoom <= maxZoom) {
++            if (minZoom > currentBounds.maxZoom) {
++                map.setBounds(CameraBoundsOptions.Builder().maxZoom(maxZoom).build())
++            } else if (maxZoom < currentBounds.minZoom) {
++                map.setBounds(CameraBoundsOptions.Builder().minZoom(minZoom).build())
++            }
++        }
+         map.setBounds(builder.build())
+-        mCameraStop?.let { updateCamera(it, mapView) }
+     }
+ 
+     private fun setInitialCamera(mapView: RNMBXMapView) {
+@@ -249,12 +267,12 @@ class RNMBXCamera(private val mContext: Context, private val mManager: RNMBXCame
+ 
+     fun setMinZoomLevel(zoomLevel: Double?) {
+         mMinZoomLevel = zoomLevel
+-        withMapView { updateMaxBounds(it) }
++        boundsChanged = true
+     }
+ 
+     fun setMaxZoomLevel(zoomLevel: Double?) {
+         mMaxZoomLevel = zoomLevel
+-        withMapView { updateMaxBounds(it) }
++        boundsChanged = true
+     }
+ 
+     fun setZoomLevel(zoomLevel: Double) {
+diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCameraManager.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCameraManager.kt
+index f630a8a..01771cd 100644
+--- a/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCameraManager.kt
++++ b/android/src/main/java/com/rnmapbox/rnmbx/components/camera/RNMBXCameraManager.kt
+@@ -40,15 +40,18 @@ class RNMBXCameraManager(private val mContext: ReactApplicationContext, val view
+ 
+     @ReactProp(name = "stop")
+     override fun setStop(camera: RNMBXCamera, map: Dynamic) {
+-        if (!map.isNull) {
+-            val mapValue = map.asMap()
+-            if (mapValue == null || mapValue.keySetIterator().hasNextKey().not()) {
+-                Logger.e("RNMBXCameraManager", "stop map is null or empty")
+-                return
+-            }
+-            val stop = fromReadableMap(mContext, mapValue, null)
+-            camera.setStop(stop)
++        val mapValue = if (map.isNull) null else map.asMap()
++        val stop = if (mapValue != null && mapValue.keySetIterator().hasNextKey()) {
++            fromReadableMap(mContext, mapValue, null)
++        } else {
++            null
+         }
++        camera.setStop(stop)
++    }
++
++    override fun onAfterUpdateTransaction(camera: RNMBXCamera) {
++        super.onAfterUpdateTransaction(camera)
++        camera.commitCameraProps()
+     }
+ 
+     @ReactProp(name = "defaultStop")
 diff --git a/android/src/main/java/com/rnmapbox/rnmbx/components/images/RNMBXImages.kt b/android/src/main/java/com/rnmapbox/rnmbx/components/images/RNMBXImages.kt
 index 5dbbfcf..f363c3e 100644
 --- a/android/src/main/java/com/rnmapbox/rnmbx/components/images/RNMBXImages.kt
@@ -507,8 +635,73 @@ index e69ab60..248be77 100644
      }
  }
  
+diff --git a/ios/RNMBX/RNMBXCamera.swift b/ios/RNMBX/RNMBXCamera.swift
+index 2f06609..bcbfa79 100644
+--- a/ios/RNMBX/RNMBXCamera.swift
++++ b/ios/RNMBX/RNMBXCamera.swift
+@@ -265,15 +265,19 @@ open class RNMBXCamera : RNMBXMapAndMapViewComponentBase {
+       _updateCameraFromTrackingMode()
+     }
+   }
+-  
+-  @objc public var maxZoomLevel: NSNumber? {
+-    didSet { _updateMaxBounds() }
+-  }
+-  
+-  @objc public var minZoomLevel: NSNumber? {
+-    didSet { _updateMaxBounds() }
++
++  private var minZoomLevel: NSNumber?
++  private var maxZoomLevel: NSNumber?
++
++  @objc(setZoomLimitsWithMinZoom:maxZoom:)
++  public func setZoomLimits(minZoom: NSNumber?, maxZoom: NSNumber?) {
++    let resetMin = minZoomLevel != nil && minZoom == nil
++    let resetMax = maxZoomLevel != nil && maxZoom == nil
++    minZoomLevel = minZoom
++    maxZoomLevel = maxZoom
++    _updateMaxBounds(resetMin: resetMin, resetMax: resetMax)
+   }
+-  
++
+   @objc public var onUserTrackingModeChange: RCTBubblingEventBlock? = nil
+   
+   @objc public var stop: [String: Any]? {
+@@ -355,7 +359,7 @@ open class RNMBXCamera : RNMBXMapAndMapViewComponentBase {
+     return CoordinateBounds(southwest: sw.coordinates, northeast: ne.coordinates)
+   }
+   
+-  func _updateMaxBounds() {
++  func _updateMaxBounds(resetMin: Bool = false, resetMax: Bool = false) {
+     withMapView { map in
+       let current = map.mapboxMap.cameraBounds
+       var options = CameraBoundsOptions()
+@@ -372,12 +376,21 @@ open class RNMBXCamera : RNMBXMapAndMapViewComponentBase {
+           infiniteBounds: true
+         )
+       }
+-      options.minZoom = self.minZoomLevel?.CGFloat
+-      options.maxZoom = self.maxZoomLevel?.CGFloat
++      // Restore the Mapbox Maps SDK defaults only when a camera prop is removed.
++      options.minZoom = self.minZoomLevel?.CGFloat ?? (resetMin ? 0 : nil)
++      options.maxZoom = self.maxZoomLevel?.CGFloat ?? (resetMax ? 22 : nil)
+       options.minPitch = current.minPitch
+       options.maxPitch = current.maxPitch
+ 
+       logged("RNMBXCamera._updateMaxBounds") {
++        // Widen a disjoint range before applying both limits.
++        if let minZoom = options.minZoom, let maxZoom = options.maxZoom, minZoom <= maxZoom {
++          if minZoom > current.maxZoom {
++            try map.mapboxMap.setCameraBounds(with: CameraBoundsOptions(maxZoom: maxZoom))
++          } else if maxZoom < current.minZoom {
++            try map.mapboxMap.setCameraBounds(with: CameraBoundsOptions(minZoom: minZoom))
++          }
++        }
+         try map.mapboxMap.setCameraBounds(with: options)
+       }
+     }
 diff --git a/ios/RNMBX/RNMBXCameraComponentView.mm b/ios/RNMBX/RNMBXCameraComponentView.mm
-index 4794097..899379d 100644
+index 4794097..2728f51 100644
 --- a/ios/RNMBX/RNMBXCameraComponentView.mm
 +++ b/ios/RNMBX/RNMBXCameraComponentView.mm
 @@ -91,7 +91,11 @@ using namespace facebook::react;
@@ -524,6 +717,32 @@ index 4794097..899379d 100644
          _view.followUserLocation = [followUserLocationDynamic boolValue];
      }
      id followUserMode = RNMBXConvertFollyDynamicToId(newViewProps.followUserMode);
+@@ -114,20 +118,14 @@ using namespace facebook::react;
+     if (followPadding != nil) {
+         _view.followPadding = followPadding;
+     }
+-    id maxZoomLevel = RNMBXConvertFollyDynamicToId(newViewProps.maxZoomLevel);
+-    if (maxZoomLevel != nil) {
+-        _view.maxZoomLevel = maxZoomLevel;
+-    }
+-    id minZoomLevel = RNMBXConvertFollyDynamicToId(newViewProps.minZoomLevel);
+-    if (minZoomLevel != nil) {
+-        _view.minZoomLevel = minZoomLevel;
++    if (!oldProps || oldViewProps.minZoomLevel != newViewProps.minZoomLevel ||
++        oldViewProps.maxZoomLevel != newViewProps.maxZoomLevel) {
++        [_view setZoomLimitsWithMinZoom:RNMBXConvertFollyDynamicToId(newViewProps.minZoomLevel)
++                                maxZoom:RNMBXConvertFollyDynamicToId(newViewProps.maxZoomLevel)];
+     }
+ 
+     if (!oldProps || oldViewProps.stop != newViewProps.stop) {
+-      id stop = RNMBXConvertFollyDynamicToId(newViewProps.stop);
+-      if (stop != nil) {
+-        _view.stop = stop;
+-      }
++      _view.stop = RNMBXConvertFollyDynamicToId(newViewProps.stop);
+     }
+   [super updateProps:props oldProps:oldProps];
+ }
 diff --git a/ios/RNMBX/Offline/RNMBXOfflineModule.m b/ios/RNMBX/Offline/RNMBXOfflineModule.m
 index 1808393..95b1081 100644
 --- a/ios/RNMBX/Offline/RNMBXOfflineModule.m

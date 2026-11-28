@@ -34,6 +34,8 @@ type CameraFixture = {
   readonly centerProp: string;
   readonly zoomProp: string;
   readonly bearingProp: string;
+  readonly leftPaddingProp: string;
+  readonly retainsPaddingOnRelease?: boolean;
   readonly initialProp: string;
   readonly getZoom: jest.Mock<() => Promise<number>>;
   readonly project: jest.Mock<() => Promise<number[]>>;
@@ -55,6 +57,8 @@ export const testNativeCamera = <Handle extends NativeMapRef>(
     centerProp,
     zoomProp,
     bearingProp,
+    leftPaddingProp,
+    retainsPaddingOnRelease,
     initialProp,
     getZoom,
     project,
@@ -146,25 +150,172 @@ export const testNativeCamera = <Handle extends NativeMapRef>(
   );
 
   test("a partial target waits for the center of the initial fit", async () => {
-    const scene = (latitude: number) => (
+    const scene = (latitude: number, left = 0) => (
       <NativeMap
         mapStyle={emptyStyle}
         initialViewState={{ bounds: [10, 20, 30, 40] }}
         viewState={{ latitude }}
+        padding={{ left }}
       />
     );
     const mounted = await render(scene(0));
-    const center = () =>
-      mounted.getByTestId("wrapper-camera").props[centerProp];
+    const camera = () => mounted.getByTestId("wrapper-camera").props;
+    const center = () => camera()[centerProp];
     expect(center()).toBeUndefined();
 
-    await mounted.rerender(scene(6));
+    await mounted.rerender(scene(6, 10));
+    expect(center()).toBeUndefined();
+    await mounted.rerender(scene(6, 20));
     expect(center()).toBeUndefined();
     const { settle } = captureEvents();
     await act(async () => settle({ ...initialViewState, longitude: 23 }));
     expect(center()).toEqual([23, 6]);
+    expect(camera().padding[leftPaddingProp]).toBe(20);
     await act(async () => settle({ ...initialViewState, longitude: 24 }));
     expect(center()).toEqual([23, 6]);
+    await mounted.rerender(scene(6, 30));
+    expect(center()).toBeUndefined();
+    expect(camera().padding[leftPaddingProp]).toBe(30);
+    await mounted.rerender(scene(7, 30));
+    expect(center()).toEqual([24, 7]);
+    await mounted.unmount();
+  });
+
+  test("padding changes leave the observed camera in place while a later target moves it", async () => {
+    const target = {
+      longitude: 12,
+      latitude: 24,
+      zoom: 8,
+      bearing: 35,
+      pitch: 20,
+    };
+    const observed = {
+      longitude: 13,
+      latitude: 25,
+      zoom: 9,
+      bearing: 45,
+      pitch: 30,
+    };
+    const observe = jest.fn();
+    const Probe = () => {
+      observe(useContext(NativeCameraContext)?.viewState);
+      return null;
+    };
+    const scene = (
+      camera: Pick<
+        NativeMapInputs,
+        "viewState" | "padding" | "longitude" | "latitude"
+      >
+    ) => (
+      <NativeMap mapStyle={emptyStyle} {...camera}>
+        <Probe />
+      </NativeMap>
+    );
+    const mounted = await render(
+      scene({ viewState: target, padding: { left: 10 } })
+    );
+    const camera = () => mounted.getByTestId("wrapper-camera").props;
+    const expectPaddingOnly = (left: number) => {
+      expect(camera()[centerProp]).toBeUndefined();
+      expect(camera()[zoomProp]).toBeUndefined();
+      expect(camera()[bearingProp]).toBeUndefined();
+      expect(camera().pitch).toBeUndefined();
+      expect(camera().padding[leftPaddingProp]).toBe(left);
+      expect(observe).toHaveBeenLastCalledWith(observed);
+    };
+    expect(camera()[centerProp]).toEqual([12, 24]);
+    expect(camera().padding[leftPaddingProp]).toBe(10);
+
+    const { move } = captureEvents();
+    await act(async () => move(observed, true));
+    const previousDispatches = jump.mock.calls.length;
+    await mounted.rerender(
+      scene({ viewState: { ...target }, padding: { left: 40 } })
+    );
+    expectPaddingOnly(40);
+    await mounted.rerender(
+      scene({ viewState: { ...target }, padding: { left: 40 } })
+    );
+    expectPaddingOnly(40);
+    await mounted.rerender(
+      scene({
+        viewState: { ...target, padding: { left: 60 } },
+        padding: { left: 50 },
+      })
+    );
+    expectPaddingOnly(60);
+    await mounted.rerender(
+      scene({
+        viewState: { ...target, padding: { left: 60 } },
+        padding: { left: 70 },
+      })
+    );
+    expectPaddingOnly(60);
+    await mounted.rerender(scene({ viewState: target, padding: { left: 70 } }));
+    expectPaddingOnly(70);
+    await mounted.rerender(scene({ viewState: target }));
+    expectPaddingOnly(0);
+
+    await mounted.rerender(scene({ viewState: { ...target, longitude: 30 } }));
+    expect(camera()[centerProp]).toEqual([30, 24]);
+    await mounted.rerender(scene({ viewState: target }));
+    expect(camera()[centerProp]).toEqual([12, 24]);
+    await mounted.rerender(scene({}));
+    expect(camera()[centerProp]).toBeUndefined();
+    expect(camera().padding).toBeUndefined();
+    await mounted.rerender(scene({ longitude: 12, latitude: 24 }));
+    expect(camera()[centerProp]).toEqual([12, 24]);
+    await mounted.rerender(
+      scene({ longitude: 12, latitude: 24, padding: { left: 80 } })
+    );
+    expectPaddingOnly(80);
+    await mounted.rerender(scene({ viewState: target, padding: { left: 80 } }));
+    expect(camera()[centerProp]).toEqual([12, 24]);
+    await mounted.rerender(scene({ padding: { left: 80 } }));
+    expect(camera()[centerProp]).toBeUndefined();
+    expect(camera()[zoomProp]).toBeUndefined();
+    expect(camera().duration).toBeUndefined();
+    expect(camera().padding?.[leftPaddingProp]).toBe(
+      retainsPaddingOnRelease ? 80 : undefined
+    );
+    expect(observe).toHaveBeenLastCalledWith(observed);
+    expect(jump.mock.calls).toHaveLength(previousDispatches);
+    await mounted.unmount();
+  });
+
+  test("keeps the pending pose before map load and sends only changed padding once loaded", async () => {
+    const target = { longitude: 12, latitude: 24, zoom: 8 };
+    const ref = createRef<Handle>();
+    const scene = (left: number) => (
+      <NativeMap
+        ref={ref}
+        mapStyle={emptyStyle}
+        initialViewState={{ longitude: 1, latitude: 2, zoom: 5 }}
+        viewState={target}
+        padding={{ left }}
+      />
+    );
+    const mounted = await render(scene(10));
+    const camera = () => mounted.getByTestId("wrapper-camera").props;
+    expect(camera()[initialProp][centerProp]).toEqual([1, 2]);
+    expect(camera()[centerProp]).toEqual([12, 24]);
+
+    await mounted.rerender(scene(40));
+    expect(camera()[centerProp]).toEqual([12, 24]);
+    expect(camera().padding[leftPaddingProp]).toBe(40);
+
+    await act(async () =>
+      mounted.getByTestId("wrapper-map").props.onDidFinishLoadingMap()
+    );
+    const map = ref.current;
+    if (!map) throw new Error("Map ref did not attach.");
+    await map.jumpTo({ center: [30, 40] });
+    const dispatches = jump.mock.calls.length;
+    await mounted.rerender(scene(50));
+    expect(camera()[centerProp]).toBeUndefined();
+    expect(camera()[zoomProp]).toBeUndefined();
+    expect(camera().padding[leftPaddingProp]).toBe(50);
+    expect(jump.mock.calls).toHaveLength(dispatches);
     await mounted.unmount();
   });
 

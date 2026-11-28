@@ -13,7 +13,10 @@ for (const [relative, names] of [
     "adapters/mapbox-native/MapboxNativeMap.tsx",
     ["MapboxNativeMapImplementation"],
   ],
-  ["adapters/maplibre-native/map.tsx", ["MaplibreNativeMapImplementation"]],
+  [
+    "adapters/maplibre-native/MaplibreNativeMap.tsx",
+    ["MaplibreNativeMapImplementation"],
+  ],
   ["facade/map.tsx", ["MountedMap", "useMapAttachment"]],
   ["facade/user-location.tsx", ["UserLocation"]],
   ["facade/native-map.tsx", ["Source", "NativeMap"]],

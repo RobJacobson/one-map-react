@@ -10,6 +10,7 @@ import {
 } from "react";
 import {
   type LayoutChangeEvent,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -2110,6 +2111,8 @@ describe("maplibre-native entry binding", () => {
     centerProp: "center",
     zoomProp: "zoom",
     bearingProp: "bearing",
+    leftPaddingProp: "left",
+    retainsPaddingOnRelease: Platform.OS === "ios",
     initialProp: "initialViewState",
     getZoom: mockGetZoom,
     project: mockProject,

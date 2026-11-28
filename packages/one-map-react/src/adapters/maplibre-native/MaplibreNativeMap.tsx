@@ -10,20 +10,19 @@ import {
   useRef,
   useState,
 } from "react";
-import type { NativeSyntheticEvent } from "react-native";
+import { type NativeSyntheticEvent, Platform } from "react-native";
 
 import type { NativeMapProps } from "../../maplibre-native.js";
 import { useNativeMapHandle } from "../index.js";
-import {
-  type NativeMoveCallbacks,
-  moveEventFromNative,
-  reportSettledMove,
-} from "../shared/index.js";
+import { moveEventFromNative, reportSettledMove } from "../shared/index.js";
 import { NativeMapHost } from "../shared/native-map-host.js";
-import { withNativeMapPresentation } from "../shared/native-map-presentation.js";
+import {
+  type NativeCameraPresentationProps,
+  withNativeMapPresentation,
+} from "../shared/native-map-presentation.js";
 import { nativeBoundsInput, nativeClick } from "../shared/native-values.js";
 import { useActiveCallbacks } from "../shared/use-active-callback.js";
-import { normalizePadding, toFlatBounds } from "../shared/wrapper-values.js";
+import { toFlatBounds } from "../shared/wrapper-values.js";
 import {
   toMaplibreInitialViewState,
   toMaplibreViewState,
@@ -48,7 +47,7 @@ type MaplibreRegionEvent = Parameters<
 /** Maplibre-native map that renders MapLibre React Native `Map` with a `Camera` child. */
 const MaplibreNativeMapImplementation = forwardRef<
   NativeAdvancedMapRef,
-  NativeMapProps & Partial<NativeMoveCallbacks>
+  NativeMapProps & NativeCameraPresentationProps
 >((props, ref) => {
   const mapStyle = useMaplibreMapStyle(props.mapStyle);
   validateMaplibreMapOptions(props);
@@ -60,7 +59,7 @@ const MaplibreNativeMapImplementation = forwardRef<
     minZoom,
     maxZoom,
     maxBounds,
-    padding,
+    cameraStop,
     style,
     onMove,
     onMoveStart,
@@ -126,7 +125,15 @@ const MaplibreNativeMapImplementation = forwardRef<
 
     reportSettledMove(sawMove, move, report, nativeEvent.bounds);
   };
-  const controlled = viewState ? toMaplibreViewState(viewState) : undefined;
+  const stop =
+    cameraStop.kind === "apply"
+      ? toMaplibreViewState(cameraStop.target)
+      : {
+          // iOS compares flattened padding values when clearing the old pose.
+          padding: Platform.OS === "ios" ? cameraStop.padding : undefined,
+        };
+  // iOS needs an explicit duration to recognize an all-zero padding request.
+  const duration = cameraStop.kind === "apply" && stop.padding ? 0 : undefined;
   const flatMaxBounds =
     maxBounds === undefined
       ? undefined
@@ -191,11 +198,9 @@ const MaplibreNativeMapImplementation = forwardRef<
             minZoom={minZoom}
             maxZoom={maxZoom}
             maxBounds={flatMaxBounds}
-            padding={
-              padding === undefined ? undefined : normalizePadding(padding)
-            }
             {...props.locationOptions}
-            {...(controlled ?? {})}
+            {...stop}
+            duration={duration}
           />
           {children}
         </MaplibreMap>
@@ -221,6 +226,7 @@ const pressEvent = (nativeEvent: {
 }) => nativeClick(nativeEvent.lngLat, nativeEvent.point, nativeEvent.features);
 
 /** Selected native map with adapter-owned presentation. */
-export const MaplibreNativeMap = withNativeMapPresentation(
-  MaplibreNativeMapImplementation
-);
+export const MaplibreNativeMap = withNativeMapPresentation<
+  NativeAdvancedMapRef,
+  NativeMapProps
+>(MaplibreNativeMapImplementation);
